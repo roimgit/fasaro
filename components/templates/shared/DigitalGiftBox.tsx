@@ -1,0 +1,153 @@
+"use client";
+
+import React, { useState } from "react";
+import { Check, Copy, Gift, QrCode, X } from "lucide-react";
+import { BankAccountItem } from "@/types/wedding";
+
+interface DigitalGiftBoxProps {
+  bankAccounts: BankAccountItem[];
+  themeStyle?: {
+    cardClass?: string;
+    badgeClass?: string;
+    buttonClass?: string;
+  };
+}
+
+export const DigitalGiftBox: React.FC<DigitalGiftBoxProps> = ({
+  bankAccounts,
+  themeStyle,
+}) => {
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [selectedQris, setSelectedQris] = useState<{ url: string; bank: string } | null>(
+    null
+  );
+
+  if (!bankAccounts || bankAccounts.length === 0) {
+    return null;
+  }
+
+  const handleCopy = async (accountNumber: string, index: number) => {
+    try {
+      await navigator.clipboard.writeText(accountNumber);
+      setCopiedIndex(index);
+      setTimeout(() => setCopiedIndex(null), 2500);
+    } catch {
+      // Fallback
+    }
+  };
+
+  return (
+    <div className="w-full my-8">
+      <div className="text-center mb-6">
+        <div className="inline-flex p-3 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 mb-2">
+          <Gift className="w-6 h-6" />
+        </div>
+        <h3 className="text-xl font-serif font-medium text-stone-800 dark:text-stone-100">
+          Kado Digital &amp; Tanda Kasih
+        </h3>
+        <p className="text-xs text-stone-500 dark:text-stone-400 mt-1 max-w-sm mx-auto">
+          Doa restu Anda merupakan karunia terindah bagi kami. Bagi yang berkenan memberikan
+          tanda kasih, dapat melalui rekening/QRIS berikut:
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 max-w-md mx-auto">
+        {bankAccounts.map((account, index) => (
+          <div
+            key={account.id ?? `${account.bankName}-${index}`}
+            className={`p-5 rounded-2xl border shadow-sm transition-all hover:shadow-md ${
+              themeStyle?.cardClass ??
+              "bg-white/90 dark:bg-stone-800/90 border-stone-200 dark:border-stone-700"
+            }`}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <span
+                className={`text-xs font-semibold uppercase tracking-wider px-2.5 py-1 rounded-md ${
+                  themeStyle?.badgeClass ??
+                  "bg-stone-100 dark:bg-stone-700 text-stone-800 dark:text-stone-200"
+                }`}
+              >
+                {account.bankName}
+              </span>
+              {account.qrisImageUrl && (
+                <button
+                  onClick={() =>
+                    setSelectedQris({
+                      url: account.qrisImageUrl as string,
+                      bank: account.bankName,
+                    })
+                  }
+                  className="inline-flex items-center gap-1 text-xs text-amber-600 hover:text-amber-700 dark:text-amber-400 font-medium"
+                >
+                  <QrCode className="w-3.5 h-3.5" />
+                  <span>Lihat QRIS</span>
+                </button>
+              )}
+            </div>
+
+            <div className="my-2">
+              <p className="text-lg font-mono font-bold tracking-wider text-stone-900 dark:text-stone-100">
+                {account.accountNumber}
+              </p>
+              <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                a.n. {account.accountHolder}
+              </p>
+            </div>
+
+            <button
+              onClick={() => handleCopy(account.accountNumber, index)}
+              className={`w-full mt-3 inline-flex items-center justify-center gap-2 py-2 px-4 rounded-xl text-xs font-medium transition-all ${
+                copiedIndex === index
+                  ? "bg-emerald-600 text-white"
+                  : themeStyle?.buttonClass ??
+                    "bg-stone-100 hover:bg-stone-200 dark:bg-stone-700 dark:hover:bg-stone-600 text-stone-800 dark:text-stone-100"
+              }`}
+            >
+              {copiedIndex === index ? (
+                <>
+                  <Check className="w-3.5 h-3.5" />
+                  <span>Nomor Berhasil Disalin!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-3.5 h-3.5" />
+                  <span>Salin Nomor Rekening</span>
+                </>
+              )}
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* QRIS Modal */}
+      {selectedQris && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+          <div className="relative w-full max-w-xs bg-white rounded-3xl p-6 text-center shadow-2xl">
+            <button
+              onClick={() => setSelectedQris(null)}
+              className="absolute top-4 right-4 p-1.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600"
+              aria-label="Tutup"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <h4 className="font-semibold text-stone-900 mb-1">Scan QRIS</h4>
+            <p className="text-xs text-stone-500 mb-4">{selectedQris.bank}</p>
+            <div className="w-48 h-48 mx-auto p-2 border rounded-2xl bg-white flex items-center justify-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={selectedQris.url}
+                alt={`QRIS ${selectedQris.bank}`}
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <p className="text-[11px] text-stone-400 mt-4">
+              Buka aplikasi e-wallet / mobile banking Anda dan scan kode QR di atas.
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default DigitalGiftBox;

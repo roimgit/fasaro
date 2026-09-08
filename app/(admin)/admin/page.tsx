@@ -1,0 +1,969 @@
+"use client";
+
+import React, { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import {
+  AlertCircle,
+  Check,
+  CheckCircle2,
+  Clock,
+  Edit2,
+  ExternalLink,
+  LogIn,
+  Palette,
+  Plus,
+  RefreshCw,
+  Search,
+  Settings,
+  Sparkles,
+  Trash2,
+  Users,
+  Wallet,
+  X,
+} from "lucide-react";
+
+interface MetricsData {
+  totalUsers: number;
+  totalActiveInvitations: number;
+  pendingPaymentsCount: number;
+  monthlyRevenue: number;
+  recentUsers: Array<{
+    id: string;
+    name: string;
+    email: string;
+    createdAt: string;
+  }>;
+}
+
+interface ClientData {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  createdAt: string;
+  invitation: {
+    id: string;
+    title: string;
+    slug: string;
+    themeId: string;
+    activeUntil: string | null;
+    isActive: boolean;
+    tier: string;
+    status: string;
+  } | null;
+}
+
+interface ThemeItem {
+  id: string;
+  themeKey: string;
+  name: string;
+  category: string;
+  thumbnail: string;
+  previewUrl: string | null;
+  isActive: boolean;
+  isPremium: boolean;
+}
+
+interface SettingItem {
+  id: string;
+  key: string;
+  value: string;
+  description: string | null;
+}
+
+export default function MasterAdminPage() {
+  const [activeTab, setActiveTab] = useState<"clients" | "themes" | "settings">("clients");
+  const [metrics, setMetrics] = useState<MetricsData | null>(null);
+  const [clients, setClients] = useState<ClientData[]>([]);
+  const [themes, setThemes] = useState<ThemeItem[]>([]);
+  const [settings, setSettings] = useState<SettingItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Search & Filter
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
+
+  // Client Edit Modal
+  const [editingClient, setEditingClient] = useState<ClientData | null>(null);
+  const [editTier, setEditTier] = useState("STARTER");
+  const [editAddDays, setEditAddDays] = useState(0);
+  const [editIsActive, setEditIsActive] = useState(true);
+
+  // Theme Add/Edit Modal
+  const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
+  const [editingThemeId, setEditingThemeId] = useState<string | null>(null);
+  const [themeForm, setThemeForm] = useState({
+    themeKey: "",
+    name: "",
+    category: "Modern Chic",
+    thumbnail: "",
+    isPremium: false,
+    isActive: true,
+  });
+
+  // Notification / Feedback
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+
+  const fetchAllData = useCallback(async (isRefresh = false) => {
+    if (isRefresh) {
+      setIsLoading(true);
+      setFeedback(null);
+    }
+    try {
+      const [resMetrics, resClients, resThemes, resSettings] = await Promise.all([
+        fetch("/api/admin/metrics"),
+        fetch("/api/admin/clients"),
+        fetch("/api/admin/themes"),
+        fetch("/api/admin/settings"),
+      ]);
+
+      if (resMetrics.ok) {
+        const json = await resMetrics.json();
+        setMetrics(json.data);
+      }
+      if (resClients.ok) {
+        const json = await resClients.json();
+        setClients(json.data || []);
+      }
+      if (resThemes.ok) {
+        const json = await resThemes.json();
+        setThemes(json.data || []);
+      }
+      if (resSettings.ok) {
+        const json = await resSettings.json();
+        setSettings(json.data || []);
+      }
+    } catch {
+      setFeedback({ type: "error", msg: "Gagal memuat data dashboard admin." });
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchAllData(false);
+  }, [fetchAllData]);
+
+  // Impersonate Login
+  const handleImpersonate = async (targetUserId: string) => {
+    if (!confirm("Masuk ke dashboard sebagai klien ini?")) return;
+    try {
+      const res = await fetch("/api/admin/impersonate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ targetUserId }),
+      });
+      const json = await res.json();
+      if (res.ok && json.redirectUrl) {
+        window.location.assign(json.redirectUrl);
+      } else {
+        throw new Error(json.error || "Gagal impersonasi");
+      }
+    } catch (err) {
+      setFeedback({
+        type: "error",
+        msg: err instanceof Error ? err.message : "Gagal impersonasi login",
+      });
+    }
+  };
+
+  // Save Client Edit
+  const handleSaveClientEdit = async () => {
+    if (!editingClient?.invitation?.id) return;
+    try {
+      const res = await fetch("/api/admin/clients", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          invitationId: editingClient.invitation.id,
+          tier: editTier,
+          addDays: editAddDays,
+          isActive: editIsActive,
+        }),
+      });
+
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Gagal memperbarui klien");
+
+      setFeedback({ type: "success", msg: "Data klien berhasil diperbarui!" });
+      setEditingClient(null);
+      fetchAllData();
+    } catch (err) {
+      setFeedback({
+        type: "error",
+        msg: err instanceof Error ? err.message : "Gagal memperbarui klien",
+      });
+    }
+  };
+
+  // Save Theme
+  const handleSaveTheme = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const url = "/api/admin/themes";
+      const method = editingThemeId ? "PUT" : "POST";
+      const body = editingThemeId ? { id: editingThemeId, ...themeForm } : themeForm;
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Gagal menyimpan tema");
+
+      setFeedback({
+        type: "success",
+        msg: editingThemeId ? "Tema berhasil diperbarui!" : "Tema baru berhasil ditambahkan!",
+      });
+      setIsThemeModalOpen(false);
+      setEditingThemeId(null);
+      setThemeForm({
+        themeKey: "",
+        name: "",
+        category: "Modern Chic",
+        thumbnail: "",
+        isPremium: false,
+        isActive: true,
+      });
+      fetchAllData();
+    } catch (err) {
+      setFeedback({
+        type: "error",
+        msg: err instanceof Error ? err.message : "Gagal menyimpan tema",
+      });
+    }
+  };
+
+  // Delete Theme
+  const handleDeleteTheme = async (id: string, name: string) => {
+    if (!confirm(`Hapus tema "${name}" dari katalog?`)) return;
+    try {
+      const res = await fetch(`/api/admin/themes?id=${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Gagal menghapus tema");
+      setFeedback({ type: "success", msg: `Tema "${name}" berhasil dihapus.` });
+      fetchAllData();
+    } catch {
+      setFeedback({ type: "error", msg: "Gagal menghapus tema." });
+    }
+  };
+
+  // Save Settings
+  const handleSaveSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ settings }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Gagal menyimpan pengaturan");
+      setFeedback({ type: "success", msg: "Pengaturan sistem berhasil disimpan!" });
+    } catch (err) {
+      setFeedback({
+        type: "error",
+        msg: err instanceof Error ? err.message : "Gagal menyimpan pengaturan",
+      });
+    }
+  };
+
+  // Filter clients
+  const filteredClients = clients.filter((c) => {
+    const matchesSearch =
+      c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.invitation?.slug.toLowerCase().includes(searchQuery.toLowerCase());
+
+    if (!matchesSearch) return false;
+    if (statusFilter === "ALL") return true;
+    return c.invitation?.status === statusFilter;
+  });
+
+  return (
+    <div className="space-y-8">
+      {/* Top Header Title & Refresh */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-serif font-bold text-white">
+            Pusat Kendali Super Admin
+          </h1>
+          <p className="text-xs sm:text-sm text-stone-400 mt-1">
+            Pantau pertumbuhan pengguna, manajemen status langganan klien, dan konfigurasi platform.
+          </p>
+        </div>
+
+        <button
+          onClick={() => void fetchAllData(true)}
+          disabled={isLoading}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-stone-800 bg-stone-900 hover:bg-stone-800 text-stone-200 text-xs font-semibold transition-all disabled:opacity-50"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin text-amber-400" : ""}`} />
+          <span>Refresh Data</span>
+        </button>
+      </div>
+
+      {/* Feedback Banner */}
+      {feedback && (
+        <div
+          className={`p-4 rounded-2xl text-xs font-medium border flex items-center justify-between gap-3 animate-in fade-in ${
+            feedback.type === "success"
+              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+              : "bg-rose-500/10 border-rose-500/30 text-rose-400"
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            {feedback.type === "success" ? (
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
+            ) : (
+              <AlertCircle className="w-4 h-4 shrink-0" />
+            )}
+            <span>{feedback.msg}</span>
+          </div>
+          <button onClick={() => setFeedback(null)} className="p-1 hover:opacity-75">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      {/* 1. Executive Metrics Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Card 1: Users */}
+        <div className="p-5 rounded-3xl bg-stone-900/60 border border-stone-800 shadow-sm space-y-2">
+          <div className="flex items-center justify-between text-stone-400 text-xs">
+            <span>Total Pengguna</span>
+            <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400">
+              <Users className="w-4 h-4" />
+            </div>
+          </div>
+          <p className="text-2xl sm:text-3xl font-bold font-serif text-white">
+            {metrics?.totalUsers ?? 0}
+          </p>
+          <p className="text-[11px] text-stone-500">Akun terdaftar dalam database</p>
+        </div>
+
+        {/* Card 2: Active Invitations */}
+        <div className="p-5 rounded-3xl bg-stone-900/60 border border-stone-800 shadow-sm space-y-2">
+          <div className="flex items-center justify-between text-stone-400 text-xs">
+            <span>Undangan Aktif</span>
+            <div className="p-2 rounded-xl bg-rose-500/10 text-rose-400">
+              <Sparkles className="w-4 h-4" />
+            </div>
+          </div>
+          <p className="text-2xl sm:text-3xl font-bold font-serif text-white">
+            {metrics?.totalActiveInvitations ?? 0}
+          </p>
+          <p className="text-[11px] text-emerald-400">Status tayang &amp; siap diakses tamu</p>
+        </div>
+
+        {/* Card 3: Monthly Revenue */}
+        <div className="p-5 rounded-3xl bg-stone-900/60 border border-stone-800 shadow-sm space-y-2">
+          <div className="flex items-center justify-between text-stone-400 text-xs">
+            <span>Pendapatan Bulan Ini</span>
+            <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
+              <Wallet className="w-4 h-4" />
+            </div>
+          </div>
+          <p className="text-2xl sm:text-3xl font-bold font-serif text-white">
+            Rp {(metrics?.monthlyRevenue ?? 0).toLocaleString("id-ID")}
+          </p>
+          <p className="text-[11px] text-stone-500">Total settlement Midtrans &amp; QRIS</p>
+        </div>
+
+        {/* Card 4: Verification Queue */}
+        <div className="p-5 rounded-3xl bg-stone-900/60 border border-stone-800 shadow-sm space-y-2 relative overflow-hidden">
+          <div className="flex items-center justify-between text-stone-400 text-xs">
+            <span>Antrean Verifikasi</span>
+            <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
+              <Clock className="w-4 h-4" />
+            </div>
+          </div>
+          <p className="text-2xl sm:text-3xl font-bold font-serif text-white">
+            {metrics?.pendingPaymentsCount ?? 0}
+          </p>
+          <Link
+            href="/admin/verifikasi-manual"
+            className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-400 hover:text-amber-300"
+          >
+            <span>Buka Halaman Verifikasi</span>
+            <ExternalLink className="w-3 h-3" />
+          </Link>
+        </div>
+      </div>
+
+      {/* 2. Navigation Tabs */}
+      <div className="flex items-center border-b border-stone-800 gap-2">
+        <button
+          onClick={() => setActiveTab("clients")}
+          className={`pb-3 px-4 text-xs font-semibold border-b-2 transition-all flex items-center gap-2 ${
+            activeTab === "clients"
+              ? "border-amber-500 text-amber-400"
+              : "border-transparent text-stone-400 hover:text-stone-200"
+          }`}
+        >
+          <Users className="w-4 h-4" />
+          <span>Manajemen Klien ({clients.length})</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab("themes")}
+          className={`pb-3 px-4 text-xs font-semibold border-b-2 transition-all flex items-center gap-2 ${
+            activeTab === "themes"
+              ? "border-amber-500 text-amber-400"
+              : "border-transparent text-stone-400 hover:text-stone-200"
+          }`}
+        >
+          <Palette className="w-4 h-4" />
+          <span>Katalog Tema ({themes.length})</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab("settings")}
+          className={`pb-3 px-4 text-xs font-semibold border-b-2 transition-all flex items-center gap-2 ${
+            activeTab === "settings"
+              ? "border-amber-500 text-amber-400"
+              : "border-transparent text-stone-400 hover:text-stone-200"
+          }`}
+        >
+          <Settings className="w-4 h-4" />
+          <span>Pengaturan Sistem</span>
+        </button>
+      </div>
+
+      {/* TAB 1: MANAJEMEN KLIEN */}
+      {activeTab === "clients" && (
+        <div className="space-y-4">
+          {/* Controls: Search & Filter */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="relative w-full sm:w-80">
+              <Search className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Cari nama, email, atau slug..."
+                className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-stone-900 border border-stone-800 text-xs text-stone-100 placeholder-stone-500 focus:outline-none focus:border-amber-500/50"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <span className="text-xs text-stone-400 whitespace-nowrap">Filter Status:</span>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="py-2 px-3 rounded-xl bg-stone-900 border border-stone-800 text-xs text-stone-200 focus:outline-none"
+              >
+                <option value="ALL">Semua Status</option>
+                <option value="ACTIVE">Aktif</option>
+                <option value="EXPIRED">Expired</option>
+                <option value="INACTIVE">Nonaktif</option>
+                <option value="NO_INVITATION">Belum Buat Undangan</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Clients Table */}
+          <div className="rounded-3xl border border-stone-800 bg-stone-900/60 overflow-hidden shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="border-b border-stone-800 bg-stone-950/50 text-stone-400 uppercase tracking-wider font-semibold">
+                  <tr>
+                    <th className="py-3.5 px-4">Pengantin</th>
+                    <th className="py-3.5 px-4">Subdomain / Slug</th>
+                    <th className="py-3.5 px-4">Paket</th>
+                    <th className="py-3.5 px-4">Masa Aktif</th>
+                    <th className="py-3.5 px-4">Status</th>
+                    <th className="py-3.5 px-4 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-stone-800/80">
+                  {filteredClients.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-8 text-center text-stone-500">
+                        Tidak ada klien yang cocok dengan pencarian.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredClients.map((client) => {
+                      const inv = client.invitation;
+                      return (
+                        <tr key={client.id} className="hover:bg-stone-800/30 transition-colors">
+                          <td className="py-3.5 px-4">
+                            <div className="font-semibold text-white">{client.name}</div>
+                            <div className="text-[11px] text-stone-400">{client.email}</div>
+                          </td>
+
+                          <td className="py-3.5 px-4 font-mono text-[11px]">
+                            {inv ? (
+                              <a
+                                href={`/invitation/${inv.slug}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-amber-400 hover:underline inline-flex items-center gap-1"
+                              >
+                                <span>/{inv.slug}</span>
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                            ) : (
+                              <span className="text-stone-600">-</span>
+                            )}
+                          </td>
+
+                          <td className="py-3.5 px-4">
+                            {inv ? (
+                              <span
+                                className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                                  inv.tier === "ULTIMATE"
+                                    ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
+                                    : inv.tier === "ELEGANT"
+                                    ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                                    : "bg-stone-700/40 text-stone-300 border border-stone-700"
+                                }`}
+                              >
+                                {inv.tier}
+                              </span>
+                            ) : (
+                              <span className="text-stone-600">-</span>
+                            )}
+                          </td>
+
+                          <td className="py-3.5 px-4 text-[11px] text-stone-400">
+                            {inv?.activeUntil
+                              ? new Date(inv.activeUntil).toLocaleDateString("id-ID", {
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                                })
+                              : "Selamanya / Draft"}
+                          </td>
+
+                          <td className="py-3.5 px-4">
+                            {inv ? (
+                              <span
+                                className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${
+                                  inv.status === "ACTIVE"
+                                    ? "bg-emerald-500/10 text-emerald-400"
+                                    : inv.status === "EXPIRED"
+                                    ? "bg-rose-500/10 text-rose-400"
+                                    : "bg-amber-500/10 text-amber-400"
+                                }`}
+                              >
+                                {inv.status}
+                              </span>
+                            ) : (
+                              <span className="text-stone-500 text-[10px]">No Draft</span>
+                            )}
+                          </td>
+
+                          <td className="py-3.5 px-4 text-right space-x-2">
+                            {inv && (
+                              <button
+                                onClick={() => {
+                                  setEditingClient(client);
+                                  setEditTier(inv.tier);
+                                  setEditIsActive(inv.isActive);
+                                  setEditAddDays(0);
+                                }}
+                                className="px-2.5 py-1 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-semibold transition-colors"
+                                title="Edit Paket / Perpanjang"
+                              >
+                                <Edit2 className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+
+                            {client.role !== "ADMIN" && (
+                              <button
+                                onClick={() => handleImpersonate(client.id)}
+                                className="px-2.5 py-1 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-semibold transition-colors inline-flex items-center gap-1"
+                                title="Login sebagai Klien ini"
+                              >
+                                <LogIn className="w-3.5 h-3.5" />
+                                <span className="hidden sm:inline text-[10px]">Impersonate</span>
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 2: KATALOG TEMA */}
+      {activeTab === "themes" && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-stone-400">
+              Katalog tema yang dapat dipilih langsung oleh pengantin tanpa kehilangan data.
+            </p>
+            <button
+              onClick={() => {
+                setEditingThemeId(null);
+                setThemeForm({
+                  themeKey: "",
+                  name: "",
+                  category: "Modern Chic",
+                  thumbnail: "",
+                  isPremium: false,
+                  isActive: true,
+                });
+                setIsThemeModalOpen(true);
+              }}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-bold transition-all"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Tambah Tema Baru</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {themes.map((theme) => (
+              <div
+                key={theme.id}
+                className="rounded-3xl border border-stone-800 bg-stone-900/60 overflow-hidden flex flex-col group hover:border-amber-500/40 transition-all"
+              >
+                <div className="relative h-44 w-full overflow-hidden bg-stone-950">
+                  <Image
+                    src={theme.thumbnail || "/images/placeholder-theme.jpg"}
+                    alt={theme.name}
+                    fill
+                    unoptimized
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute top-3 left-3 flex gap-1.5">
+                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-stone-900/80 backdrop-blur-md text-amber-300 border border-stone-700">
+                      {theme.category}
+                    </span>
+                    {theme.isPremium ? (
+                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500 text-stone-950">
+                        PREMIUM
+                      </span>
+                    ) : (
+                      <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-stone-800 text-stone-300">
+                        FREE
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                  <div>
+                    <h3 className="font-serif font-bold text-base text-white">{theme.name}</h3>
+                    <p className="text-xs font-mono text-stone-500 mt-0.5">Key: {theme.themeKey}</p>
+                  </div>
+
+                  <div className="pt-3 border-t border-stone-800 flex items-center justify-between">
+                    <span
+                      className={`inline-flex items-center gap-1 text-[11px] font-semibold ${
+                        theme.isActive ? "text-emerald-400" : "text-stone-500"
+                      }`}
+                    >
+                      {theme.isActive ? <Check className="w-3.5 h-3.5" /> : <X className="w-3.5 h-3.5" />}
+                      <span>{theme.isActive ? "Aktif di Katalog" : "Nonaktif"}</span>
+                    </span>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => {
+                          setEditingThemeId(theme.id);
+                          setThemeForm({
+                            themeKey: theme.themeKey,
+                            name: theme.name,
+                            category: theme.category,
+                            thumbnail: theme.thumbnail,
+                            isPremium: theme.isPremium,
+                            isActive: theme.isActive,
+                          });
+                          setIsThemeModalOpen(true);
+                        }}
+                        className="p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs"
+                        title="Edit Tema"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteTheme(theme.id, theme.name)}
+                        className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs"
+                        title="Hapus Tema"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: PENGATURAN SISTEM */}
+      {activeTab === "settings" && (
+        <form onSubmit={handleSaveSettings} className="space-y-6 max-w-3xl">
+          <div className="rounded-3xl border border-stone-800 bg-stone-900/60 p-6 sm:p-8 space-y-6">
+            <div>
+              <h2 className="text-lg font-serif font-bold text-white">Konfigurasi Gateway &amp; QRIS</h2>
+              <p className="text-xs text-stone-400 mt-0.5">
+                Pengaturan kunci API Sandbox Midtrans, informasi nomor rekening QRIS manual, dan kuota upload foto.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              {settings.map((item, idx) => (
+                <div key={item.key} className="space-y-1.5">
+                  <label className="text-xs font-semibold text-stone-300 flex items-center justify-between">
+                    <span>{item.key}</span>
+                    <span className="text-[10px] text-stone-500 font-normal">
+                      {item.description || ""}
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    value={item.value}
+                    onChange={(e) => {
+                      const updated = [...settings];
+                      updated[idx].value = e.target.value;
+                      setSettings(updated);
+                    }}
+                    className="w-full px-4 py-2.5 rounded-2xl bg-stone-950 border border-stone-800 text-xs text-stone-100 font-mono focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+              ))}
+            </div>
+
+            <div className="pt-4 border-t border-stone-800 flex justify-end">
+              <button
+                type="submit"
+                className="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-bold transition-all shadow-md shadow-amber-500/20"
+              >
+                Simpan Semua Pengaturan
+              </button>
+            </div>
+          </div>
+        </form>
+      )}
+
+      {/* MODAL: EDIT CLIENT / EXTEND VALIDITY */}
+      {editingClient && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-3xl bg-stone-900 border border-stone-800 p-6 space-y-6 shadow-2xl">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-serif font-bold text-lg text-white">Edit Paket &amp; Masa Aktif</h3>
+                <p className="text-xs text-stone-400">{editingClient.name} ({editingClient.email})</p>
+              </div>
+              <button onClick={() => setEditingClient(null)} className="p-1 hover:opacity-75">
+                <X className="w-5 h-5 text-stone-400" />
+              </button>
+            </div>
+
+            <div className="space-y-4 text-xs">
+              {/* Tier Selection */}
+              <div className="space-y-1.5">
+                <label className="font-semibold text-stone-300">Tingkat Paket Langganan:</label>
+                <select
+                  value={editTier}
+                  onChange={(e) => setEditTier(e.target.value)}
+                  className="w-full py-2.5 px-3 rounded-xl bg-stone-950 border border-stone-800 text-stone-200"
+                >
+                  <option value="STARTER">Starter (Rp 69.000)</option>
+                  <option value="ELEGANT">Elegant (Rp 149.000)</option>
+                  <option value="ULTIMATE">Ultimate (Rp 279.000)</option>
+                </select>
+              </div>
+
+              {/* Add Validity Days */}
+              <div className="space-y-1.5">
+                <label className="font-semibold text-stone-300">Perpanjang Masa Aktif:</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { label: "Tetap (0 Hari)", days: 0 },
+                    { label: "+30 Hari", days: 30 },
+                    { label: "+365 Hari (1 Tahun)", days: 365 },
+                  ].map((btn) => (
+                    <button
+                      key={btn.days}
+                      type="button"
+                      onClick={() => setEditAddDays(btn.days)}
+                      className={`py-2 rounded-xl text-center font-medium border ${
+                        editAddDays === btn.days
+                          ? "bg-amber-500/20 text-amber-300 border-amber-500/50"
+                          : "bg-stone-950 border-stone-800 text-stone-400"
+                      }`}
+                    >
+                      {btn.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Status Toggle */}
+              <div className="space-y-1.5">
+                <label className="font-semibold text-stone-300">Status Undangan:</label>
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="isActive"
+                      checked={editIsActive}
+                      onChange={() => setEditIsActive(true)}
+                    />
+                    <span>Aktif</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="isActive"
+                      checked={!editIsActive}
+                      onChange={() => setEditIsActive(false)}
+                    />
+                    <span>Nonaktifkan</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-stone-800 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setEditingClient(null)}
+                className="px-4 py-2 rounded-xl bg-stone-800 text-stone-300 text-xs font-semibold"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveClientEdit}
+                className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-bold shadow-md"
+              >
+                Simpan Perubahan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: ADD / EDIT THEME */}
+      {isThemeModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+          <form
+            onSubmit={handleSaveTheme}
+            className="w-full max-w-md rounded-3xl bg-stone-900 border border-stone-800 p-6 space-y-5 shadow-2xl"
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="font-serif font-bold text-lg text-white">
+                {editingThemeId ? "Edit Tema" : "Tambah Tema Baru"}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsThemeModalOpen(false)}
+                className="p-1 hover:opacity-75"
+              >
+                <X className="w-5 h-5 text-stone-400" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div className="space-y-1">
+                <label className="font-semibold text-stone-300">Theme Key (ID):</label>
+                <input
+                  type="text"
+                  required
+                  disabled={Boolean(editingThemeId)}
+                  value={themeForm.themeKey}
+                  onChange={(e) => setThemeForm({ ...themeForm, themeKey: e.target.value })}
+                  placeholder="contoh: modern-gold"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 font-mono disabled:opacity-50"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-semibold text-stone-300">Nama Tema:</label>
+                <input
+                  type="text"
+                  required
+                  value={themeForm.name}
+                  onChange={(e) => setThemeForm({ ...themeForm, name: e.target.value })}
+                  placeholder="contoh: Modern Gold Luxury"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-semibold text-stone-300">Kategori:</label>
+                <select
+                  value={themeForm.category}
+                  onChange={(e) => setThemeForm({ ...themeForm, category: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-200"
+                >
+                  <option value="Minimalist">Minimalist</option>
+                  <option value="Floral & Rustic">Floral &amp; Rustic</option>
+                  <option value="Syar'i & Adat">Syar&apos;i &amp; Adat</option>
+                  <option value="Luxury Dark Gold">Luxury Dark Gold</option>
+                  <option value="Modern Chic">Modern Chic</option>
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-semibold text-stone-300">URL Gambar Thumbnail:</label>
+                <input
+                  type="url"
+                  required
+                  value={themeForm.thumbnail}
+                  onChange={(e) => setThemeForm({ ...themeForm, thumbnail: e.target.value })}
+                  placeholder="https://..."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100"
+                />
+              </div>
+
+              <div className="flex items-center gap-6 pt-2">
+                <label className="flex items-center gap-2 cursor-pointer text-stone-300">
+                  <input
+                    type="checkbox"
+                    checked={themeForm.isPremium}
+                    onChange={(e) =>
+                      setThemeForm({ ...themeForm, isPremium: e.target.checked })
+                    }
+                  />
+                  <span>Tema Premium (Berbayar)</span>
+                </label>
+
+                <label className="flex items-center gap-2 cursor-pointer text-stone-300">
+                  <input
+                    type="checkbox"
+                    checked={themeForm.isActive}
+                    onChange={(e) => setThemeForm({ ...themeForm, isActive: e.target.checked })}
+                  />
+                  <span>Aktif di Katalog</span>
+                </label>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-stone-800 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setIsThemeModalOpen(false)}
+                className="px-4 py-2 rounded-xl bg-stone-800 text-stone-300 text-xs font-semibold"
+              >
+                Batal
+              </button>
+              <button
+                type="submit"
+                className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-bold shadow-md"
+              >
+                {editingThemeId ? "Perbarui Tema" : "Tambah Tema"}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+    </div>
+  );
+}
