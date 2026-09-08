@@ -67,7 +67,7 @@ export interface WeddingInvitationData {
   wishes?: WishItem[];
 }
 
-export type ThemeId = "minimalist" | "rustic" | "syari" | "royal" | "adirara";
+export type ThemeId = "minimalist" | "rustic" | "syari" | "royal" | "adirara" | "minang";
 
 export interface ThemeMeta {
   id: ThemeId;
@@ -82,6 +82,16 @@ export interface ThemeMeta {
 }
 
 export const THEME_LIST: ThemeMeta[] = [
+  {
+    id: "minang",
+    name: "Traditional Minang",
+    category: "Syar'i/Adat",
+    description: "Kemegahan adat Minangkabau: motif atap gonjong Rumah Gadang emas, songket Pandai Sikek mewah, sapaan Anak Daro & Marapulai, dan carano tanda kasih digital.",
+    fontHeading: "font-serif",
+    fontBody: "font-sans",
+    accentColor: "#d97706",
+    bgPreview: "from-[#382a0f] via-[#5c131a] to-[#1a0f07]",
+  },
   {
     id: "minimalist",
     name: "Modern Editorial",

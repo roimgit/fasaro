@@ -75,7 +75,9 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
         />
       )}
 
-      <FloatingAudioPlayer audioUrl={data.musicUrl} autoPlayTrigger={isOpen} />
+      {!isEmbedded && (
+        <FloatingAudioPlayer audioUrl={data.musicUrl} autoPlayTrigger={isOpen} />
+      )}
 
       {/* Main Container */}
       <main className="max-w-2xl mx-auto px-4 sm:px-6 py-12 text-center space-y-24">
@@ -406,62 +408,64 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
       </main>
 
       {/* 2. Floating Bottom Navigation Bar (Khas WebNikah) */}
-      <nav
-        className={`fixed bottom-3 left-1/2 -translate-x-1/2 z-40 transform-gpu will-change-transform bg-white/95 dark:bg-stone-900/95 backdrop-blur-sm px-4 py-2 rounded-full border border-stone-200 dark:border-stone-800 shadow-xl flex items-center gap-3 sm:gap-5 text-stone-600 dark:text-stone-300 transition-all duration-500 ${
-          isOpen
-            ? "opacity-100 translate-y-0 pointer-events-auto"
-            : "opacity-0 translate-y-10 pointer-events-none"
-        }`}
-      >
-        <a
-          href="#home"
-          className="flex flex-col items-center justify-center p-1 hover:text-rose-700 transition-colors"
-          title="Home"
+      {!isEmbedded && (
+        <nav
+          className={`fixed bottom-3 left-1/2 -translate-x-1/2 z-40 transform-gpu will-change-transform bg-white/95 dark:bg-stone-900/95 backdrop-blur-sm px-4 py-2 rounded-full border border-stone-200 dark:border-stone-800 shadow-xl flex items-center gap-3 sm:gap-5 text-stone-600 dark:text-stone-300 transition-all duration-500 ${
+            isOpen
+              ? "opacity-100 translate-y-0 pointer-events-auto"
+              : "opacity-0 translate-y-10 pointer-events-none"
+          }`}
         >
-          <Heart className="w-4 h-4" />
-          <span className="text-[9px] mt-0.5">Mempelai</span>
-        </a>
-        <a
-          href="#cerita"
-          className="flex flex-col items-center justify-center p-1 hover:text-rose-700 transition-colors"
-          title="Cerita"
-        >
-          <Sparkles className="w-4 h-4" />
-          <span className="text-[9px] mt-0.5">Cerita</span>
-        </a>
-        <a
-          href="#undangan"
-          className="flex flex-col items-center justify-center p-1 hover:text-rose-700 transition-colors"
-          title="Acara"
-        >
-          <Calendar className="w-4 h-4" />
-          <span className="text-[9px] mt-0.5">Acara</span>
-        </a>
-        <a
-          href="#galeri"
-          className="flex flex-col items-center justify-center p-1 hover:text-rose-700 transition-colors"
-          title="Galeri"
-        >
-          <ImageIcon className="w-4 h-4" />
-          <span className="text-[9px] mt-0.5">Photo</span>
-        </a>
-        <a
-          href="#kado"
-          className="flex flex-col items-center justify-center p-1 hover:text-rose-700 transition-colors"
-          title="Kado"
-        >
-          <Gift className="w-4 h-4" />
-          <span className="text-[9px] mt-0.5">Kado</span>
-        </a>
-        <a
-          href="#doa"
-          className="flex flex-col items-center justify-center p-1 hover:text-rose-700 transition-colors"
-          title="Ucapan"
-        >
-          <MessageSquare className="w-4 h-4" />
-          <span className="text-[9px] mt-0.5">Ucapan</span>
-        </a>
-      </nav>
+          <a
+            href="#home"
+            className="flex flex-col items-center justify-center p-1 hover:text-rose-700 transition-colors"
+            title="Home"
+          >
+            <Heart className="w-4 h-4" />
+            <span className="text-[9px] mt-0.5">Mempelai</span>
+          </a>
+          <a
+            href="#cerita"
+            className="flex flex-col items-center justify-center p-1 hover:text-rose-700 transition-colors"
+            title="Cerita"
+          >
+            <Sparkles className="w-4 h-4" />
+            <span className="text-[9px] mt-0.5">Cerita</span>
+          </a>
+          <a
+            href="#undangan"
+            className="flex flex-col items-center justify-center p-1 hover:text-rose-700 transition-colors"
+            title="Acara"
+          >
+            <Calendar className="w-4 h-4" />
+            <span className="text-[9px] mt-0.5">Acara</span>
+          </a>
+          <a
+            href="#galeri"
+            className="flex flex-col items-center justify-center p-1 hover:text-rose-700 transition-colors"
+            title="Galeri"
+          >
+            <ImageIcon className="w-4 h-4" />
+            <span className="text-[9px] mt-0.5">Photo</span>
+          </a>
+          <a
+            href="#kado"
+            className="flex flex-col items-center justify-center p-1 hover:text-rose-700 transition-colors"
+            title="Kado"
+          >
+            <Gift className="w-4 h-4" />
+            <span className="text-[9px] mt-0.5">Kado</span>
+          </a>
+          <a
+            href="#doa"
+            className="flex flex-col items-center justify-center p-1 hover:text-rose-700 transition-colors"
+            title="Ucapan"
+          >
+            <MessageSquare className="w-4 h-4" />
+            <span className="text-[9px] mt-0.5">Ucapan</span>
+          </a>
+        </nav>
+      )}
     </div>
   );
 };

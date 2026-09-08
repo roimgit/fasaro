@@ -55,7 +55,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
   return (
     <div
       suppressHydrationWarning
-      className={`flex items-center justify-center gap-2 sm:gap-4 my-6 ${
+      className={`flex items-center justify-center gap-1.5 sm:gap-4 my-6 max-w-full overflow-hidden px-1 ${
         themeStyle?.containerClass ?? ""
       }`}
     >
@@ -63,20 +63,20 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
         <div
           key={unit.label}
           suppressHydrationWarning
-          className={`flex flex-col items-center justify-center min-w-[64px] sm:min-w-[76px] p-3 rounded-2xl shadow-sm border ${
+          className={`flex flex-col items-center justify-center flex-1 min-w-[52px] max-w-[76px] py-2.5 px-1 sm:p-3 rounded-2xl shadow-sm border ${
             themeStyle?.boxClass ?? "bg-white/80 border-stone-200"
           }`}
         >
           <span
             suppressHydrationWarning
-            className={`text-xl sm:text-2xl font-bold tracking-tight ${
+            className={`text-lg sm:text-2xl font-bold tracking-tight ${
               themeStyle?.numberClass ?? "text-stone-800"
             }`}
           >
             {String(unit.value).padStart(2, "0")}
           </span>
           <span
-            className={`text-[10px] sm:text-xs uppercase tracking-wider mt-1 ${
+            className={`text-[9px] sm:text-xs uppercase tracking-wider mt-0.5 sm:mt-1 ${
               themeStyle?.labelClass ?? "text-stone-500"
             }`}
           >

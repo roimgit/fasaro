@@ -48,7 +48,9 @@ export const MinimalistTheme: React.FC<ThemeProps> = ({
         />
       )}
 
-      <FloatingAudioPlayer audioUrl={data.musicUrl} autoPlayTrigger={isOpen} />
+      {!isEmbedded && (
+        <FloatingAudioPlayer audioUrl={data.musicUrl} autoPlayTrigger={isOpen} />
+      )}
 
       <main className="max-w-xl mx-auto px-4 py-16 text-center space-y-20">
         {/* Header Hero */}

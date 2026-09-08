@@ -46,12 +46,12 @@ function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-md p-8 rounded-3xl bg-white/90 dark:bg-stone-900/90 border border-stone-200 dark:border-stone-800 shadow-xl backdrop-blur-xl">
+    <div className="w-full max-w-md p-8 rounded-3xl bg-white border border-stone-200 shadow-xl backdrop-blur-xl">
       <div className="text-center mb-6">
-        <div className="inline-flex p-3 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 mb-2">
+        <div className="inline-flex p-3 rounded-full bg-orange-50 text-orange-600 mb-2">
           <Heart className="w-6 h-6 fill-current" />
         </div>
-        <h1 className="text-2xl font-serif font-bold text-stone-900 dark:text-stone-100">
+        <h1 className="text-2xl font-serif font-bold text-stone-900">
           {isRegisterMode ? "Daftar Akun Baru" : "Masuk ke Fasaro"}
         </h1>
         <p className="text-xs text-stone-500 mt-1">
@@ -62,7 +62,7 @@ function LoginForm() {
       </div>
 
       {errorMessage && (
-        <div className="mb-4 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 text-xs border border-rose-200 dark:border-rose-900">
+        <div className="mb-4 p-3 rounded-xl bg-rose-50 text-rose-700 text-xs border border-rose-200">
           {errorMessage}
         </div>
       )}
@@ -70,7 +70,7 @@ function LoginForm() {
       <form onSubmit={handleSubmit} className="space-y-4">
         {isRegisterMode && (
           <div>
-            <label className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1">
+            <label className="block text-xs font-semibold text-stone-700 mb-1">
               Nama Lengkap
             </label>
             <div className="relative">
@@ -80,7 +80,7 @@ function LoginForm() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Nama Anda..."
-                className="w-full py-2.5 px-3.5 pl-10 rounded-xl text-sm border border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                className="w-full py-2.5 px-3.5 pl-10 rounded-xl text-sm border border-stone-300 bg-stone-50 text-stone-900 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:outline-none"
               />
               <Sparkles className="w-4 h-4 text-stone-400 absolute left-3 top-3" />
             </div>
@@ -88,7 +88,7 @@ function LoginForm() {
         )}
 
         <div>
-          <label className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1">
+          <label className="block text-xs font-semibold text-stone-700 mb-1">
             Email
           </label>
           <div className="relative">
@@ -98,14 +98,14 @@ function LoginForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="nama@email.com"
-              className="w-full py-2.5 px-3.5 pl-10 rounded-xl text-sm border border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:ring-2 focus:ring-amber-500 focus:outline-none"
+              className="w-full py-2.5 px-3.5 pl-10 rounded-xl text-sm border border-stone-300 bg-stone-50 text-stone-900 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:outline-none"
             />
             <Mail className="w-4 h-4 text-stone-400 absolute left-3 top-3" />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1">
+          <label className="block text-xs font-semibold text-stone-700 mb-1">
             Kata Sandi
           </label>
           <div className="relative">
@@ -115,7 +115,7 @@ function LoginForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Minimal 6 karakter..."
-              className="w-full py-2.5 px-3.5 pl-10 rounded-xl text-sm border border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:ring-2 focus:ring-amber-500 focus:outline-none"
+              className="w-full py-2.5 px-3.5 pl-10 rounded-xl text-sm border border-stone-300 bg-stone-50 text-stone-900 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:outline-none"
             />
             <Lock className="w-4 h-4 text-stone-400 absolute left-3 top-3" />
           </div>
@@ -124,7 +124,7 @@ function LoginForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full py-3 px-4 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white shadow-lg shadow-amber-900/20 transition-all disabled:opacity-50"
+          className="w-full py-3 px-4 rounded-xl text-xs font-bold bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg shadow-orange-500/20 transition-all disabled:opacity-50"
         >
           {isLoading
             ? "Memproses..."
@@ -141,7 +141,7 @@ function LoginForm() {
             setIsRegisterMode(!isRegisterMode);
             setErrorMessage(null);
           }}
-          className="text-xs text-amber-600 dark:text-amber-400 hover:underline font-medium"
+          className="text-xs text-orange-600 hover:underline font-medium"
         >
           {isRegisterMode
             ? "Sudah punya akun? Masuk di sini"
@@ -154,7 +154,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <main className="min-h-screen flex items-center justify-center p-4 bg-stone-100 dark:bg-stone-950">
+    <main className="min-h-screen flex items-center justify-center p-4 bg-[#fafaf9]">
       <Suspense fallback={<div className="text-xs text-stone-400">Memuat form...</div>}>
         <LoginForm />
       </Suspense>

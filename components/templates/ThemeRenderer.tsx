@@ -7,6 +7,7 @@ import RusticTheme from "./rustic/RusticTheme";
 import SyariTheme from "./syari/SyariTheme";
 import RoyalTheme from "./royal/RoyalTheme";
 import AdiRaraTheme from "./adirara/AdiRaraTheme";
+import MinangTheme from "./minang/MinangTheme";
 
 interface ThemeRendererProps {
   data: WeddingInvitationData;
@@ -26,6 +27,15 @@ export const ThemeRenderer: React.FC<ThemeRendererProps> = ({
   const activeTheme = forcedThemeId || data.themeId;
 
   switch (activeTheme) {
+    case "minang":
+      return (
+        <MinangTheme
+          data={data}
+          guestName={guestName}
+          showCover={showCover}
+          isEmbedded={isEmbedded}
+        />
+      );
     case "adirara":
       return (
         <AdiRaraTheme

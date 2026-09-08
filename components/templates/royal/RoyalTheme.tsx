@@ -52,7 +52,9 @@ export const RoyalTheme: React.FC<ThemeProps> = ({
         />
       )}
 
-      <FloatingAudioPlayer audioUrl={data.musicUrl} autoPlayTrigger={isOpen} />
+      {!isEmbedded && (
+        <FloatingAudioPlayer audioUrl={data.musicUrl} autoPlayTrigger={isOpen} />
+      )}
 
       <main className="max-w-xl mx-auto px-4 py-16 text-center space-y-20 relative">
         {/* Header Mahkota Royal */}
@@ -85,7 +87,7 @@ export const RoyalTheme: React.FC<ThemeProps> = ({
 
         {/* Countdown */}
         {primaryEvent?.date && (
-          <section className="py-6 px-4 rounded-3xl bg-slate-900/80 border border-amber-500/30 backdrop-blur-md shadow-[0_0_30px_rgba(245,158,11,0.08)]">
+          <section className="py-6 px-3 sm:px-4 rounded-3xl bg-slate-900/80 border border-amber-500/30 backdrop-blur-md shadow-[0_0_30px_rgba(245,158,11,0.08)] overflow-hidden">
             <div className="flex items-center justify-center gap-1.5 text-xs tracking-widest uppercase text-amber-400 mb-3">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Menghitung Waktu Bersejarah</span>
