@@ -108,7 +108,7 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
           {/* Countdown Card */}
           {primaryEvent?.date && (
             <div className="mt-8 p-6 rounded-3xl bg-white border border-[#eadacb] shadow-sm">
-              <p className="text-xs uppercase tracking-widest text-stone-500 mb-2">
+              <p className="text-xs uppercase tracking-widest text-stone-800 font-semibold mb-2">
                 Menghitung Hari Menuju Hari Bahagia
               </p>
               <CountdownTimer
@@ -116,7 +116,7 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
                 themeStyle={{
                   boxClass: "bg-[#fffaf5] border-[#ebd6c4] shadow-sm",
                   numberClass: "text-rose-900 font-serif font-bold",
-                  labelClass: "text-stone-600 text-[10px]",
+                  labelClass: "text-stone-800 font-semibold text-[10px]",
                 }}
               />
             </div>
@@ -129,7 +129,7 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
             <h2 className="text-3xl font-serif font-semibold text-rose-900">
               Kedua Mempelai
             </h2>
-            <p className="text-xs text-stone-600 italic leading-relaxed">
+            <p className="text-xs text-stone-800 font-medium italic leading-relaxed">
               &quot;{data.coupleInfo.greetingMessage ||
                 "Maha Kuasa Allah yang telah mempertemukan kami dalam sebuah momen tak terduga. Dengan memohon rahmat dan ridho-Nya, kami mengundang Anda untuk menyaksikan ikatan janji suci kami."}&quot;
             </p>
@@ -157,7 +157,7 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
                   {data.coupleInfo.brideName}
                 </h3>
                 {(data.coupleInfo.brideFather || data.coupleInfo.brideMother) && (
-                  <p className="text-xs text-stone-600">
+                  <p className="text-xs text-stone-700 font-medium">
                     Putri dari Bpk. {data.coupleInfo.brideFather || "..."} &amp; Ibu{" "}
                     {data.coupleInfo.brideMother || "..."}
                   </p>
@@ -196,7 +196,7 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
                   {data.coupleInfo.groomName}
                 </h3>
                 {(data.coupleInfo.groomFather || data.coupleInfo.groomMother) && (
-                  <p className="text-xs text-stone-600">
+                  <p className="text-xs text-stone-700 font-medium">
                     Putra dari Bpk. {data.coupleInfo.groomFather || "..."} &amp; Ibu{" "}
                     {data.coupleInfo.groomMother || "..."}
                   </p>
@@ -227,27 +227,27 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
 
           <div className="space-y-4 text-left max-w-lg mx-auto">
             <div className="p-5 rounded-2xl bg-white border border-[#ebd6c4] shadow-sm relative pl-6 border-l-4 border-l-rose-700">
-              <span className="text-[11px] font-semibold text-rose-700">Awal Pertemuan</span>
+              <span className="text-[11px] font-bold text-rose-700">Awal Pertemuan</span>
               <h4 className="font-bold text-sm text-stone-900 mt-0.5">Pertama Kali Berjumpa</h4>
-              <p className="text-xs text-stone-600 mt-1 leading-relaxed">
+              <p className="text-xs text-stone-700 font-normal mt-1 leading-relaxed">
                 Dipertemukan dalam sebuah momen yang tak direncanakan, senyum dan kepribadian santun
                 itu selalu membekas hingga takdir mempertemukan kembali.
               </p>
             </div>
 
             <div className="p-5 rounded-2xl bg-white border border-[#ebd6c4] shadow-sm relative pl-6 border-l-4 border-l-rose-700">
-              <span className="text-[11px] font-semibold text-rose-700">Silaturahmi Keluarga</span>
+              <span className="text-[11px] font-bold text-rose-700">Silaturahmi Keluarga</span>
               <h4 className="font-bold text-sm text-stone-900 mt-0.5">Mengunjungi Rumah Keluarga</h4>
-              <p className="text-xs text-stone-600 mt-1 leading-relaxed">
+              <p className="text-xs text-stone-700 font-normal mt-1 leading-relaxed">
                 Niat tulus dipertemukan dengan restu kedua orang tua saat pertama kali bersilaturahmi
                 ke kediaman keluarga besar.
               </p>
             </div>
 
             <div className="p-5 rounded-2xl bg-white border border-[#ebd6c4] shadow-sm relative pl-6 border-l-4 border-l-rose-700">
-              <span className="text-[11px] font-semibold text-rose-700">Lamaran &amp; Komitmen</span>
+              <span className="text-[11px] font-bold text-rose-700">Lamaran &amp; Komitmen</span>
               <h4 className="font-bold text-sm text-stone-900 mt-0.5">Prosesi Lamaran Resmi</h4>
-              <p className="text-xs text-stone-600 mt-1 leading-relaxed">
+              <p className="text-xs text-stone-700 font-normal mt-1 leading-relaxed">
                 Mengikat janji awal dalam sebuah acara lamaran hangat dihadiri sanak famili terdekat
                 menuju gerbang pernikahan.
               </p>
@@ -337,7 +337,7 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
                 Dokumentasi
               </span>
               <h2 className="text-3xl font-serif font-semibold text-[#332a24]">Galeri Photo</h2>
-              <p className="text-xs text-stone-500">
+              <p className="text-xs text-stone-700 font-medium">
                 Photo-photo kebahagiaan kami yang kami kenang selalu.
               </p>
             </div>
@@ -401,16 +401,16 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
         </section>
 
         {/* Footer */}
-        <footer className="pt-8 text-stone-400 text-xs space-y-1">
+        <footer className="pt-8 text-stone-600 text-xs space-y-1 font-medium">
           <p>Digital Invitation by Fasaro &bull; WebNikah Edition</p>
-          <p className="text-[10px]">Terima kasih atas doa &amp; restu Anda</p>
+          <p className="text-[11px] text-stone-500">Terima kasih atas doa &amp; restu Anda</p>
         </footer>
       </main>
 
       {/* 2. Floating Bottom Navigation Bar (Khas WebNikah) */}
       {!isEmbedded && (
         <nav
-          className={`fixed bottom-3 left-1/2 -translate-x-1/2 z-40 transform-gpu will-change-transform bg-white/95 dark:bg-stone-900/95 backdrop-blur-sm px-4 py-2 rounded-full border border-stone-200 dark:border-stone-800 shadow-xl flex items-center gap-3 sm:gap-5 text-stone-600 dark:text-stone-300 transition-all duration-500 ${
+          className={`fixed bottom-3 left-1/2 -translate-x-1/2 z-40 transform-gpu will-change-transform bg-white/95 dark:bg-stone-900/95 backdrop-blur-sm px-4 py-2 rounded-full border border-stone-200 dark:border-stone-800 shadow-xl flex items-center gap-3 sm:gap-5 text-stone-800 dark:text-stone-200 transition-all duration-500 ${
             isOpen
               ? "opacity-100 translate-y-0 pointer-events-auto"
               : "opacity-0 translate-y-10 pointer-events-none"

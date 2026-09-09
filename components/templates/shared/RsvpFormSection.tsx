@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import confetti from "canvas-confetti";
-import { CheckCircle2, Send, Users } from "lucide-react";
+import { CheckCircle2, Loader2, Send, Users } from "lucide-react";
 
 interface RsvpFormSectionProps {
   invitationId: string;
@@ -84,10 +84,10 @@ export const RsvpFormSection: React.FC<RsvpFormSectionProps> = ({
           <div className="inline-flex p-3 rounded-full bg-rose-100 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 mb-2">
             <Users className="w-5 h-5" />
           </div>
-          <h3 className="text-xl font-serif font-medium text-stone-900 dark:text-stone-100">
+          <h3 className="text-xl font-serif font-bold text-stone-900 dark:text-stone-100">
             Konfirmasi Kehadiran (RSVP)
           </h3>
-          <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
+          <p className="text-xs text-stone-700 dark:text-stone-300 font-medium mt-1">
             Bantu kami mempersiapkan jamuan terbaik dengan mengonfirmasi kehadiran Anda.
           </p>
         </div>
@@ -95,10 +95,10 @@ export const RsvpFormSection: React.FC<RsvpFormSectionProps> = ({
         {isSubmitted ? (
           <div className="text-center py-6 animate-in fade-in zoom-in">
             <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-3" />
-            <h4 className="text-base font-semibold text-stone-800 dark:text-stone-100">
+            <h4 className="text-base font-bold text-stone-900 dark:text-stone-100">
               Terima Kasih atas Konfirmasi Anda!
             </h4>
-            <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
+            <p className="text-xs text-stone-700 dark:text-stone-300 font-medium mt-1">
               Jawaban Anda telah kami simpan. Sampai jumpa di hari bahagia!
             </p>
           </div>
@@ -200,13 +200,22 @@ export const RsvpFormSection: React.FC<RsvpFormSectionProps> = ({
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl text-sm font-semibold transition-all shadow-md hover:scale-[1.01] active:scale-[0.98] disabled:opacity-50 ${
+              className={`w-full inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl text-sm font-semibold transition-all shadow-md hover:scale-[1.01] active:scale-[0.98] disabled:opacity-50 cursor-pointer ${
                 themeStyle?.buttonClass ??
                 "bg-amber-600 hover:bg-amber-700 text-white shadow-amber-900/20"
               }`}
             >
-              <Send className="w-4 h-4" />
-              <span>{isSubmitting ? "Mengirim..." : "Kirim Konfirmasi"}</span>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Menyimpan Konfirmasi...</span>
+                </>
+              ) : (
+                <>
+                  <Send className="w-4 h-4" />
+                  <span>Kirim Konfirmasi</span>
+                </>
+              )}
             </button>
           </form>
         )}

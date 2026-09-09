@@ -224,12 +224,6 @@ export default async function PublicInvitationPage(props: InvitationPageProps) {
   const { slug } = await props.params;
   const { to } = await props.searchParams;
 
-  // 1. Cek fallback demo data untuk slug preview / demo langsung
-  const demoData = getDemoWeddingData(slug);
-  if (demoData) {
-    return <ThemeRenderer data={demoData} guestName={to} />;
-  }
-
   let invitation = null;
   try {
     const { prisma } = await import("@/lib/prisma");
@@ -248,7 +242,12 @@ export default async function PublicInvitationPage(props: InvitationPageProps) {
     invitation = null;
   }
 
+  // Fallback demo data jika belum ada di database
   if (!invitation) {
+    const demoData = getDemoWeddingData(slug);
+    if (demoData) {
+      return <ThemeRenderer data={demoData} guestName={to} />;
+    }
     notFound();
   }
 

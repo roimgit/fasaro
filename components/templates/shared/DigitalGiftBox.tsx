@@ -42,10 +42,10 @@ export const DigitalGiftBox: React.FC<DigitalGiftBoxProps> = ({
         <div className="inline-flex p-3 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 mb-2">
           <Gift className="w-6 h-6" />
         </div>
-        <h3 className="text-xl font-serif font-medium text-stone-800 dark:text-stone-100">
+        <h3 className="text-xl font-serif font-bold text-stone-900 dark:text-stone-100">
           Kado Digital &amp; Tanda Kasih
         </h3>
-        <p className="text-xs text-stone-500 dark:text-stone-400 mt-1 max-w-sm mx-auto">
+        <p className="text-xs text-stone-700 dark:text-stone-300 font-medium mt-1 max-w-sm mx-auto">
           Doa restu Anda merupakan karunia terindah bagi kami. Bagi yang berkenan memberikan
           tanda kasih, dapat melalui rekening/QRIS berikut:
         </p>
@@ -77,7 +77,7 @@ export const DigitalGiftBox: React.FC<DigitalGiftBoxProps> = ({
                       bank: account.bankName,
                     })
                   }
-                  className="inline-flex items-center gap-1 text-xs text-amber-600 hover:text-amber-700 dark:text-amber-400 font-medium"
+                  className="inline-flex items-center gap-1 text-xs text-amber-600 hover:text-amber-700 dark:text-amber-400 font-semibold cursor-pointer"
                 >
                   <QrCode className="w-3.5 h-3.5" />
                   <span>Lihat QRIS</span>
@@ -89,14 +89,14 @@ export const DigitalGiftBox: React.FC<DigitalGiftBoxProps> = ({
               <p className="text-lg font-mono font-bold tracking-wider text-stone-900 dark:text-stone-100">
                 {account.accountNumber}
               </p>
-              <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+              <p className="text-xs text-stone-700 dark:text-stone-300 font-medium mt-0.5">
                 a.n. {account.accountHolder}
               </p>
             </div>
 
             <button
               onClick={() => handleCopy(account.accountNumber, index)}
-              className={`w-full mt-3 inline-flex items-center justify-center gap-2 py-2 px-4 rounded-xl text-xs font-medium transition-all ${
+              className={`w-full mt-3 inline-flex items-center justify-center gap-2 py-2 px-4 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                 copiedIndex === index
                   ? "bg-emerald-600 text-white"
                   : themeStyle?.buttonClass ??
@@ -125,13 +125,13 @@ export const DigitalGiftBox: React.FC<DigitalGiftBoxProps> = ({
           <div className="relative w-full max-w-xs bg-white rounded-3xl p-6 text-center shadow-2xl">
             <button
               onClick={() => setSelectedQris(null)}
-              className="absolute top-4 right-4 p-1.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600"
+              className="absolute top-4 right-4 p-1.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 cursor-pointer"
               aria-label="Tutup"
             >
               <X className="w-4 h-4" />
             </button>
-            <h4 className="font-semibold text-stone-900 mb-1">Scan QRIS</h4>
-            <p className="text-xs text-stone-500 mb-4">{selectedQris.bank}</p>
+            <h4 className="font-bold text-stone-900 mb-1">Scan QRIS</h4>
+            <p className="text-xs text-stone-700 font-medium mb-4">{selectedQris.bank}</p>
             <div className="w-48 h-48 mx-auto p-2 border rounded-2xl bg-white flex items-center justify-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -140,7 +140,7 @@ export const DigitalGiftBox: React.FC<DigitalGiftBoxProps> = ({
                 className="w-full h-full object-contain"
               />
             </div>
-            <p className="text-[11px] text-stone-400 mt-4">
+            <p className="text-xs text-stone-600 font-medium mt-4">
               Buka aplikasi e-wallet / mobile banking Anda dan scan kode QR di atas.
             </p>
           </div>

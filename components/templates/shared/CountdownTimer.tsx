@@ -70,14 +70,14 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
           <span
             suppressHydrationWarning
             className={`text-lg sm:text-2xl font-bold tracking-tight ${
-              themeStyle?.numberClass ?? "text-stone-800"
+              themeStyle?.numberClass ?? "text-stone-900 font-bold"
             }`}
           >
             {String(unit.value).padStart(2, "0")}
           </span>
           <span
-            className={`text-[9px] sm:text-xs uppercase tracking-wider mt-0.5 sm:mt-1 ${
-              themeStyle?.labelClass ?? "text-stone-500"
+            className={`text-[9px] sm:text-xs uppercase tracking-wider font-semibold mt-0.5 sm:mt-1 ${
+              themeStyle?.labelClass ?? "text-stone-700 dark:text-stone-300"
             }`}
           >
             {unit.label}

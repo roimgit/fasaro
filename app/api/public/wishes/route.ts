@@ -3,6 +3,43 @@ import sanitizeHtml from "sanitize-html";
 import prisma from "@/lib/prisma";
 import { rateLimit } from "@/lib/redis";
 import { wishSchema } from "@/lib/validations";
+import { getInvitationMeta } from "@/lib/invitation-cache";
+
+const KNOWN_DEMO_SLUGS = [
+  "rian-sinta",
+  "faisal-putri",
+  "adirara",
+  "royal",
+  "syari",
+  "rustic",
+  "minimalist",
+  "minang",
+  "showcase",
+];
+
+const INITIAL_DEMO_WISHES = [
+  {
+    id: "demo-w-1",
+    senderName: "Budi & Ani Santoso",
+    message: "Barakallahu lakum wa baraka alaikum. Selamat menempuh hidup baru untuk kedua mempelai!",
+    reaction: "💖",
+    createdAt: new Date(Date.now() - 3600000 * 2).toISOString(),
+  },
+  {
+    id: "demo-w-2",
+    senderName: "Keluarga Besar Bpk. Hendra",
+    message: "Semoga menjadi keluarga yang sakinah, mawaddah, dan warahmah. Bahagia selalu selamanya.",
+    reaction: "🤲",
+    createdAt: new Date(Date.now() - 3600000 * 5).toISOString(),
+  },
+  {
+    id: "demo-w-3",
+    senderName: "Dinda & Sahabat Kampus",
+    message: "Selamat yaa! Senang sekali melihat kalian berdua bersanding di pelaminan. Lancar sampai hari H!",
+    reaction: "🎉",
+    createdAt: new Date(Date.now() - 3600000 * 12).toISOString(),
+  },
+];
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
@@ -19,38 +56,54 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    const [wishes, totalCount] = await Promise.all([
-      prisma.wish.findMany({
-        where: {
-          invitationId,
-          isHidden: false,
-        },
-        orderBy: { createdAt: "desc" },
-        skip,
-        take: limit,
-        select: {
-          id: true,
-          senderName: true,
-          message: true,
-          reaction: true,
-          createdAt: true,
-        },
-      }),
-      prisma.wish.count({
-        where: {
-          invitationId,
-          isHidden: false,
-        },
-      }),
-    ]);
+    // Fast cached lookup for invitation
+    const invitation = await getInvitationMeta(invitationId);
 
+    if (invitation) {
+      const [wishes, totalCount] = await Promise.all([
+        prisma.wish.findMany({
+          where: {
+            invitationId: invitation.id,
+            isHidden: false,
+          },
+          orderBy: { createdAt: "desc" },
+          skip,
+          take: limit,
+          select: {
+            id: true,
+            senderName: true,
+            message: true,
+            reaction: true,
+            createdAt: true,
+          },
+        }),
+        prisma.wish.count({
+          where: {
+            invitationId: invitation.id,
+            isHidden: false,
+          },
+        }),
+      ]);
+
+      return NextResponse.json({
+        data: wishes,
+        pagination: {
+          page,
+          limit,
+          totalCount,
+          totalPages: Math.ceil(totalCount / limit),
+        },
+      });
+    }
+
+    // Fallback for demo preview
     return NextResponse.json({
-      data: wishes,
+      data: INITIAL_DEMO_WISHES,
       pagination: {
-        page,
-        limit,
-        totalCount,
-        totalPages: Math.ceil(totalCount / limit),
+        page: 1,
+        limit: 20,
+        totalCount: INITIAL_DEMO_WISHES.length,
+        totalPages: 1,
       },
     });
   } catch (error) {
@@ -69,8 +122,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const forwardedFor = request.headers.get("x-forwarded-for");
     const ip = forwardedFor ? forwardedFor.split(",")[0].trim() : "127.0.0.1";
 
-    // Rate limit: max 3 wishes per minute per IP
-    const limiter = await rateLimit(ip, "submit_wish", 3, 60);
+    // Rate limit: max 10 wishes per minute per IP
+    const limiter = await rateLimit(ip, "submit_wish", 10, 60);
     if (!limiter.allowed) {
       return NextResponse.json(
         {
@@ -96,18 +149,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const { invitationId, senderName, message, reaction } = parsed.data;
 
-    const invitation = await prisma.invitation.findUnique({
-      where: { id: invitationId },
-      select: { id: true, isActive: true },
-    });
-
-    if (!invitation || !invitation.isActive) {
-      return NextResponse.json(
-        { error: "Undangan tidak valid atau sudah nonaktif" },
-        { status: 404 }
-      );
-    }
-
     // XSS Sanitization
     const sanitizedSender = sanitizeHtml(senderName, {
       allowedTags: [],
@@ -119,28 +160,61 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       allowedAttributes: {},
     }).trim();
 
-    const wish = await prisma.wish.create({
-      data: {
-        invitationId,
+    // Fast cached lookup for invitation
+    const invitation = await getInvitationMeta(invitationId);
+
+    if (invitation && invitation.isActive) {
+      const wish = await prisma.wish.create({
+        data: {
+          invitationId: invitation.id,
+          senderName: sanitizedSender,
+          message: sanitizedMessage,
+          reaction: reaction ?? null,
+        },
+        select: {
+          id: true,
+          senderName: true,
+          message: true,
+          reaction: true,
+          createdAt: true,
+        },
+      });
+
+      return NextResponse.json(
+        {
+          message: "Ucapan doa berhasil dikirim",
+          data: wish,
+        },
+        { status: 201 }
+      );
+    }
+
+    // Demo / preview mode support
+    const isDemo =
+      invitationId.startsWith("demo-") ||
+      KNOWN_DEMO_SLUGS.some((s) => invitationId.toLowerCase().includes(s));
+
+    if (isDemo) {
+      const mockWish = {
+        id: `demo-w-${Date.now()}`,
         senderName: sanitizedSender,
         message: sanitizedMessage,
-        reaction: reaction ?? null,
-      },
-      select: {
-        id: true,
-        senderName: true,
-        message: true,
-        reaction: true,
-        createdAt: true,
-      },
-    });
+        reaction: reaction ?? "💖",
+        createdAt: new Date().toISOString(),
+      };
+
+      return NextResponse.json(
+        {
+          message: "Ucapan doa berhasil dikirim",
+          data: mockWish,
+        },
+        { status: 201 }
+      );
+    }
 
     return NextResponse.json(
-      {
-        message: "Ucapan doa berhasil dikirim",
-        data: wish,
-      },
-      { status: 201 }
+      { error: "Undangan tidak valid atau sudah nonaktif" },
+      { status: 404 }
     );
   } catch (error) {
     return NextResponse.json(

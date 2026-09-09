@@ -14,5 +14,5 @@ if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
 }
 
-// Prisma Client singleton instance
+// Prisma Client singleton instance for database access
 export default prisma;

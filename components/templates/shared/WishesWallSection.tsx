@@ -59,16 +59,33 @@ export const WishesWallSection: React.FC<WishesWallSectionProps> = ({
       return;
     }
 
+    const trimmedName = senderName.trim();
+    const trimmedMessage = message.trim();
+    const currentReaction = selectedReaction;
+
+    // Optimistic UI: tampilkan langsung seketika tanpa menunggu jaringan
+    const optimisticWish: WishItem = {
+      id: `optimistic-${Date.now()}`,
+      senderName: trimmedName,
+      message: trimmedMessage,
+      reaction: currentReaction,
+      createdAt: new Date().toISOString(),
+    };
+
+    setWishes((prev) => [optimisticWish, ...prev]);
+    setMessage("");
+    setFeedback({ type: "success", text: "Ucapan & doa restu berhasil dikirim!" });
     setIsSubmitting(true);
+
     try {
       const res = await fetch("/api/public/wishes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           invitationId,
-          senderName: senderName.trim(),
-          message: message.trim(),
-          reaction: selectedReaction,
+          senderName: trimmedName,
+          message: trimmedMessage,
+          reaction: currentReaction,
         }),
       });
 
@@ -78,10 +95,14 @@ export const WishesWallSection: React.FC<WishesWallSectionProps> = ({
       }
 
       const resJson = await res.json();
-      setWishes((prev) => [resJson.data, ...prev]);
-      setMessage("");
-      setFeedback({ type: "success", text: "Ucapan & doa restu berhasil dikirim!" });
+      // Replace optimistic item with server verified item
+      setWishes((prev) =>
+        prev.map((w) => (w.id === optimisticWish.id ? resJson.data : w))
+      );
     } catch (err) {
+      // Revert optimistic wish if server rejected
+      setWishes((prev) => prev.filter((w) => w.id !== optimisticWish.id));
+      setMessage(trimmedMessage);
       setFeedback({
         type: "error",
         text: err instanceof Error ? err.message : "Terjadi kesalahan",
@@ -103,10 +124,10 @@ export const WishesWallSection: React.FC<WishesWallSectionProps> = ({
           <div className="inline-flex p-3 rounded-full bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 mb-2">
             <MessageSquare className="w-5 h-5" />
           </div>
-          <h3 className="text-xl font-serif font-medium text-stone-900 dark:text-stone-100">
+          <h3 className="text-xl font-serif font-bold text-stone-900 dark:text-stone-100">
             Untaian Doa &amp; Ucapan
           </h3>
-          <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
+          <p className="text-xs text-stone-700 dark:text-stone-300 font-medium mt-1">
             Kirimkan doa tulus dan harapan terbaik bagi kedua mempelai.
           </p>
         </div>
@@ -133,7 +154,7 @@ export const WishesWallSection: React.FC<WishesWallSectionProps> = ({
               placeholder="Nama Anda..."
               className={`w-full py-2.5 px-3.5 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${
                 themeStyle?.inputClass ??
-                "bg-stone-50 dark:bg-stone-900 border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100"
+                "bg-stone-50 dark:bg-stone-900 border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100 placeholder:text-stone-500"
               }`}
             />
           </div>
@@ -147,7 +168,7 @@ export const WishesWallSection: React.FC<WishesWallSectionProps> = ({
               placeholder="Tuliskan doa restu untuk kedua mempelai..."
               className={`w-full py-2.5 px-3.5 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none ${
                 themeStyle?.inputClass ??
-                "bg-stone-50 dark:bg-stone-900 border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100"
+                "bg-stone-50 dark:bg-stone-900 border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100 placeholder:text-stone-500"
               }`}
             />
           </div>
@@ -187,9 +208,9 @@ export const WishesWallSection: React.FC<WishesWallSectionProps> = ({
         {/* Wishes List Wall */}
         <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
           {isLoading ? (
-            <p className="text-center text-xs text-stone-400 py-4">Memuat ucapan...</p>
+            <p className="text-center text-xs text-stone-600 dark:text-stone-300 py-4 font-medium">Memuat ucapan...</p>
           ) : wishes.length === 0 ? (
-            <p className="text-center text-xs text-stone-400 py-6 italic">
+            <p className="text-center text-xs text-stone-600 dark:text-stone-300 py-6 font-medium italic">
               Belum ada ucapan. Jadilah yang pertama memberikan doa restu!
             </p>
           ) : (
@@ -202,18 +223,18 @@ export const WishesWallSection: React.FC<WishesWallSectionProps> = ({
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
+                  <span className="font-bold text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
                     {w.senderName}
                     {w.reaction && <span>{w.reaction}</span>}
                   </span>
-                  <span className="text-[10px] text-stone-400">
+                  <span className="text-[11px] text-stone-600 dark:text-stone-400 font-medium">
                     {new Date(w.createdAt).toLocaleDateString("id-ID", {
                       day: "numeric",
                       month: "short",
                     })}
                   </span>
                 </div>
-                <p className="text-stone-600 dark:text-stone-300 leading-relaxed break-words">
+                <p className="text-stone-800 dark:text-stone-200 font-normal leading-relaxed break-words">
                   {w.message}
                 </p>
               </div>
