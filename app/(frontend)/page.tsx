@@ -119,41 +119,37 @@ export default function HomePage() {
   const [heroTheme, setHeroTheme] = useState("minang");
 
   return (
-    <div className="min-h-screen bg-[#fafaf9] text-stone-900 flex flex-col selection:bg-orange-500 selection:text-white">
+    <div className="min-h-screen bg-[#F3F6FB] text-slate-900 flex flex-col selection:bg-[#F97316] selection:text-white">
       {/* 1. Sticky Responsive Navbar */}
       <MarketingNavbar />
 
       {/* 2. Hero Section */}
-      <section id="home" className="relative pt-12 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-        {/* Glow backdrop */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
-        <div className="absolute top-1/3 left-1/4 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
-
+      <section id="home" className="relative pt-12 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left Column: Copywriting & CTA */}
           <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
             {/* Live Counter Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-orange-200 bg-orange-50/80 text-orange-700 text-xs font-semibold">
-              <Users className="w-3.5 h-3.5" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#E2E8F0] bg-white text-[#F97316] text-xs font-semibold shadow-xs">
+              <Users className="w-3.5 h-3.5 text-[#F97316]" />
               <span>250.000+ Pasangan Telah Menggunakan Platform Kami</span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-extrabold tracking-tight text-stone-950 leading-tight">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 leading-tight">
               Buat Website Undangan Pernikahan Digital Elegan{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 via-amber-600 to-orange-500">
+              <span className="text-[#F97316]">
                 dalam Hitungan Menit
               </span>
             </h1>
 
-            <p className="text-sm sm:text-base text-stone-600 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-              Platform all-in-one mirip WebNikah: ganti tema 1-klik tanpa data hilang, amplop digital terintegrasi (QRIS/Bank), buku tamu RSVP realtime, hingga audio player autoplay super cepat.
+            <p className="text-sm sm:text-base text-slate-600 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+              Platform all-in-one: ganti tema 1-klik tanpa data hilang, amplop digital terintegrasi (QRIS/Bank), buku tamu RSVP realtime, hingga audio player autoplay super cepat.
             </p>
 
             {/* CTA Dual Buttons */}
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3.5 pt-2">
               <Link
                 href="/login?from=/dashboard"
-                className="inline-flex items-center gap-2 py-3.5 px-7 rounded-full text-xs font-bold bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-xl shadow-orange-500/25 transition-all hover:scale-105 active:scale-95"
+                className="inline-flex items-center gap-2 py-3 px-6 rounded-xl text-xs font-semibold bg-[#F97316] hover:bg-[#EA580C] text-white shadow-xs transition-colors"
               >
                 <span>Mulai Sekarang - Gratis</span>
                 <ArrowRight className="w-4 h-4" />
@@ -163,16 +159,16 @@ export default function HomePage() {
                 href={`/invitation/demo-${heroTheme}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 py-3.5 px-6 rounded-full text-xs font-semibold border border-stone-200 bg-white hover:bg-stone-50 text-stone-800 transition-all hover:border-stone-300 shadow-sm"
+                className="inline-flex items-center gap-2 py-3 px-5 rounded-xl text-xs font-semibold border border-[#E2E8F0] bg-white hover:bg-slate-50 text-slate-800 transition-colors shadow-xs"
               >
-                <Play className="w-3.5 h-3.5 fill-current text-orange-500" />
+                <Play className="w-3.5 h-3.5 fill-current text-[#F97316]" />
                 <span>Buka Demo di Tab Baru</span>
-                <ExternalLink className="w-3.5 h-3.5 text-stone-400" />
+                <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
               </a>
             </div>
 
             {/* Checklist Trust Factors */}
-            <div className="pt-4 flex flex-wrap items-center justify-center lg:justify-start gap-5 text-xs text-stone-600">
+            <div className="pt-3 flex flex-wrap items-center justify-center lg:justify-start gap-5 text-xs text-slate-600">
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 <span>Tanpa Biaya Pembuatan Awal</span>
@@ -183,15 +179,15 @@ export default function HomePage() {
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>Ganti Tema Bebas</span>
+                <span>Ganti Tema Bebas Kapan Saja</span>
               </div>
             </div>
           </div>
 
-          {/* Right Column: Animated Smartphone Frame Mockup with 1-Click Theme Switcher */}
+          {/* Right Column: Smartphone Frame Mockup with 1-Click Theme Switcher */}
           <div className="lg:col-span-5 flex flex-col items-center">
             {/* Quick Hero Theme Selector */}
-            <div className="flex flex-wrap items-center justify-center gap-1.5 p-1 bg-white/90 border border-stone-200 rounded-full mb-3 text-[11px] shadow-sm">
+            <div className="flex flex-wrap items-center justify-center gap-1.5 p-1 bg-white border border-[#E2E8F0] rounded-xl mb-3 text-[11px] shadow-xs">
               {[
                 { id: "minang", label: "Minang Adat" },
                 { id: "adirara", label: "Adi & Rara" },
@@ -203,10 +199,10 @@ export default function HomePage() {
                 <button
                   key={t.id}
                   onClick={() => setHeroTheme(t.id)}
-                  className={`px-3 py-1 rounded-full transition-all font-medium ${
+                  className={`px-3 py-1 rounded-lg transition-colors font-semibold ${
                     heroTheme === t.id
-                      ? "bg-orange-500 text-white font-bold shadow-md shadow-orange-500/20"
-                      : "text-stone-600 hover:text-stone-950 hover:bg-stone-100"
+                      ? "bg-[#F97316] text-white shadow-xs"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                   }`}
                 >
                   {t.label}
@@ -214,14 +210,14 @@ export default function HomePage() {
               ))}
             </div>
 
-            <div className="relative w-full max-w-[340px] h-[640px] bg-stone-900 rounded-[50px] p-3 shadow-2xl border-4 border-stone-800 hover:border-orange-500/40 flex flex-col transition-colors duration-300">
-              {/* Top Notch Speaker */}
-              <div className="w-32 h-4 bg-stone-800 rounded-full mx-auto mb-2 shrink-0 flex items-center justify-center">
-                <div className="w-2.5 h-2.5 rounded-full bg-stone-950"></div>
+            <div className="relative w-full max-w-[340px] h-[640px] bg-slate-950 rounded-[44px] p-3 shadow-xl border border-slate-800 flex flex-col transition-colors">
+              {/* Top Notch */}
+              <div className="w-28 h-3.5 bg-slate-800 rounded-full mx-auto mb-2 shrink-0 flex items-center justify-center">
+                <div className="w-2 h-2 rounded-full bg-slate-900"></div>
               </div>
 
               {/* Screen Viewer */}
-              <div className="flex-1 w-full rounded-[38px] overflow-y-auto overflow-x-hidden no-scrollbar bg-stone-950 shadow-inner relative isolate scroll-smooth">
+              <div className="flex-1 w-full rounded-[32px] overflow-y-auto overflow-x-hidden no-scrollbar bg-slate-900 shadow-inner relative isolate scroll-smooth">
                 <ThemeRenderer
                   data={DEMO_WEDDING_DATA}
                   forcedThemeId={heroTheme}
@@ -231,23 +227,23 @@ export default function HomePage() {
                 />
               </div>
 
-              {/* Floating Mini Badge on phone with direct Open in New Tab action */}
+              {/* Floating Mini Badge */}
               <a
                 href={`/invitation/demo-${heroTheme}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="absolute -bottom-4 -left-4 bg-white/95 hover:bg-white border border-stone-200/90 backdrop-blur-md rounded-2xl p-3 shadow-xl flex items-center gap-2.5 transition-transform hover:scale-105 group"
+                className="absolute -bottom-3 -left-3 bg-white border border-[#E2E8F0] rounded-xl p-3 shadow-md flex items-center gap-2.5 transition-transform hover:scale-105 group"
                 title="Klik untuk membuka demo tema ini di tab baru"
               >
-                <div className="p-2 rounded-xl bg-orange-50 text-orange-600 group-hover:bg-orange-500 group-hover:text-white transition-colors">
+                <div className="p-2 rounded-lg bg-orange-50 text-[#F97316] group-hover:bg-[#F97316] group-hover:text-white transition-colors">
                   <ExternalLink className="w-4 h-4" />
                 </div>
                 <div className="text-left">
-                  <p className="text-[11px] font-bold text-stone-900 flex items-center gap-1">
+                  <p className="text-[11px] font-bold text-slate-900 flex items-center gap-1">
                     <span>Demo Layar Penuh</span>
-                    <ArrowRight className="w-3 h-3 text-orange-500" />
+                    <ArrowRight className="w-3 h-3 text-[#F97316]" />
                   </p>
-                  <p className="text-[9px] text-stone-500">Klik untuk buka di tab baru</p>
+                  <p className="text-[9px] text-slate-500">Klik untuk buka tab baru</p>
                 </div>
               </a>
             </div>
@@ -256,20 +252,20 @@ export default function HomePage() {
       </section>
 
       {/* 3. Live Wedding Showcase (Baru Saja Menikah) */}
-      <section className="border-y border-stone-200/80 bg-white py-16 px-4">
-        <div className="max-w-6xl mx-auto space-y-10">
+      <section className="border-y border-[#E2E8F0] bg-white py-14 px-4">
+        <div className="max-w-6xl mx-auto space-y-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-center sm:text-left space-y-1">
-              <span className="text-xs uppercase tracking-widest text-orange-600 font-semibold">
+              <span className="text-xs uppercase tracking-wider text-[#F97316] font-semibold">
                 Live Showcase
               </span>
-              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-stone-900">
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
                 Baru Saja Menikah Menggunakan Fasaro
               </h2>
             </div>
             <Link
               href="/login?from=/dashboard"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-orange-600 hover:text-orange-700"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#F97316] hover:underline"
             >
               <span>Bergabung Bersama Mereka</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -280,13 +276,13 @@ export default function HomePage() {
             {RECENT_WEDDINGS.map((w, idx) => (
               <div
                 key={idx}
-                className="group rounded-3xl bg-stone-50/70 border border-stone-200/90 overflow-hidden shadow-sm hover:border-orange-500/40 hover:shadow-lg hover:shadow-orange-500/5 transition-all text-left flex flex-col justify-between"
+                className="group rounded-xl bg-white border border-[#E2E8F0] overflow-hidden shadow-xs hover:border-[#F97316] transition-all text-left flex flex-col justify-between"
               >
                 <a
                   href={`/invitation/${w.slug}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block relative h-48 w-full overflow-hidden"
+                  className="block relative h-48 w-full overflow-hidden bg-slate-100"
                   title={`Buka undangan ${w.couple} di tab baru`}
                 >
                   <Image
@@ -295,33 +291,33 @@ export default function HomePage() {
                     fill
                     sizes="(max-width: 768px) 100vw, 400px"
                     priority={false}
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-semibold text-amber-300 border border-white/10">
+                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-slate-900/80 backdrop-blur-xs text-[10px] font-semibold text-white border border-white/10">
                     {w.theme}
                   </div>
                 </a>
 
-                <div className="p-5 space-y-3">
+                <div className="p-4 space-y-3">
                   <div>
                     <a
                       href={`/invitation/${w.slug}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-serif font-bold text-lg text-stone-900 hover:text-orange-600 transition-colors"
+                      className="font-bold text-base text-slate-900 hover:text-[#F97316] transition-colors"
                     >
                       {w.couple}
                     </a>
-                    <p className="text-xs text-stone-500 mt-0.5">{w.venue}</p>
+                    <p className="text-xs text-slate-500 mt-0.5">{w.venue}</p>
                   </div>
 
-                  <div className="pt-2 border-t border-stone-200/80 flex items-center justify-between">
-                    <span className="text-[11px] text-stone-500">{w.date}</span>
+                  <div className="pt-2 border-t border-[#E2E8F0] flex items-center justify-between">
+                    <span className="text-[11px] text-slate-500">{w.date}</span>
                     <a
                       href={`/invitation/${w.slug}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-orange-600 hover:text-orange-700 hover:underline"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#F97316] hover:underline"
                     >
                       <span>Lihat Contoh</span>
                       <ExternalLink className="w-3.5 h-3.5" />

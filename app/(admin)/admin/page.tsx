@@ -284,14 +284,14 @@ export default function MasterAdminPage() {
   });
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Top Header Title & Refresh */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-serif font-bold text-white">
+          <h1 className="text-xl sm:text-2xl font-sans font-bold text-slate-900 tracking-tight">
             Pusat Kendali Super Admin
           </h1>
-          <p className="text-xs sm:text-sm text-stone-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Pantau pertumbuhan pengguna, manajemen status langganan klien, dan konfigurasi platform.
           </p>
         </div>
@@ -299,9 +299,9 @@ export default function MasterAdminPage() {
         <button
           onClick={() => void fetchAllData(true)}
           disabled={isLoading}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-stone-800 bg-stone-900 hover:bg-stone-800 text-stone-200 text-xs font-semibold transition-all disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-[#E2E8F0] bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-all shadow-xs disabled:opacity-50"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin text-amber-400" : ""}`} />
+          <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin text-[#F97316]" : "text-slate-500"}`} />
           <span>Refresh Data</span>
         </button>
       </div>
@@ -309,21 +309,21 @@ export default function MasterAdminPage() {
       {/* Feedback Banner */}
       {feedback && (
         <div
-          className={`p-4 rounded-2xl text-xs font-medium border flex items-center justify-between gap-3 animate-in fade-in ${
+          className={`p-3.5 rounded-xl text-xs font-medium border flex items-center justify-between gap-3 animate-in fade-in ${
             feedback.type === "success"
-              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-              : "bg-rose-500/10 border-rose-500/30 text-rose-400"
+              ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+              : "bg-rose-50 border-rose-200 text-rose-800"
           }`}
         >
           <div className="flex items-center gap-2">
             {feedback.type === "success" ? (
-              <CheckCircle2 className="w-4 h-4 shrink-0" />
+              <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
             ) : (
-              <AlertCircle className="w-4 h-4 shrink-0" />
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
             )}
             <span>{feedback.msg}</span>
           </div>
-          <button onClick={() => setFeedback(null)} className="p-1 hover:opacity-75">
+          <button onClick={() => setFeedback(null)} className="p-1 text-slate-500 hover:text-slate-800">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -332,61 +332,61 @@ export default function MasterAdminPage() {
       {/* 1. Executive Metrics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Users */}
-        <div className="p-5 rounded-3xl bg-stone-900/60 border border-stone-800 shadow-sm space-y-2">
-          <div className="flex items-center justify-between text-stone-400 text-xs">
+        <div className="p-5 rounded-xl bg-white border border-[#E2E8F0] shadow-xs space-y-2">
+          <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
             <span>Total Pengguna</span>
-            <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400">
+            <div className="p-2 rounded-lg bg-orange-50 text-[#F97316]">
               <Users className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold font-serif text-white">
+          <p className="text-2xl font-bold font-sans text-slate-900 tracking-tight">
             {metrics?.totalUsers ?? 0}
           </p>
-          <p className="text-[11px] text-stone-500">Akun terdaftar dalam database</p>
+          <p className="text-[11px] text-slate-500">Akun terdaftar dalam database</p>
         </div>
 
         {/* Card 2: Active Invitations */}
-        <div className="p-5 rounded-3xl bg-stone-900/60 border border-stone-800 shadow-sm space-y-2">
-          <div className="flex items-center justify-between text-stone-400 text-xs">
+        <div className="p-5 rounded-xl bg-white border border-[#E2E8F0] shadow-xs space-y-2">
+          <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
             <span>Undangan Aktif</span>
-            <div className="p-2 rounded-xl bg-rose-500/10 text-rose-400">
+            <div className="p-2 rounded-lg bg-orange-50 text-[#F97316]">
               <Sparkles className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold font-serif text-white">
+          <p className="text-2xl font-bold font-sans text-slate-900 tracking-tight">
             {metrics?.totalActiveInvitations ?? 0}
           </p>
-          <p className="text-[11px] text-emerald-400">Status tayang &amp; siap diakses tamu</p>
+          <p className="text-[11px] text-emerald-600 font-medium">Status tayang &amp; siap diakses tamu</p>
         </div>
 
         {/* Card 3: Monthly Revenue */}
-        <div className="p-5 rounded-3xl bg-stone-900/60 border border-stone-800 shadow-sm space-y-2">
-          <div className="flex items-center justify-between text-stone-400 text-xs">
+        <div className="p-5 rounded-xl bg-white border border-[#E2E8F0] shadow-xs space-y-2">
+          <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
             <span>Pendapatan Bulan Ini</span>
-            <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
+            <div className="p-2 rounded-lg bg-orange-50 text-[#F97316]">
               <Wallet className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold font-serif text-white">
+          <p className="text-2xl font-bold font-sans text-slate-900 tracking-tight">
             Rp {(metrics?.monthlyRevenue ?? 0).toLocaleString("id-ID")}
           </p>
-          <p className="text-[11px] text-stone-500">Total settlement Midtrans &amp; QRIS</p>
+          <p className="text-[11px] text-slate-500">Total settlement Midtrans &amp; QRIS</p>
         </div>
 
         {/* Card 4: Verification Queue */}
-        <div className="p-5 rounded-3xl bg-stone-900/60 border border-stone-800 shadow-sm space-y-2 relative overflow-hidden">
-          <div className="flex items-center justify-between text-stone-400 text-xs">
+        <div className="p-5 rounded-xl bg-white border border-[#E2E8F0] shadow-xs space-y-2">
+          <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
             <span>Antrean Verifikasi</span>
-            <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
+            <div className="p-2 rounded-lg bg-orange-50 text-[#F97316]">
               <Clock className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold font-serif text-white">
+          <p className="text-2xl font-bold font-sans text-slate-900 tracking-tight">
             {metrics?.pendingPaymentsCount ?? 0}
           </p>
           <Link
             href="/admin/verifikasi-manual"
-            className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-400 hover:text-amber-300"
+            className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#F97316] hover:underline"
           >
             <span>Buka Halaman Verifikasi</span>
             <ExternalLink className="w-3 h-3" />
@@ -395,13 +395,13 @@ export default function MasterAdminPage() {
       </div>
 
       {/* 2. Navigation Tabs */}
-      <div className="flex items-center border-b border-stone-800 gap-2">
+      <div className="flex items-center border-b border-[#E2E8F0] gap-2">
         <button
           onClick={() => setActiveTab("clients")}
           className={`pb-3 px-4 text-xs font-semibold border-b-2 transition-all flex items-center gap-2 ${
             activeTab === "clients"
-              ? "border-amber-500 text-amber-400"
-              : "border-transparent text-stone-400 hover:text-stone-200"
+              ? "border-[#F97316] text-[#F97316]"
+              : "border-transparent text-slate-500 hover:text-slate-800"
           }`}
         >
           <Users className="w-4 h-4" />
@@ -412,8 +412,8 @@ export default function MasterAdminPage() {
           onClick={() => setActiveTab("themes")}
           className={`pb-3 px-4 text-xs font-semibold border-b-2 transition-all flex items-center gap-2 ${
             activeTab === "themes"
-              ? "border-amber-500 text-amber-400"
-              : "border-transparent text-stone-400 hover:text-stone-200"
+              ? "border-[#F97316] text-[#F97316]"
+              : "border-transparent text-slate-500 hover:text-slate-800"
           }`}
         >
           <Palette className="w-4 h-4" />
@@ -424,8 +424,8 @@ export default function MasterAdminPage() {
           onClick={() => setActiveTab("settings")}
           className={`pb-3 px-4 text-xs font-semibold border-b-2 transition-all flex items-center gap-2 ${
             activeTab === "settings"
-              ? "border-amber-500 text-amber-400"
-              : "border-transparent text-stone-400 hover:text-stone-200"
+              ? "border-[#F97316] text-[#F97316]"
+              : "border-transparent text-slate-500 hover:text-slate-800"
           }`}
         >
           <Settings className="w-4 h-4" />
@@ -439,22 +439,22 @@ export default function MasterAdminPage() {
           {/* Controls: Search & Filter */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="relative w-full sm:w-80">
-              <Search className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Cari nama, email, atau slug..."
-                className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-stone-900 border border-stone-800 text-xs text-stone-100 placeholder-stone-500 focus:outline-none focus:border-amber-500/50"
+                className="w-full pl-10 pr-4 py-2 rounded-lg bg-white border border-[#E2E8F0] text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] shadow-xs"
               />
             </div>
 
             <div className="flex items-center gap-2 w-full sm:w-auto">
-              <span className="text-xs text-stone-400 whitespace-nowrap">Filter Status:</span>
+              <span className="text-xs text-slate-500 whitespace-nowrap">Filter Status:</span>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="py-2 px-3 rounded-xl bg-stone-900 border border-stone-800 text-xs text-stone-200 focus:outline-none"
+                className="py-2 px-3 rounded-lg bg-white border border-[#E2E8F0] text-xs text-slate-700 focus:outline-none focus:border-[#F97316] shadow-xs"
               >
                 <option value="ALL">Semua Status</option>
                 <option value="ACTIVE">Aktif</option>
@@ -466,23 +466,23 @@ export default function MasterAdminPage() {
           </div>
 
           {/* Clients Table */}
-          <div className="rounded-3xl border border-stone-800 bg-stone-900/60 overflow-hidden shadow-sm">
+          <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-xs">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="border-b border-stone-800 bg-stone-950/50 text-stone-400 uppercase tracking-wider font-semibold">
+                <thead className="border-b border-[#E2E8F0] bg-slate-50/75 text-slate-500 uppercase tracking-wider font-semibold text-[11px]">
                   <tr>
-                    <th className="py-3.5 px-4">Pengantin</th>
-                    <th className="py-3.5 px-4">Subdomain / Slug</th>
-                    <th className="py-3.5 px-4">Paket</th>
-                    <th className="py-3.5 px-4">Masa Aktif</th>
-                    <th className="py-3.5 px-4">Status</th>
-                    <th className="py-3.5 px-4 text-right">Aksi</th>
+                    <th className="py-3 px-4">Pengantin</th>
+                    <th className="py-3 px-4">Subdomain / Slug</th>
+                    <th className="py-3 px-4">Paket</th>
+                    <th className="py-3 px-4">Masa Aktif</th>
+                    <th className="py-3 px-4">Status</th>
+                    <th className="py-3 px-4 text-right">Aksi</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-800/80">
+                <tbody className="divide-y divide-[#E2E8F0]">
                   {filteredClients.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="py-8 text-center text-stone-500">
+                      <td colSpan={6} className="py-8 text-center text-slate-400">
                         Tidak ada klien yang cocok dengan pencarian.
                       </td>
                     </tr>
@@ -490,10 +490,10 @@ export default function MasterAdminPage() {
                     filteredClients.map((client) => {
                       const inv = client.invitation;
                       return (
-                        <tr key={client.id} className="hover:bg-stone-800/30 transition-colors">
+                        <tr key={client.id} className="hover:bg-slate-50/60 transition-colors">
                           <td className="py-3.5 px-4">
-                            <div className="font-semibold text-white">{client.name}</div>
-                            <div className="text-[11px] text-stone-400">{client.email}</div>
+                            <div className="font-semibold text-slate-900">{client.name}</div>
+                            <div className="text-[11px] text-slate-500">{client.email}</div>
                           </td>
 
                           <td className="py-3.5 px-4 font-mono text-[11px]">
@@ -502,35 +502,35 @@ export default function MasterAdminPage() {
                                 href={`/invitation/${inv.slug}`}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="text-amber-400 hover:underline inline-flex items-center gap-1"
+                                className="text-[#F97316] hover:underline inline-flex items-center gap-1"
                               >
                                 <span>/{inv.slug}</span>
                                 <ExternalLink className="w-3 h-3" />
                               </a>
                             ) : (
-                              <span className="text-stone-600">-</span>
+                              <span className="text-slate-400">-</span>
                             )}
                           </td>
 
                           <td className="py-3.5 px-4">
                             {inv ? (
                               <span
-                                className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                                className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
                                   inv.tier === "ULTIMATE"
-                                    ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
+                                    ? "bg-orange-50 text-[#F97316] border border-orange-200"
                                     : inv.tier === "ELEGANT"
-                                    ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
-                                    : "bg-stone-700/40 text-stone-300 border border-stone-700"
+                                    ? "bg-slate-100 text-slate-700 border border-[#E2E8F0]"
+                                    : "bg-slate-50 text-slate-600 border border-[#E2E8F0]"
                                 }`}
                               >
                                 {inv.tier}
                               </span>
                             ) : (
-                              <span className="text-stone-600">-</span>
+                              <span className="text-slate-400">-</span>
                             )}
                           </td>
 
-                          <td className="py-3.5 px-4 text-[11px] text-stone-400">
+                          <td className="py-3.5 px-4 text-[11px] text-slate-500">
                             {inv?.activeUntil
                               ? new Date(inv.activeUntil).toLocaleDateString("id-ID", {
                                   day: "numeric",
@@ -543,18 +543,18 @@ export default function MasterAdminPage() {
                           <td className="py-3.5 px-4">
                             {inv ? (
                               <span
-                                className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${
+                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold ${
                                   inv.status === "ACTIVE"
-                                    ? "bg-emerald-500/10 text-emerald-400"
+                                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                                     : inv.status === "EXPIRED"
-                                    ? "bg-rose-500/10 text-rose-400"
-                                    : "bg-amber-500/10 text-amber-400"
+                                    ? "bg-rose-50 text-rose-700 border border-rose-200"
+                                    : "bg-slate-100 text-slate-700 border border-slate-200"
                                 }`}
                               >
                                 {inv.status}
                               </span>
                             ) : (
-                              <span className="text-stone-500 text-[10px]">No Draft</span>
+                              <span className="text-slate-400 text-[10px]">No Draft</span>
                             )}
                           </td>
 
@@ -567,7 +567,7 @@ export default function MasterAdminPage() {
                                   setEditIsActive(inv.isActive);
                                   setEditAddDays(0);
                                 }}
-                                className="px-2.5 py-1 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-semibold transition-colors"
+                                className="px-2.5 py-1 rounded-lg border border-[#E2E8F0] bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium transition-colors shadow-xs"
                                 title="Edit Paket / Perpanjang"
                               >
                                 <Edit2 className="w-3.5 h-3.5" />
@@ -577,7 +577,7 @@ export default function MasterAdminPage() {
                             {client.role !== "ADMIN" && (
                               <button
                                 onClick={() => handleImpersonate(client.id)}
-                                className="px-2.5 py-1 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-semibold transition-colors inline-flex items-center gap-1"
+                                className="px-2.5 py-1 rounded-lg bg-orange-50 hover:bg-blue-100 border border-orange-200 text-[#F97316] text-xs font-medium transition-colors inline-flex items-center gap-1"
                                 title="Login sebagai Klien ini"
                               >
                                 <LogIn className="w-3.5 h-3.5" />
@@ -600,7 +600,7 @@ export default function MasterAdminPage() {
       {activeTab === "themes" && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <p className="text-xs text-stone-400">
+            <p className="text-xs text-slate-500">
               Katalog tema yang dapat dipilih langsung oleh pengantin tanpa kehilangan data.
             </p>
             <button
@@ -616,7 +616,7 @@ export default function MasterAdminPage() {
                 });
                 setIsThemeModalOpen(true);
               }}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-bold transition-all"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#F97316] hover:bg-[#EA580C] text-white text-xs font-semibold transition-all shadow-sm"
             >
               <Plus className="w-4 h-4" />
               <span>Tambah Tema Baru</span>
@@ -627,9 +627,9 @@ export default function MasterAdminPage() {
             {themes.map((theme) => (
               <div
                 key={theme.id}
-                className="rounded-3xl border border-stone-800 bg-stone-900/60 overflow-hidden flex flex-col group hover:border-amber-500/40 transition-all"
+                className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden flex flex-col group hover:border-[#F97316]/40 transition-all shadow-xs"
               >
-                <div className="relative h-44 w-full overflow-hidden bg-stone-950">
+                <div className="relative h-44 w-full overflow-hidden bg-slate-100">
                   <Image
                     src={theme.thumbnail || "/images/placeholder-theme.jpg"}
                     alt={theme.name}
@@ -638,38 +638,38 @@ export default function MasterAdminPage() {
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute top-3 left-3 flex gap-1.5">
-                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-stone-900/80 backdrop-blur-md text-amber-300 border border-stone-700">
+                    <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-white/95 text-slate-700 border border-[#E2E8F0]">
                       {theme.category}
                     </span>
                     {theme.isPremium ? (
-                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500 text-stone-950">
+                      <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#F97316] text-white">
                         PREMIUM
                       </span>
                     ) : (
-                      <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-stone-800 text-stone-300">
+                      <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-600 border border-[#E2E8F0]">
                         FREE
                       </span>
                     )}
                   </div>
                 </div>
 
-                <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
                   <div>
-                    <h3 className="font-serif font-bold text-base text-white">{theme.name}</h3>
-                    <p className="text-xs font-mono text-stone-500 mt-0.5">Key: {theme.themeKey}</p>
+                    <h3 className="font-sans font-semibold text-sm text-slate-900">{theme.name}</h3>
+                    <p className="text-xs font-mono text-slate-400 mt-0.5">Key: {theme.themeKey}</p>
                   </div>
 
-                  <div className="pt-3 border-t border-stone-800 flex items-center justify-between">
+                  <div className="pt-3 border-t border-[#E2E8F0] flex items-center justify-between">
                     <span
-                      className={`inline-flex items-center gap-1 text-[11px] font-semibold ${
-                        theme.isActive ? "text-emerald-400" : "text-stone-500"
+                      className={`inline-flex items-center gap-1 text-[11px] font-medium ${
+                        theme.isActive ? "text-emerald-600" : "text-slate-400"
                       }`}
                     >
                       {theme.isActive ? <Check className="w-3.5 h-3.5" /> : <X className="w-3.5 h-3.5" />}
                       <span>{theme.isActive ? "Aktif di Katalog" : "Nonaktif"}</span>
                     </span>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       <button
                         onClick={() => {
                           setEditingThemeId(theme.id);
@@ -683,14 +683,14 @@ export default function MasterAdminPage() {
                           });
                           setIsThemeModalOpen(true);
                         }}
-                        className="p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs"
+                        className="p-1.5 rounded-lg border border-[#E2E8F0] hover:bg-slate-50 text-slate-600 text-xs"
                         title="Edit Tema"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => handleDeleteTheme(theme.id, theme.name)}
-                        className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs"
+                        className="p-1.5 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs"
                         title="Hapus Tema"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -707,10 +707,10 @@ export default function MasterAdminPage() {
       {/* TAB 3: PENGATURAN SISTEM */}
       {activeTab === "settings" && (
         <form onSubmit={handleSaveSettings} className="space-y-6 max-w-3xl">
-          <div className="rounded-3xl border border-stone-800 bg-stone-900/60 p-6 sm:p-8 space-y-6">
+          <div className="rounded-xl border border-[#E2E8F0] bg-white p-6 sm:p-8 space-y-6 shadow-xs">
             <div>
-              <h2 className="text-lg font-serif font-bold text-white">Konfigurasi Gateway &amp; QRIS</h2>
-              <p className="text-xs text-stone-400 mt-0.5">
+              <h2 className="text-base font-sans font-bold text-slate-900">Konfigurasi Gateway &amp; QRIS</h2>
+              <p className="text-xs text-slate-500 mt-0.5">
                 Pengaturan kunci API Sandbox Midtrans, informasi nomor rekening QRIS manual, dan kuota upload foto.
               </p>
             </div>
@@ -718,9 +718,9 @@ export default function MasterAdminPage() {
             <div className="space-y-4">
               {settings.map((item, idx) => (
                 <div key={item.key} className="space-y-1.5">
-                  <label className="text-xs font-semibold text-stone-300 flex items-center justify-between">
+                  <label className="text-xs font-semibold text-slate-700 flex items-center justify-between">
                     <span>{item.key}</span>
-                    <span className="text-[10px] text-stone-500 font-normal">
+                    <span className="text-[10px] text-slate-400 font-normal">
                       {item.description || ""}
                     </span>
                   </label>
@@ -732,16 +732,16 @@ export default function MasterAdminPage() {
                       updated[idx].value = e.target.value;
                       setSettings(updated);
                     }}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-stone-950 border border-stone-800 text-xs text-stone-100 font-mono focus:outline-none focus:border-amber-500"
+                    className="w-full px-3.5 py-2 rounded-lg bg-white border border-[#E2E8F0] text-xs text-slate-900 font-mono focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316]"
                   />
                 </div>
               ))}
             </div>
 
-            <div className="pt-4 border-t border-stone-800 flex justify-end">
+            <div className="pt-4 border-t border-[#E2E8F0] flex justify-end">
               <button
                 type="submit"
-                className="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-bold transition-all shadow-md shadow-amber-500/20"
+                className="px-5 py-2 rounded-lg bg-[#F97316] hover:bg-[#EA580C] text-white text-xs font-semibold transition-all shadow-sm"
               >
                 Simpan Semua Pengaturan
               </button>
@@ -752,26 +752,26 @@ export default function MasterAdminPage() {
 
       {/* MODAL: EDIT CLIENT / EXTEND VALIDITY */}
       {editingClient && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-3xl bg-stone-900 border border-stone-800 p-6 space-y-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
+          <div className="w-full max-w-md rounded-xl bg-white border border-[#E2E8F0] p-6 space-y-5 shadow-xl">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-serif font-bold text-lg text-white">Edit Paket &amp; Masa Aktif</h3>
-                <p className="text-xs text-stone-400">{editingClient.name} ({editingClient.email})</p>
+                <h3 className="font-sans font-bold text-base text-slate-900">Edit Paket &amp; Masa Aktif</h3>
+                <p className="text-xs text-slate-500">{editingClient.name} ({editingClient.email})</p>
               </div>
-              <button onClick={() => setEditingClient(null)} className="p-1 hover:opacity-75">
-                <X className="w-5 h-5 text-stone-400" />
+              <button onClick={() => setEditingClient(null)} className="p-1 text-slate-400 hover:text-slate-600">
+                <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-4 text-xs">
               {/* Tier Selection */}
               <div className="space-y-1.5">
-                <label className="font-semibold text-stone-300">Tingkat Paket Langganan:</label>
+                <label className="font-semibold text-slate-700">Tingkat Paket Langganan:</label>
                 <select
                   value={editTier}
                   onChange={(e) => setEditTier(e.target.value)}
-                  className="w-full py-2.5 px-3 rounded-xl bg-stone-950 border border-stone-800 text-stone-200"
+                  className="w-full py-2 px-3 rounded-lg bg-white border border-[#E2E8F0] text-slate-800 focus:outline-none focus:border-[#F97316]"
                 >
                   <option value="STARTER">Starter (Rp 69.000)</option>
                   <option value="ELEGANT">Elegant (Rp 149.000)</option>
@@ -781,7 +781,7 @@ export default function MasterAdminPage() {
 
               {/* Add Validity Days */}
               <div className="space-y-1.5">
-                <label className="font-semibold text-stone-300">Perpanjang Masa Aktif:</label>
+                <label className="font-semibold text-slate-700">Perpanjang Masa Aktif:</label>
                 <div className="grid grid-cols-3 gap-2">
                   {[
                     { label: "Tetap (0 Hari)", days: 0 },
@@ -792,10 +792,10 @@ export default function MasterAdminPage() {
                       key={btn.days}
                       type="button"
                       onClick={() => setEditAddDays(btn.days)}
-                      className={`py-2 rounded-xl text-center font-medium border ${
+                      className={`py-2 rounded-lg text-center font-medium border text-xs transition-colors ${
                         editAddDays === btn.days
-                          ? "bg-amber-500/20 text-amber-300 border-amber-500/50"
-                          : "bg-stone-950 border-stone-800 text-stone-400"
+                          ? "bg-orange-50 text-[#F97316] border-[#F97316]"
+                          : "bg-white border-[#E2E8F0] text-slate-600 hover:bg-slate-50"
                       }`}
                     >
                       {btn.label}
@@ -806,9 +806,9 @@ export default function MasterAdminPage() {
 
               {/* Status Toggle */}
               <div className="space-y-1.5">
-                <label className="font-semibold text-stone-300">Status Undangan:</label>
-                <div className="flex items-center gap-3">
-                  <label className="flex items-center gap-2 cursor-pointer">
+                <label className="font-semibold text-slate-700">Status Undangan:</label>
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer text-slate-700">
                     <input
                       type="radio"
                       name="isActive"
@@ -817,7 +817,7 @@ export default function MasterAdminPage() {
                     />
                     <span>Aktif</span>
                   </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
+                  <label className="flex items-center gap-2 cursor-pointer text-slate-700">
                     <input
                       type="radio"
                       name="isActive"
@@ -830,18 +830,18 @@ export default function MasterAdminPage() {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-stone-800 flex justify-end gap-3">
+            <div className="pt-4 border-t border-[#E2E8F0] flex justify-end gap-2.5">
               <button
                 type="button"
                 onClick={() => setEditingClient(null)}
-                className="px-4 py-2 rounded-xl bg-stone-800 text-stone-300 text-xs font-semibold"
+                className="px-4 py-2 rounded-lg border border-[#E2E8F0] bg-white hover:bg-slate-50 text-slate-600 text-xs font-medium"
               >
                 Batal
               </button>
               <button
                 type="button"
                 onClick={handleSaveClientEdit}
-                className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-bold shadow-md"
+                className="px-4 py-2 rounded-lg bg-[#F97316] hover:bg-[#EA580C] text-white text-xs font-semibold shadow-xs"
               >
                 Simpan Perubahan
               </button>
@@ -852,27 +852,27 @@ export default function MasterAdminPage() {
 
       {/* MODAL: ADD / EDIT THEME */}
       {isThemeModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
           <form
             onSubmit={handleSaveTheme}
-            className="w-full max-w-md rounded-3xl bg-stone-900 border border-stone-800 p-6 space-y-5 shadow-2xl"
+            className="w-full max-w-md rounded-xl bg-white border border-[#E2E8F0] p-6 space-y-4 shadow-xl"
           >
             <div className="flex items-center justify-between">
-              <h3 className="font-serif font-bold text-lg text-white">
+              <h3 className="font-sans font-bold text-base text-slate-900">
                 {editingThemeId ? "Edit Tema" : "Tambah Tema Baru"}
               </h3>
               <button
                 type="button"
                 onClick={() => setIsThemeModalOpen(false)}
-                className="p-1 hover:opacity-75"
+                className="p-1 text-slate-400 hover:text-slate-600"
               >
-                <X className="w-5 h-5 text-stone-400" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-3 text-xs">
               <div className="space-y-1">
-                <label className="font-semibold text-stone-300">Theme Key (ID):</label>
+                <label className="font-semibold text-slate-700">Theme Key (ID):</label>
                 <input
                   type="text"
                   required
@@ -880,28 +880,28 @@ export default function MasterAdminPage() {
                   value={themeForm.themeKey}
                   onChange={(e) => setThemeForm({ ...themeForm, themeKey: e.target.value })}
                   placeholder="contoh: modern-gold"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 font-mono disabled:opacity-50"
+                  className="w-full px-3 py-2 rounded-lg bg-white border border-[#E2E8F0] text-slate-900 font-mono disabled:opacity-50 focus:outline-none focus:border-[#F97316]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-stone-300">Nama Tema:</label>
+                <label className="font-semibold text-slate-700">Nama Tema:</label>
                 <input
                   type="text"
                   required
                   value={themeForm.name}
                   onChange={(e) => setThemeForm({ ...themeForm, name: e.target.value })}
                   placeholder="contoh: Modern Gold Luxury"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100"
+                  className="w-full px-3 py-2 rounded-lg bg-white border border-[#E2E8F0] text-slate-900 focus:outline-none focus:border-[#F97316]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-stone-300">Kategori:</label>
+                <label className="font-semibold text-slate-700">Kategori:</label>
                 <select
                   value={themeForm.category}
                   onChange={(e) => setThemeForm({ ...themeForm, category: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-200"
+                  className="w-full px-3 py-2 rounded-lg bg-white border border-[#E2E8F0] text-slate-800 focus:outline-none focus:border-[#F97316]"
                 >
                   <option value="Minimalist">Minimalist</option>
                   <option value="Floral & Rustic">Floral &amp; Rustic</option>
@@ -912,19 +912,19 @@ export default function MasterAdminPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-stone-300">URL Gambar Thumbnail:</label>
+                <label className="font-semibold text-slate-700">URL Gambar Thumbnail:</label>
                 <input
                   type="url"
                   required
                   value={themeForm.thumbnail}
                   onChange={(e) => setThemeForm({ ...themeForm, thumbnail: e.target.value })}
                   placeholder="https://..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100"
+                  className="w-full px-3 py-2 rounded-lg bg-white border border-[#E2E8F0] text-slate-900 focus:outline-none focus:border-[#F97316]"
                 />
               </div>
 
               <div className="flex items-center gap-6 pt-2">
-                <label className="flex items-center gap-2 cursor-pointer text-stone-300">
+                <label className="flex items-center gap-2 cursor-pointer text-slate-700">
                   <input
                     type="checkbox"
                     checked={themeForm.isPremium}
@@ -935,7 +935,7 @@ export default function MasterAdminPage() {
                   <span>Tema Premium (Berbayar)</span>
                 </label>
 
-                <label className="flex items-center gap-2 cursor-pointer text-stone-300">
+                <label className="flex items-center gap-2 cursor-pointer text-slate-700">
                   <input
                     type="checkbox"
                     checked={themeForm.isActive}
@@ -946,17 +946,17 @@ export default function MasterAdminPage() {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-stone-800 flex justify-end gap-3">
+            <div className="pt-4 border-t border-[#E2E8F0] flex justify-end gap-2.5">
               <button
                 type="button"
                 onClick={() => setIsThemeModalOpen(false)}
-                className="px-4 py-2 rounded-xl bg-stone-800 text-stone-300 text-xs font-semibold"
+                className="px-4 py-2 rounded-lg border border-[#E2E8F0] bg-white hover:bg-slate-50 text-slate-600 text-xs font-medium"
               >
                 Batal
               </button>
               <button
                 type="submit"
-                className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-bold shadow-md"
+                className="px-4 py-2 rounded-lg bg-[#F97316] hover:bg-[#EA580C] text-white text-xs font-semibold shadow-xs"
               >
                 {editingThemeId ? "Perbarui Tema" : "Tambah Tema"}
               </button>

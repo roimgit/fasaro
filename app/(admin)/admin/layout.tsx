@@ -23,60 +23,65 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col font-sans selection:bg-amber-500 selection:text-stone-950">
+    <div className="min-h-screen bg-[#F3F6FB] text-slate-800 flex flex-col font-sans selection:bg-orange-500 selection:text-white">
       {/* Top Navbar */}
-      <header className="sticky top-0 z-50 border-b border-stone-800/80 bg-stone-950/80 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 border-b border-[#E2E8F0] bg-white/95 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           {/* Logo & Badge */}
           <div className="flex items-center gap-3">
             <Link href="/admin" className="flex items-center gap-2 group">
-              <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-amber-600 via-amber-500 to-rose-500 flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform">
-                <Sparkles className="w-5 h-5 text-stone-950 fill-stone-950" />
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-orange-500 to-amber-500 flex items-center justify-center text-white transition-transform group-hover:scale-105 shadow-xs">
+                <Sparkles className="w-4 h-4 fill-white" />
               </div>
-              <span className="font-serif font-bold text-lg tracking-wider text-stone-100">
-                Fasaro <span className="text-amber-400 font-sans text-xs uppercase px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20">Master Admin</span>
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="font-sans font-bold text-base tracking-tight text-slate-900">
+                  Fasaro
+                </span>
+                <span className="text-[#F97316] font-sans text-[11px] font-semibold uppercase px-2 py-0.5 rounded-md bg-orange-50 border border-orange-100">
+                  Master Admin
+                </span>
+              </div>
             </Link>
           </div>
 
           {/* Quick Nav Tabs */}
-          <nav className="hidden md:flex items-center gap-1 text-xs font-semibold">
+          <nav className="hidden md:flex items-center gap-1.5 text-xs font-medium">
             <Link
               href="/admin"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-stone-300 hover:text-white hover:bg-stone-900 transition-colors"
+              className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
             >
-              <LayoutDashboard className="w-4 h-4 text-amber-400" />
+              <LayoutDashboard className="w-4 h-4 text-[#F97316]" />
               <span>Pusat Kendali</span>
             </Link>
 
             <Link
               href="/admin/verifikasi-manual"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-stone-300 hover:text-white hover:bg-stone-900 transition-colors"
+              className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
             >
-              <CheckSquare className="w-4 h-4 text-emerald-400" />
+              <CheckSquare className="w-4 h-4 text-[#F97316]" />
               <span>Verifikasi Manual</span>
             </Link>
 
             <Link
               href="/"
               target="_blank"
-              className="flex items-center gap-2 px-3 py-2 rounded-xl text-stone-400 hover:text-white transition-colors"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors"
             >
-              <Globe className="w-4 h-4" />
-              <span>Buka Landing Page</span>
+              <Globe className="w-4 h-4 text-slate-400" />
+              <span>Lihat Website</span>
             </Link>
           </nav>
 
           {/* Admin Profile & Logout */}
           <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-stone-900 border border-stone-800 text-xs">
-              <Shield className="w-3.5 h-3.5 text-amber-400" />
-              <span className="text-stone-300 font-medium">{session.email}</span>
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-[#E2E8F0] text-xs">
+              <Shield className="w-3.5 h-3.5 text-[#F97316]" />
+              <span className="text-slate-700 font-medium">{session.email}</span>
             </div>
 
             <Link
               href="/login"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-semibold transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 text-xs font-medium transition-colors shadow-xs"
               title="Keluar / Ganti Akun"
             >
               <LogOut className="w-3.5 h-3.5" />
@@ -92,8 +97,8 @@ export default async function AdminLayout({
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-stone-900 py-6 text-center text-xs text-stone-500">
-        <p>Fasaro Wedding SaaS &bull; Platform Management &amp; Super Admin Console</p>
+      <footer className="border-t border-[#E2E8F0] bg-white py-5 text-center text-xs text-slate-500">
+        <p>Panel Manajemen Platform Fasaro &copy; {new Date().getFullYear()}. Hak Cipta Dilindungi.</p>
       </footer>
     </div>
   );

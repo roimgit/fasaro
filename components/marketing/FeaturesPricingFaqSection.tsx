@@ -144,7 +144,7 @@ export const FeaturesPricingFaqSection: React.FC = () => {
     },
     {
       q: "Apakah saya bisa mengganti tema setelah undangan selesai dibuat?",
-      a: "Bisa banget! Berkat arsitektur modular Fasaro (Aturan P0), Anda bisa berganti-ganti tema kapan saja dari dashboard hanya dengan 1-klik tanpa ada satu pun data yang hilang.",
+      a: "Bisa banget! Berkat arsitektur modular Fasaro, Anda bisa berganti-ganti tema kapan saja dari dashboard hanya dengan 1-klik tanpa ada satu pun data yang hilang.",
     },
     {
       q: "Bagaimana cara tamu mengirimkan kado/amplop digital?",
@@ -161,18 +161,18 @@ export const FeaturesPricingFaqSection: React.FC = () => {
   ];
 
   return (
-    <div className="w-full space-y-28 py-10">
+    <div className="w-full space-y-24 py-8">
       {/* 1. Fitur Unggulan Grid */}
-      <section id="fitur" className="max-w-6xl mx-auto px-4 space-y-12 scroll-mt-20">
-        <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 border border-orange-200 text-orange-700 text-xs font-semibold">
+      <section id="fitur" className="max-w-6xl mx-auto px-4 space-y-10 scroll-mt-20">
+        <div className="text-center space-y-2.5 max-w-2xl mx-auto">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 border border-orange-100 text-[#F97316] text-xs font-semibold">
             <Zap className="w-3.5 h-3.5" />
             <span>Fitur Lengkap &amp; Canggih</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-stone-900">
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900">
             Semua yang Anda Butuhkan untuk Hari Bahagia
           </h2>
-          <p className="text-xs sm:text-sm text-stone-600">
+          <p className="text-xs sm:text-sm text-slate-500">
             Didesain khusus untuk mempermudah calon pengantin mempersiapkan pesta pernikahan modern.
           </p>
         </div>
@@ -183,13 +183,13 @@ export const FeaturesPricingFaqSection: React.FC = () => {
             return (
               <div
                 key={idx}
-                className="p-6 rounded-3xl bg-white border border-stone-200/90 shadow-sm hover:border-orange-500/40 hover:shadow-lg hover:shadow-orange-500/5 transition-all space-y-3 text-left group"
+                className="p-6 rounded-2xl bg-white border border-[#E2E8F0] shadow-xs hover:border-[#F97316] transition-all space-y-3 text-left group"
               >
-                <div className="w-12 h-12 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-600 group-hover:scale-110 transition-transform">
-                  <Icon className="w-6 h-6" />
+                <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center text-[#F97316] group-hover:scale-105 transition-transform">
+                  <Icon className="w-5 h-5" />
                 </div>
-                <h3 className="font-bold text-base text-stone-900">{f.title}</h3>
-                <p className="text-xs text-stone-600 leading-relaxed">{f.desc}</p>
+                <h3 className="font-semibold text-base text-slate-900">{f.title}</h3>
+                <p className="text-xs text-slate-600 leading-relaxed">{f.desc}</p>
               </div>
             );
           })}
@@ -197,56 +197,56 @@ export const FeaturesPricingFaqSection: React.FC = () => {
       </section>
 
       {/* 2. Tabel Paket Harga */}
-      <section id="harga" className="max-w-6xl mx-auto px-4 space-y-12 scroll-mt-20">
-        <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 border border-orange-200 text-orange-700 text-xs font-semibold">
+      <section id="harga" className="max-w-6xl mx-auto px-4 space-y-10 scroll-mt-20">
+        <div className="text-center space-y-2.5 max-w-2xl mx-auto">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 border border-orange-100 text-[#F97316] text-xs font-semibold">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Biaya Transparan &amp; Terjangkau</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-stone-900">
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900">
             Pilihan Paket Sesuai Kebutuhan Anda
           </h2>
-          <p className="text-xs sm:text-sm text-stone-600">
+          <p className="text-xs sm:text-sm text-slate-500">
             Sekali bayar tanpa biaya tersembunyi. Aktif seketika via gateway otomatis atau transfer manual.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
           {pricingPlans.map((plan, idx) => (
             <div
               key={idx}
-              className={`rounded-3xl p-8 flex flex-col justify-between relative transition-all ${
+              className={`rounded-2xl p-7 flex flex-col justify-between relative transition-all ${
                 plan.highlight
-                  ? "bg-white border-2 border-orange-500 shadow-xl shadow-orange-500/10 scale-105"
-                  : "bg-white border border-stone-200 hover:border-stone-300 shadow-sm"
+                  ? "bg-white border-2 border-[#F97316] shadow-md ring-1 ring-orange-100"
+                  : "bg-white border border-[#E2E8F0] hover:border-slate-300 shadow-xs"
               }`}
             >
               {plan.badge && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 py-1 px-4 rounded-full text-[10px] font-bold uppercase tracking-wider bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 py-0.5 px-3 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-[#F97316] text-white shadow-xs">
                   {plan.badge}
                 </div>
               )}
 
               <div className="space-y-4 text-left">
                 <div>
-                  <h3 className="font-bold text-lg text-stone-900">{plan.name}</h3>
-                  <p className="text-xs text-stone-500 mt-1">{plan.description}</p>
+                  <h3 className="font-bold text-lg text-slate-900">{plan.name}</h3>
+                  <p className="text-xs text-slate-500 mt-1">{plan.description}</p>
                 </div>
 
                 <div className="py-2">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-xs text-stone-500">Rp</span>
-                    <span className="text-4xl font-serif font-bold text-stone-900 tracking-tight">
+                    <span className="text-xs text-slate-500">Rp</span>
+                    <span className="text-3xl font-bold text-slate-900 tracking-tight">
                       {plan.price}
                     </span>
                   </div>
-                  <span className="text-[11px] text-orange-600 font-semibold">{plan.period}</span>
+                  <span className="text-[11px] text-[#F97316] font-semibold">{plan.period}</span>
                 </div>
 
-                <div className="space-y-2.5 pt-2 border-t border-stone-100">
+                <div className="space-y-2.5 pt-2 border-t border-[#E2E8F0]">
                   {plan.features.map((feat, fIdx) => (
-                    <div key={fIdx} className="flex items-start gap-2.5 text-xs text-stone-700">
-                      <Check className="w-4 h-4 text-orange-600 shrink-0 mt-0.5" />
+                    <div key={fIdx} className="flex items-start gap-2.5 text-xs text-slate-700">
+                      <Check className="w-4 h-4 text-[#F97316] shrink-0 mt-0.5" />
                       <span>{feat}</span>
                     </div>
                   ))}
@@ -256,10 +256,10 @@ export const FeaturesPricingFaqSection: React.FC = () => {
               <div className="pt-8">
                 <Link
                   href={`/login?from=/dashboard&upgradeTier=${plan.tier}`}
-                  className={`w-full block text-center py-3 px-6 rounded-2xl text-xs font-bold transition-all ${
+                  className={`w-full block text-center py-2.5 px-4 rounded-xl text-xs font-semibold transition-colors ${
                     plan.highlight
-                      ? "bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg shadow-orange-500/20 hover:scale-105"
-                      : "bg-stone-100 hover:bg-stone-200 text-stone-800"
+                      ? "bg-[#F97316] hover:bg-[#EA580C] text-white shadow-xs"
+                      : "bg-[#F8FAFC] border border-[#E2E8F0] hover:bg-slate-100 text-slate-800"
                   }`}
                 >
                   Pilih {plan.name}
@@ -271,16 +271,16 @@ export const FeaturesPricingFaqSection: React.FC = () => {
       </section>
 
       {/* 3. Testimoni Pasangan */}
-      <section id="testimoni" className="max-w-6xl mx-auto px-4 space-y-12 scroll-mt-20">
-        <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 border border-orange-200 text-orange-700 text-xs font-semibold">
-            <Heart className="w-3.5 h-3.5 fill-orange-500 text-orange-500" />
+      <section id="testimoni" className="max-w-6xl mx-auto px-4 space-y-10 scroll-mt-20">
+        <div className="text-center space-y-2.5 max-w-2xl mx-auto">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 border border-orange-100 text-[#F97316] text-xs font-semibold">
+            <Heart className="w-3.5 h-3.5 fill-[#F97316] text-[#F97316]" />
             <span>Cerita Bahagia</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-stone-900">
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900">
             Kisah Sukses Pengantin Fasaro
           </h2>
-          <p className="text-xs sm:text-sm text-stone-600">
+          <p className="text-xs sm:text-sm text-slate-500">
             Dipercaya oleh ribuan pasangan pengantin dari Sabang sampai Merauke.
           </p>
         </div>
@@ -289,25 +289,25 @@ export const FeaturesPricingFaqSection: React.FC = () => {
           {testimonials.map((testi, idx) => (
             <div
               key={idx}
-              className="p-6 rounded-3xl bg-white border border-stone-200/90 shadow-sm space-y-4 text-left flex flex-col justify-between hover:shadow-md transition-shadow"
+              className="p-6 rounded-2xl bg-white border border-[#E2E8F0] shadow-xs space-y-4 text-left flex flex-col justify-between"
             >
-              <div className="space-y-3">
-                <div className="flex items-center gap-1 text-amber-400">
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-1 text-amber-500">
                   {[...Array(testi.rating)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-amber-400" />
+                    <Star key={i} className="w-3.5 h-3.5 fill-amber-500" />
                   ))}
                 </div>
-                <p className="text-xs text-stone-700 leading-relaxed italic">
+                <p className="text-xs text-slate-600 leading-relaxed">
                   &quot;{testi.comment}&quot;
                 </p>
               </div>
 
-              <div className="pt-4 border-t border-stone-100 flex items-center justify-between">
+              <div className="pt-3.5 border-t border-[#E2E8F0] flex items-center justify-between">
                 <div>
-                  <h4 className="font-bold text-sm text-stone-900">{testi.couple}</h4>
-                  <span className="text-[11px] text-stone-500">{testi.city}</span>
+                  <h4 className="font-semibold text-xs text-slate-900">{testi.couple}</h4>
+                  <span className="text-[11px] text-slate-500">{testi.city}</span>
                 </div>
-                <span className="text-[10px] text-orange-700 font-mono bg-orange-50 px-2 py-0.5 rounded-md">
+                <span className="text-[10px] text-[#F97316] font-mono bg-orange-50 px-2 py-0.5 rounded border border-orange-100">
                   {testi.weddingDate}
                 </span>
               </div>
@@ -317,13 +317,13 @@ export const FeaturesPricingFaqSection: React.FC = () => {
       </section>
 
       {/* 4. Accordion FAQ */}
-      <section id="faq" className="max-w-4xl mx-auto px-4 space-y-10 scroll-mt-20">
-        <div className="text-center space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 border border-orange-200 text-orange-700 text-xs font-semibold">
+      <section id="faq" className="max-w-4xl mx-auto px-4 space-y-8 scroll-mt-20">
+        <div className="text-center space-y-2.5">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 border border-orange-100 text-[#F97316] text-xs font-semibold">
             <HelpCircle className="w-3.5 h-3.5" />
             <span>Frequently Asked Questions</span>
           </div>
-          <h2 className="text-3xl font-serif font-bold text-stone-900">Pertanyaan Sering Ditanyakan</h2>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900">Pertanyaan Sering Ditanyakan</h2>
         </div>
 
         <div className="space-y-3 text-left">
@@ -332,22 +332,22 @@ export const FeaturesPricingFaqSection: React.FC = () => {
             return (
               <div
                 key={idx}
-                className="rounded-2xl bg-white border border-stone-200/90 shadow-sm overflow-hidden transition-all"
+                className="rounded-xl bg-white border border-[#E2E8F0] shadow-xs overflow-hidden transition-colors"
               >
                 <button
                   type="button"
                   onClick={() => setOpenFaq(isOpen ? null : idx)}
-                  className="w-full py-4 px-6 flex items-center justify-between gap-4 text-sm font-semibold text-stone-800 hover:text-orange-600 text-left transition-colors"
+                  className="w-full py-3.5 px-5 flex items-center justify-between gap-4 text-xs sm:text-sm font-semibold text-slate-800 hover:text-[#F97316] text-left transition-colors"
                 >
                   <span>{faq.q}</span>
                   <ChevronDown
-                    className={`w-4 h-4 text-stone-400 transition-transform ${
-                      isOpen ? "rotate-180 text-orange-600" : ""
+                    className={`w-4 h-4 text-slate-400 transition-transform shrink-0 ${
+                      isOpen ? "rotate-180 text-[#F97316]" : ""
                     }`}
                   />
                 </button>
                 {isOpen && (
-                  <div className="px-6 pb-4 text-xs text-stone-600 leading-relaxed border-t border-stone-100 pt-3 animate-in fade-in">
+                  <div className="px-5 pb-3.5 text-xs text-slate-600 leading-relaxed border-t border-[#E2E8F0] pt-3 animate-in fade-in">
                     {faq.a}
                   </div>
                 )}
@@ -357,23 +357,23 @@ export const FeaturesPricingFaqSection: React.FC = () => {
         </div>
       </section>
 
-      {/* 5. Footer Lengkap */}
-      <footer className="border-t border-stone-200 bg-white pt-16 pb-8">
-        <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8 text-left pb-12">
+      {/* 5. Footer */}
+      <footer className="border-t border-[#E2E8F0] bg-white pt-14 pb-8">
+        <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8 text-left pb-10">
           {/* Brand Col */}
           <div className="space-y-3 md:col-span-1">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-orange-600 via-orange-500 to-amber-500 flex items-center justify-center shadow-md shadow-orange-500/20">
-                <Heart className="w-4 h-4 text-white fill-white" />
+              <div className="w-8 h-8 rounded-lg bg-[#F97316] flex items-center justify-center text-white shadow-xs">
+                <Heart className="w-4 h-4 fill-white" />
               </div>
-              <span className="text-lg font-serif font-bold text-stone-900">
-                Fasaro<span className="text-orange-500">.</span>
+              <span className="text-lg font-bold tracking-tight text-slate-900">
+                Fasaro<span className="text-[#F97316]">.</span>
               </span>
             </div>
-            <p className="text-xs text-stone-600 leading-relaxed">
+            <p className="text-xs text-slate-500 leading-relaxed">
               Platform pembuatan undangan pernikahan digital elegan nomor #1 di Indonesia. Berkecepatan tinggi, aman, dan mudah digunakan.
             </p>
-            <div className="flex items-center gap-2 text-xs text-emerald-600">
+            <div className="flex items-center gap-2 text-xs text-emerald-600 font-medium">
               <ShieldCheck className="w-4 h-4" />
               <span>SSL 256-Bit Secured &amp; Verified</span>
             </div>
@@ -381,50 +381,50 @@ export const FeaturesPricingFaqSection: React.FC = () => {
 
           {/* Navigation Links */}
           <div className="space-y-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-stone-900">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-900">
               Navigasi Cepat
             </h4>
-            <ul className="space-y-1.5 text-xs text-stone-600">
-              <li><a href="#home" className="hover:text-orange-600 transition-colors">Beranda</a></li>
-              <li><a href="#tema" className="hover:text-orange-600 transition-colors">Katalog Tema</a></li>
-              <li><a href="#fitur" className="hover:text-orange-600 transition-colors">Fitur Platform</a></li>
-              <li><a href="#harga" className="hover:text-orange-600 transition-colors">Paket Harga</a></li>
+            <ul className="space-y-1.5 text-xs text-slate-600">
+              <li><a href="#home" className="hover:text-[#F97316] transition-colors">Beranda</a></li>
+              <li><a href="#tema" className="hover:text-[#F97316] transition-colors">Katalog Tema</a></li>
+              <li><a href="#fitur" className="hover:text-[#F97316] transition-colors">Fitur Platform</a></li>
+              <li><a href="#harga" className="hover:text-[#F97316] transition-colors">Paket Harga</a></li>
             </ul>
           </div>
 
           {/* Program & Kemitraan */}
           <div className="space-y-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-stone-900">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-900">
               Kemitraan &amp; Komunitas
             </h4>
-            <ul className="space-y-1.5 text-xs text-stone-600">
-              <li><Link href="/login" className="hover:text-orange-600 transition-colors">Program Reseller WO</Link></li>
-              <li><Link href="/login" className="hover:text-orange-600 transition-colors">Mitra Fotografer Wedding</Link></li>
-              <li><Link href="/login" className="hover:text-orange-600 transition-colors">Affiliate Earning</Link></li>
-              <li><Link href="/admin/verifikasi-manual" className="hover:text-orange-600 transition-colors">Admin Portal</Link></li>
+            <ul className="space-y-1.5 text-xs text-slate-600">
+              <li><Link href="/login" className="hover:text-[#F97316] transition-colors">Program Reseller WO</Link></li>
+              <li><Link href="/login" className="hover:text-[#F97316] transition-colors">Mitra Fotografer Wedding</Link></li>
+              <li><Link href="/login" className="hover:text-[#F97316] transition-colors">Affiliate Earning</Link></li>
+              <li><Link href="/admin/verifikasi-manual" className="hover:text-[#F97316] transition-colors">Admin Portal</Link></li>
             </ul>
           </div>
 
           {/* Kontak Support */}
           <div className="space-y-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-stone-900">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-900">
               Bantuan &amp; Kontak
             </h4>
-            <p className="text-xs text-stone-600">
+            <p className="text-xs text-slate-500">
               Customer Success siap membantu persiapan hari bahagia Anda setiap hari (08:00 - 22:00 WIB).
             </p>
             <a
               href="https://wa.me/6281234567890?text=Halo%20Admin%20Fasaro%20saya%20ingin%20tanya%20undangan%20pernikahan"
               target="_blank"
               rel="noreferrer"
-              className="inline-block mt-2 py-2 px-4 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm"
+              className="inline-block mt-2 py-2 px-3.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-colors"
             >
               Chat WhatsApp Support
             </a>
           </div>
         </div>
 
-        <div className="max-w-6xl mx-auto px-4 pt-6 border-t border-stone-200 text-center text-xs text-stone-500">
+        <div className="max-w-6xl mx-auto px-4 pt-6 border-t border-[#E2E8F0] text-center text-xs text-slate-400">
           <p>&copy; {new Date().getFullYear()} Fasaro Wedding Platform. Hak Cipta Dilindungi Undang-Undang.</p>
         </div>
       </footer>
