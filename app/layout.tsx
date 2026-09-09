@@ -30,6 +30,9 @@ export const metadata: Metadata = {
     "fasaro",
   ],
   authors: [{ name: "Fasaro Wedding" }],
+  verification: {
+    google: "n66cH7S-Us2bCPgZ3lwvWyYRpbKtyU7HUkt45s-6FbQ",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
