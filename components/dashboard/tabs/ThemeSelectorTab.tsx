@@ -6,18 +6,19 @@ import {
   ExternalLink,
   Eye,
   Palette,
-  Sparkles,
 } from "lucide-react";
 import { THEME_LIST, ThemeId } from "@/types/wedding";
 
 interface ThemeSelectorTabProps {
   currentThemeId: ThemeId;
+  slug?: string;
   onSelectTheme: (id: ThemeId) => void;
   onOpenPreview: () => void;
 }
 
 export const ThemeSelectorTab: React.FC<ThemeSelectorTabProps> = ({
   currentThemeId,
+  slug,
   onSelectTheme,
   onOpenPreview,
 }) => {
@@ -30,7 +31,7 @@ export const ThemeSelectorTab: React.FC<ThemeSelectorTabProps> = ({
             Pilihan Desain Tema Undangan
           </h2>
           <p className="text-xs text-slate-500">
-            Ganti tema kapan saja secara instan. Seluruh data yang sudah Anda isi tetap aman tersimpan.
+            Ganti tema kapan saja secara instan. Seluruh data mempelai yang sudah Anda isi otomatis diterapkan ke tema yang dipilih.
           </p>
         </div>
 
@@ -48,6 +49,11 @@ export const ThemeSelectorTab: React.FC<ThemeSelectorTabProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {THEME_LIST.map((theme) => {
           const isSelected = currentThemeId === theme.id;
+          const previewUrl = slug
+            ? isSelected
+              ? `/invitation/${slug}`
+              : `/invitation/${slug}?theme=${theme.id}`
+            : `/invitation/demo-${theme.id}`;
 
           return (
             <div
@@ -88,35 +94,57 @@ export const ThemeSelectorTab: React.FC<ThemeSelectorTabProps> = ({
               </div>
 
               {/* Action Buttons */}
-              <div className="grid grid-cols-2 gap-2 pt-1">
-                <a
-                  href={`/invitation/demo-${theme.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="py-2 px-2 rounded-lg text-xs font-semibold border border-[#E2E8F0] bg-[#F8FAFC] hover:bg-slate-100 text-slate-700 text-center flex items-center justify-center gap-1 transition-colors min-h-[40px]"
-                >
-                  <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Demo</span>
-                </a>
+              <div className="space-y-1.5 pt-1">
+                <div className="grid grid-cols-2 gap-2">
+                  <a
+                    href={previewUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="py-2 px-2 rounded-lg text-xs font-semibold border border-[#E2E8F0] bg-[#F8FAFC] hover:bg-slate-100 text-slate-700 text-center flex items-center justify-center gap-1 transition-colors min-h-[40px]"
+                    title={
+                      slug
+                        ? isSelected
+                          ? "Buka undangan Anda dengan data asli"
+                          : "Pratinjau data mempelai Anda pada tema ini"
+                        : "Buka demo"
+                    }
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+                    <span>{isSelected ? "Buka Web" : "Pratinjau"}</span>
+                  </a>
 
-                <button
-                  type="button"
-                  onClick={() => onSelectTheme(theme.id)}
-                  className={`py-2 px-2 rounded-lg text-xs font-semibold text-center flex items-center justify-center gap-1 transition-colors min-h-[40px] ${
-                    isSelected
-                      ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                      : "bg-[#F97316] hover:bg-[#EA580C] text-white shadow-xs"
-                  }`}
-                >
-                  {isSelected ? (
-                    <>
-                      <Check className="w-3.5 h-3.5" />
-                      <span>Digunakan</span>
-                    </>
-                  ) : (
-                    <span>Pilih Tema</span>
-                  )}
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => onSelectTheme(theme.id)}
+                    className={`py-2 px-2 rounded-lg text-xs font-semibold text-center flex items-center justify-center gap-1 transition-colors min-h-[40px] ${
+                      isSelected
+                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                        : "bg-[#F97316] hover:bg-[#EA580C] text-white shadow-xs"
+                    }`}
+                  >
+                    {isSelected ? (
+                      <>
+                        <Check className="w-3.5 h-3.5" />
+                        <span>Digunakan</span>
+                      </>
+                    ) : (
+                      <span>Pilih Tema</span>
+                    )}
+                  </button>
+                </div>
+
+                {slug && (
+                  <div className="text-center">
+                    <a
+                      href={`/invitation/demo-${theme.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10px] text-slate-400 hover:text-slate-600 transition-colors inline-block py-0.5"
+                    >
+                      Lihat versi contoh dummy &rarr;
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
           );

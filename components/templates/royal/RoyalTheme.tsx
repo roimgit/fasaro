@@ -10,7 +10,7 @@ import GoogleMapEmbed from "../shared/GoogleMapEmbed";
 import DigitalGiftBox from "../shared/DigitalGiftBox";
 import RsvpFormSection from "../shared/RsvpFormSection";
 import WishesWallSection from "../shared/WishesWallSection";
-import { Calendar, Camera, Clock, Crown, Heart, Sparkles } from "lucide-react";
+import { Calendar, Camera, Clock, Crown, Heart } from "lucide-react";
 
 interface ThemeProps {
   data: WeddingInvitationData;
@@ -89,7 +89,7 @@ export const RoyalTheme: React.FC<ThemeProps> = ({
         {primaryEvent?.date && (
           <section className="py-6 px-3 sm:px-4 rounded-3xl bg-slate-900/80 border border-amber-500/30 backdrop-blur-md shadow-[0_0_30px_rgba(245,158,11,0.08)] overflow-hidden">
             <div className="flex items-center justify-center gap-1.5 text-xs tracking-widest uppercase text-amber-400 mb-3">
-              <Sparkles className="w-3.5 h-3.5" />
+              <Clock className="w-3.5 h-3.5" />
               <span>Menghitung Waktu Bersejarah</span>
             </div>
             <CountdownTimer

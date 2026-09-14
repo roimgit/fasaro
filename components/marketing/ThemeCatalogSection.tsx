@@ -1,13 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
-import { Eye, ExternalLink, Smartphone, Sparkles, X } from "lucide-react";
-import { THEME_LIST, ThemeId, WeddingInvitationData } from "@/types/wedding";
-import ThemeRenderer from "@/components/templates/ThemeRenderer";
+import { ExternalLink, Eye, Palette } from "lucide-react";
+import { THEME_LIST, WeddingInvitationData } from "@/types/wedding";
 
 interface ThemeCatalogProps {
-  demoData: WeddingInvitationData;
+  demoData?: WeddingInvitationData;
 }
 
 const CATEGORIES = [
@@ -19,9 +17,8 @@ const CATEGORIES = [
   "Modern Chic",
 ] as const;
 
-export const ThemeCatalogSection: React.FC<ThemeCatalogProps> = ({ demoData }) => {
+export const ThemeCatalogSection: React.FC<ThemeCatalogProps> = () => {
   const [activeCategory, setActiveCategory] = useState<string>("Semua");
-  const [modalTheme, setModalTheme] = useState<ThemeId | null>(null);
 
   const filteredThemes = THEME_LIST.filter((theme) => {
     if (activeCategory === "Semua") return true;
@@ -32,8 +29,8 @@ export const ThemeCatalogSection: React.FC<ThemeCatalogProps> = ({ demoData }) =
     <section id="tema" className="w-full space-y-10 py-16 scroll-mt-20">
       <div className="text-center space-y-2.5 max-w-2xl mx-auto">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 border border-orange-100 text-[#F97316] text-xs font-semibold">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>Koleksi Eksklusif</span>
+          <Palette className="w-3.5 h-3.5" />
+          <span>Koleksi Desain Tema</span>
         </div>
         <h2 className="text-3xl font-bold tracking-tight text-slate-900">
           Pilihan Desain Tema Undangan Digital
@@ -65,9 +62,9 @@ export const ThemeCatalogSection: React.FC<ThemeCatalogProps> = ({ demoData }) =
         {filteredThemes.map((theme) => (
           <div
             key={theme.id}
-            className="group relative rounded-2xl bg-white border border-[#E2E8F0] p-5 shadow-xs hover:border-[#F97316] hover:shadow-md transition-all flex flex-col justify-between space-y-4"
+            className="rounded-2xl bg-white border border-[#E2E8F0] p-5 shadow-xs transition-all flex flex-col justify-between space-y-4"
           >
-            {/* Visual Cover Preview */}
+            {/* Visual Cover Preview (No hover overlay) */}
             <div
               className={`h-48 w-full rounded-xl bg-gradient-to-tr ${theme.bgPreview} relative overflow-hidden flex flex-col items-center justify-center p-4 border border-white/10`}
             >
@@ -77,27 +74,6 @@ export const ThemeCatalogSection: React.FC<ThemeCatalogProps> = ({ demoData }) =
               <span className="text-[10px] uppercase tracking-wider text-white/90 mt-1 px-2.5 py-0.5 rounded-full bg-black/30 backdrop-blur-xs font-semibold">
                 {theme.category}
               </span>
-
-              {/* Hover Quick Overlay */}
-              <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setModalTheme(theme.id)}
-                  className="py-1.5 px-3 rounded-lg text-xs font-semibold bg-white text-slate-900 shadow-xs hover:bg-slate-100 transition-colors flex items-center gap-1.5"
-                >
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>Preview</span>
-                </button>
-                <a
-                  href={`/invitation/demo-${theme.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="py-1.5 px-3 rounded-lg text-xs font-semibold bg-[#F97316] text-white shadow-xs hover:bg-[#EA580C] transition-colors flex items-center gap-1.5"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                  <span>Tab Baru</span>
-                </a>
-              </div>
             </div>
 
             {/* Content Details */}
@@ -111,113 +87,25 @@ export const ThemeCatalogSection: React.FC<ThemeCatalogProps> = ({ demoData }) =
               <p className="text-xs text-slate-500 line-clamp-2">{theme.description}</p>
             </div>
 
-            {/* Action Buttons */}
-            <div className="space-y-2 pt-2 border-t border-[#E2E8F0]">
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setModalTheme(theme.id)}
-                  className="py-2 px-2.5 rounded-lg text-xs font-semibold border border-[#E2E8F0] bg-[#F8FAFC] hover:bg-slate-100 text-slate-700 transition-colors flex items-center justify-center gap-1.5"
-                  title="Preview simulasi ponsel"
-                >
-                  <Smartphone className="w-3.5 h-3.5 text-[#F97316] shrink-0" />
-                  <span>Simulasi</span>
-                </button>
-
-                <a
-                  href={`/invitation/demo-${theme.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="py-2 px-2.5 rounded-lg text-xs font-semibold border border-orange-200 bg-orange-50/70 hover:bg-blue-100 text-[#F97316] transition-colors flex items-center justify-center gap-1.5"
-                  title="Buka undangan demo di tab baru"
-                >
-                  <ExternalLink className="w-3.5 h-3.5 text-[#F97316] shrink-0" />
-                  <span>Tab Baru</span>
-                </a>
-              </div>
-
-              <Link
-                href={`/login?from=/dashboard&themeId=${theme.id}`}
-                className="w-full py-2.5 px-3 rounded-lg text-xs font-semibold bg-[#F97316] hover:bg-[#EA580C] text-white shadow-xs transition-colors text-center flex items-center justify-center"
+            {/* Action Button: Single Preview Button */}
+            <div className="pt-2 border-t border-[#E2E8F0]">
+              <a
+                href={`/invitation/demo-${theme.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-[#F97316] hover:bg-[#EA580C] text-white shadow-xs transition-colors flex items-center justify-center gap-1.5 min-h-[40px]"
+                title="Buka pratinjau tema di tab baru"
               >
-                <span>Gunakan Tema Ini</span>
-              </Link>
+                <Eye className="w-3.5 h-3.5 shrink-0" />
+                <span>Preview</span>
+                <ExternalLink className="w-3.5 h-3.5 shrink-0 opacity-80" />
+              </a>
             </div>
           </div>
         ))}
       </div>
-
-      {/* Live Phone Simulation Modal */}
-      {modalTheme && (
-        <div
-          onClick={() => setModalTheme(null)}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-sm h-[88vh] bg-slate-950 rounded-[44px] p-3 shadow-2xl border border-slate-800 flex flex-col"
-          >
-            {/* Top Bar with notch, external link & close */}
-            <div className="flex items-center justify-between px-3 py-1 mb-1 shrink-0">
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-slate-400 font-mono">Live Demo</span>
-                <a
-                  href={`/invitation/demo-${modalTheme}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-[11px] text-[#F97316] hover:underline font-medium transition-colors"
-                  title="Buka demo layar penuh di tab baru"
-                >
-                  <span>Buka Tab Baru</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
-              <button
-                onClick={() => setModalTheme(null)}
-                className="p-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
-                aria-label="Tutup Preview"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Notch */}
-            <div className="w-24 h-3 bg-slate-800 rounded-full mx-auto mb-2 shrink-0 flex items-center justify-center">
-              <div className="w-2 h-2 rounded-full bg-slate-900"></div>
-            </div>
-
-            {/* Mobile Viewport Content */}
-            <div className="flex-1 w-full rounded-[32px] overflow-y-auto overflow-x-hidden no-scrollbar bg-slate-900 shadow-inner relative isolate scroll-smooth">
-              <ThemeRenderer
-                data={demoData}
-                forcedThemeId={modalTheme}
-                guestName="Bapak Budi & Rekan"
-                isEmbedded={true}
-              />
-            </div>
-
-            {/* Bottom Select CTA */}
-            <div className="pt-2.5 px-1 shrink-0 grid grid-cols-2 gap-2">
-              <a
-                href={`/invitation/demo-${modalTheme}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="py-2.5 rounded-xl text-xs font-semibold border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-200 text-center flex items-center justify-center gap-1.5 transition-colors"
-              >
-                <ExternalLink className="w-3.5 h-3.5 text-[#F97316]" />
-                <span>Buka Tab Baru</span>
-              </a>
-              <Link
-                href={`/login?from=/dashboard&themeId=${modalTheme}`}
-                className="py-2.5 rounded-xl text-xs font-semibold bg-[#F97316] hover:bg-[#EA580C] text-white shadow-xs text-center transition-colors flex items-center justify-center"
-              >
-                Gunakan Tema
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
     </section>
   );
 };
+
 export default ThemeCatalogSection;

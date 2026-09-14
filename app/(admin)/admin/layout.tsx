@@ -8,7 +8,6 @@ import {
   LayoutDashboard,
   LogOut,
   Shield,
-  Sparkles,
 } from "lucide-react";
 
 export default async function AdminLayout({
@@ -31,7 +30,7 @@ export default async function AdminLayout({
           <div className="flex items-center gap-3">
             <Link href="/admin" className="flex items-center gap-2 group">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-orange-500 to-amber-500 flex items-center justify-center text-white transition-transform group-hover:scale-105 shadow-xs">
-                <Sparkles className="w-4 h-4 fill-white" />
+                <Shield className="w-4 h-4 fill-white" />
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-sans font-bold text-base tracking-tight text-slate-900">

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { rateLimit } from "@/lib/redis";
+import { rateLimit } from "@/lib/rate-limit";
 import { rsvpSchema } from "@/lib/validations";
 import { getInvitationMeta } from "@/lib/invitation-cache";
 

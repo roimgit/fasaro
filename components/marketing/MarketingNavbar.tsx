@@ -3,10 +3,9 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import {
-  Menu,
-  Sparkles,
-  X,
   Heart,
+  Menu,
+  X,
 } from "lucide-react";
 
 export const MarketingNavbar: React.FC = () => {
@@ -47,20 +46,12 @@ export const MarketingNavbar: React.FC = () => {
           ))}
         </nav>
 
-        {/* Action Buttons */}
-        <div className="hidden md:flex items-center gap-2.5">
+        {/* Action Button */}
+        <div className="hidden md:flex items-center">
           <Link
             href="/login"
-            className="py-2 px-4 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
-          >
-            Masuk
-          </Link>
-
-          <Link
-            href="/login?from=/dashboard"
             className="inline-flex items-center gap-1.5 py-2 px-4 rounded-lg text-xs font-semibold bg-[#F97316] hover:bg-[#EA580C] text-white shadow-xs transition-colors"
           >
-            <Sparkles className="w-3.5 h-3.5" />
             <span>Buat Undangan</span>
           </Link>
         </div>
@@ -91,18 +82,11 @@ export const MarketingNavbar: React.FC = () => {
             ))}
           </div>
 
-          <div className="pt-3 border-t border-[#E2E8F0] flex flex-col gap-2">
+          <div className="pt-3 border-t border-[#E2E8F0]">
             <Link
               href="/login"
               onClick={() => setIsOpen(false)}
-              className="w-full text-center py-2.5 px-4 rounded-lg text-xs font-semibold border border-[#E2E8F0] text-slate-700 hover:bg-slate-50"
-            >
-              Masuk
-            </Link>
-            <Link
-              href="/login?from=/dashboard"
-              onClick={() => setIsOpen(false)}
-              className="w-full text-center py-2.5 px-4 rounded-lg text-xs font-semibold bg-[#F97316] hover:bg-[#EA580C] text-white shadow-xs"
+              className="block w-full text-center py-2.5 px-4 rounded-lg text-xs font-semibold bg-[#F97316] hover:bg-[#EA580C] text-white shadow-xs"
             >
               Buat Undangan
             </Link>

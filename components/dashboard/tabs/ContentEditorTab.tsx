@@ -11,7 +11,7 @@ import {
   MapPin,
   Music,
   Plus,
-  Sparkles,
+  BookOpen,
   Trash2,
   Upload,
   Video,
@@ -164,7 +164,7 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
     { id: 1, title: "2. Jadwal & Lokasi Acara", icon: Calendar, badge: `${schedules.length} Sesi` },
     { id: 2, title: "3. Galeri Foto & Musik Latar", icon: ImageIcon, badge: `${galleries.length} Foto` },
     { id: 3, title: "4. Amplop Digital & QRIS", icon: CreditCard, badge: `${bankAccounts.length} Rekening` },
-    { id: 4, title: "5. Cerita Cinta (Love Story)", icon: Sparkles, badge: `${stories.length} Momen` },
+    { id: 4, title: "5. Cerita Cinta (Love Story)", icon: BookOpen, badge: `${stories.length} Momen` },
   ];
 
   return (
@@ -839,7 +839,7 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
         >
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-amber-50 text-amber-600">
-              <Sparkles className="w-4 h-4" />
+              <BookOpen className="w-4 h-4" />
             </div>
             <div>
               <span className="block">{sections[4].title}</span>

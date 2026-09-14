@@ -8,6 +8,7 @@ import {
   BankAccountInput,
 } from "@/lib/validations";
 import { SubscriptionTier } from "@prisma/client";
+import { revalidateInvitationCache } from "@/lib/invitation-cache";
 
 export async function GET() {
   try {
@@ -85,7 +86,13 @@ export async function PUT(request: NextRequest) {
     const user = await requireAuth();
     const body = await request.json();
 
-    const parseResult = invitationSchema.safeParse(body);
+    // Normalize schedules/eventSchedules alias
+    const normalizedBody = {
+      ...body,
+      schedules: body.schedules || body.eventSchedules || [],
+    };
+
+    const parseResult = invitationSchema.safeParse(normalizedBody);
     if (!parseResult.success) {
       return NextResponse.json(
         {
@@ -189,6 +196,12 @@ export async function PUT(request: NextRequest) {
       return inv;
     });
 
+    // Invalidate caches immediately
+    revalidateInvitationCache(updated.slug, updated.id);
+    if (userInv.slug !== updated.slug) {
+      revalidateInvitationCache(userInv.slug, userInv.id);
+    }
+
     return NextResponse.json({
       success: true,
       message: "Data undangan berhasil disimpan",
@@ -200,3 +213,68 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ success: false, error: message }, { status });
   }
 }
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const user = await requireAuth();
+    const body = await request.json();
+
+    const userInv = await prisma.invitation.findFirst({
+      where: { userId: user.userId },
+    });
+
+    if (!userInv) {
+      return NextResponse.json({ success: false, error: "Undangan tidak ditemukan" }, { status: 404 });
+    }
+
+    const updateData: Record<string, unknown> = {};
+
+    if (body.themeId && typeof body.themeId === "string") {
+      updateData.themeId = body.themeId;
+    }
+    if (body.isActive !== undefined) {
+      updateData.isActive = Boolean(body.isActive);
+    }
+    if (body.title && typeof body.title === "string") {
+      updateData.title = body.title.trim();
+    }
+    if (body.slug && typeof body.slug === "string") {
+      const cleanSlug = body.slug.toLowerCase().trim();
+      const existingSlug = await prisma.invitation.findFirst({
+        where: {
+          slug: cleanSlug,
+          userId: { not: user.userId },
+        },
+      });
+      if (existingSlug) {
+        return NextResponse.json(
+          { success: false, error: "Subdomain tautan sudah digunakan pasangan lain" },
+          { status: 409 }
+        );
+      }
+      updateData.slug = cleanSlug;
+    }
+
+    const updated = await prisma.invitation.update({
+      where: { id: userInv.id },
+      data: updateData,
+    });
+
+    // Invalidate caches
+    revalidateInvitationCache(updated.slug, updated.id);
+    if (userInv.slug !== updated.slug) {
+      revalidateInvitationCache(userInv.slug, userInv.id);
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Pengaturan berhasil diperbarui",
+      data: updated,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Gagal memperbarui pengaturan";
+    const status = message.includes("UNAUTHORIZED") ? 401 : 500;
+    return NextResponse.json({ success: false, error: message }, { status });
+  }
+}
+

@@ -8,7 +8,6 @@ import {
   Heart,
   LogOut,
   RefreshCw,
-  Sparkles,
 } from "lucide-react";
 
 interface MobileTopBarProps {

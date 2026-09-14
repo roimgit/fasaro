@@ -32,13 +32,18 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     // Verify SHA512 signature key (bypass in dev if test signature or test server key)
-    const isMock = process.env.MIDTRANS_SERVER_KEY?.includes("YOUR_SANDBOX");
-    const isSignatureValid = isMock || verifyMidtransSignature(
-      order_id,
-      status_code,
-      gross_amount,
-      signature_key
-    );
+    const isDev = process.env.MIDTRANS_IS_PRODUCTION !== "true";
+    const isMock =
+      process.env.MIDTRANS_SERVER_KEY?.includes("YOUR_SANDBOX") ||
+      (isDev && signature_key === "dev_mock_signature");
+    const isSignatureValid =
+      isMock ||
+      verifyMidtransSignature(
+        order_id,
+        status_code,
+        gross_amount,
+        signature_key
+      );
 
     if (!isSignatureValid) {
       return NextResponse.json(

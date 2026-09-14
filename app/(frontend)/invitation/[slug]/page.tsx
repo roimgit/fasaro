@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import ThemeRenderer from "@/components/templates/ThemeRenderer";
-import { WeddingInvitationData } from "@/types/wedding";
+import { WeddingInvitationData, ThemeId } from "@/types/wedding";
 
 export const revalidate = 60;
 
@@ -217,12 +217,12 @@ export async function generateMetadata(props: {
 
 interface InvitationPageProps {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ to?: string }>;
+  searchParams: Promise<{ to?: string; theme?: string }>;
 }
 
 export default async function PublicInvitationPage(props: InvitationPageProps) {
   const { slug } = await props.params;
-  const { to } = await props.searchParams;
+  const { to, theme } = await props.searchParams;
 
   let invitation = null;
   try {
@@ -246,7 +246,7 @@ export default async function PublicInvitationPage(props: InvitationPageProps) {
   if (!invitation) {
     const demoData = getDemoWeddingData(slug);
     if (demoData) {
-      return <ThemeRenderer data={demoData} guestName={to} />;
+      return <ThemeRenderer data={demoData} guestName={to} forcedThemeId={theme as ThemeId | undefined} />;
     }
     notFound();
   }
@@ -257,7 +257,7 @@ export default async function PublicInvitationPage(props: InvitationPageProps) {
     id: invitation.id,
     slug: invitation.slug,
     title: invitation.title,
-    themeId: invitation.themeId,
+    themeId: (theme as ThemeId) || invitation.themeId,
     coupleInfo,
     activeUntil: invitation.activeUntil,
     isActive: invitation.isActive,
@@ -288,5 +288,5 @@ export default async function PublicInvitationPage(props: InvitationPageProps) {
     })),
   };
 
-  return <ThemeRenderer data={weddingData} guestName={to} />;
+  return <ThemeRenderer data={weddingData} guestName={to} forcedThemeId={theme as ThemeId | undefined} />;
 }

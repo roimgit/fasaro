@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import sanitizeHtml from "sanitize-html";
 import prisma from "@/lib/prisma";
-import { rateLimit } from "@/lib/redis";
+import { rateLimit } from "@/lib/rate-limit";
 import { wishSchema } from "@/lib/validations";
 import { getInvitationMeta } from "@/lib/invitation-cache";
 

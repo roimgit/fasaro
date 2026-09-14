@@ -11,19 +11,37 @@ export interface SnapTransactionResponse {
   redirect_url: string;
 }
 
-const MIDTRANS_SERVER_KEY = process.env.MIDTRANS_SERVER_KEY || "";
-const IS_PRODUCTION = process.env.MIDTRANS_IS_PRODUCTION === "true";
+export function isMidtransProduction(): boolean {
+  const serverKey = getMidtransServerKey();
+  // Auto-detect environment based on Midtrans key prefix:
+  // Keys starting with 'Mid-server-' (without 'SB-') are Midtrans Production keys.
+  if (serverKey.startsWith("Mid-server-")) {
+    return true;
+  }
+  if (serverKey.startsWith("SB-Mid-server-")) {
+    return false;
+  }
+  return process.env.MIDTRANS_IS_PRODUCTION === "true";
+}
 
-const SNAP_API_URL = IS_PRODUCTION
-  ? "https://app.midtrans.com/snap/v1/transactions"
-  : "https://app.sandbox.midtrans.com/snap/v1/transactions";
+export function getMidtransServerKey(): string {
+  return process.env.MIDTRANS_SERVER_KEY || "";
+}
+
+export function getSnapApiUrl(): string {
+  return isMidtransProduction()
+    ? "https://app.midtrans.com/snap/v1/transactions"
+    : "https://app.sandbox.midtrans.com/snap/v1/transactions";
+}
 
 export async function createSnapTransaction(
   orderId: string,
   amount: number,
   customerDetails: CustomerDetails
 ): Promise<SnapTransactionResponse> {
-  const authHeader = Buffer.from(`${MIDTRANS_SERVER_KEY}:`).toString("base64");
+  const serverKey = getMidtransServerKey();
+  const snapApiUrl = getSnapApiUrl();
+  const authHeader = Buffer.from(`${serverKey}:`).toString("base64");
 
   const payload = {
     transaction_details: {
@@ -40,19 +58,15 @@ export async function createSnapTransaction(
     },
   };
 
-  // If server key is dummy or sandbox without network, gracefully simulate or call API
-  if (
-    !MIDTRANS_SERVER_KEY ||
-    MIDTRANS_SERVER_KEY.includes("YOUR_SANDBOX")
-  ) {
-    // Development fallback token so testing never blocks
+  // If server key is missing or is the placeholder sandbox key, return dev mock token
+  if (!serverKey || serverKey.includes("YOUR_SANDBOX")) {
     return {
       token: `mock_snap_${orderId}_${Date.now()}`,
       redirect_url: `https://app.sandbox.midtrans.com/snap/v2/vtweb/mock_snap_${orderId}`,
     };
   }
 
-  const response = await fetch(SNAP_API_URL, {
+  const response = await fetch(snapApiUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -64,7 +78,7 @@ export async function createSnapTransaction(
 
   if (!response.ok) {
     const errorBody = await response.text();
-    throw new Error(`Midtrans API error (${response.status}): ${errorBody}`);
+    throw new Error(`Midtrans Sandbox API error (${response.status}): ${errorBody}`);
   }
 
   return response.json() as Promise<SnapTransactionResponse>;
@@ -76,7 +90,9 @@ export function verifyMidtransSignature(
   grossAmount: string,
   signatureKey: string
 ): boolean {
-  const hashString = `${orderId}${statusCode}${grossAmount}${MIDTRANS_SERVER_KEY}`;
+  const serverKey = getMidtransServerKey();
+  const hashString = `${orderId}${statusCode}${grossAmount}${serverKey}`;
   const computedHash = crypto.createHash("sha512").update(hashString).digest("hex");
   return computedHash.toLowerCase() === signatureKey.toLowerCase();
 }
+

@@ -11,6 +11,7 @@ import DigitalGiftBox from "../shared/DigitalGiftBox";
 import RsvpFormSection from "../shared/RsvpFormSection";
 import WishesWallSection from "../shared/WishesWallSection";
 import {
+  BookOpen,
   Calendar,
   CalendarPlus,
   Clock,
@@ -18,7 +19,6 @@ import {
   Heart,
   Image as ImageIcon,
   MessageSquare,
-  Sparkles,
 } from "lucide-react";
 
 interface ThemeProps {
@@ -273,7 +273,7 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
                 className="p-6 sm:p-8 rounded-3xl bg-white border border-[#ebd6c4] shadow-sm space-y-5 text-center"
               >
                 <div className="inline-flex p-2.5 rounded-full bg-rose-50 text-rose-700 mb-1">
-                  <Sparkles className="w-5 h-5" />
+                  <Clock className="w-5 h-5" />
                 </div>
                 <h3 className="text-2xl font-serif font-bold text-rose-900">
                   {schedule.eventName}
@@ -429,7 +429,7 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
             className="flex flex-col items-center justify-center p-1 hover:text-rose-700 transition-colors"
             title="Cerita"
           >
-            <Sparkles className="w-4 h-4" />
+            <BookOpen className="w-4 h-4" />
             <span className="text-[9px] mt-0.5">Cerita</span>
           </a>
           <a

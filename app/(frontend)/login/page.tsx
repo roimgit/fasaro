@@ -6,7 +6,7 @@ import {
   Heart,
   Lock,
   Mail,
-  Sparkles,
+  User,
   Eye,
   EyeOff,
   AlertCircle,
@@ -62,7 +62,15 @@ function LoginForm() {
   const [formError, setFormError] = useState<string | null>(null);
 
   const errorParam = searchParams.get("error");
-  const paramErrorMessage = errorParam ? ERROR_MESSAGE_MAP[errorParam] || "Terjadi kendala autentikasi" : null;
+  const detailsParam = searchParams.get("details");
+  const baseParamMessage = errorParam
+    ? ERROR_MESSAGE_MAP[errorParam] || "Terjadi kendala autentikasi"
+    : null;
+  const paramErrorMessage = baseParamMessage
+    ? detailsParam
+      ? `${baseParamMessage} (Detail: ${detailsParam})`
+      : baseParamMessage
+    : null;
   const activeErrorMessage = formError || paramErrorMessage;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -153,7 +161,7 @@ function LoginForm() {
                 placeholder="Nama Anda..."
                 className="w-full py-2.5 px-3.5 pl-10 rounded-lg text-sm border border-[#E2E8F0] bg-white text-slate-900 placeholder:text-slate-400 focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] focus:outline-none transition-colors"
               />
-              <Sparkles className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <User className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
             </div>
           </div>
         )}

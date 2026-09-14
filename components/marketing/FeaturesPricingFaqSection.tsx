@@ -12,7 +12,6 @@ import {
   MapPin,
   QrCode,
   ShieldCheck,
-  Sparkles,
   Star,
   Users,
   Wallet,
@@ -200,7 +199,7 @@ export const FeaturesPricingFaqSection: React.FC = () => {
       <section id="harga" className="max-w-6xl mx-auto px-4 space-y-10 scroll-mt-20">
         <div className="text-center space-y-2.5 max-w-2xl mx-auto">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 border border-orange-100 text-[#F97316] text-xs font-semibold">
-            <Sparkles className="w-3.5 h-3.5" />
+            <Check className="w-3.5 h-3.5" />
             <span>Biaya Transparan &amp; Terjangkau</span>
           </div>
           <h2 className="text-3xl font-bold tracking-tight text-slate-900">

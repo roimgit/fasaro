@@ -118,6 +118,51 @@ export async function POST(request: NextRequest) {
   }
 }
 
+export async function PUT(request: NextRequest) {
+  try {
+    const user = await requireAuth();
+    const body = await request.json();
+    const { id, name, phoneNumber, quota } = body;
+
+    if (!id || typeof id !== "string") {
+      return NextResponse.json({ success: false, error: "ID tamu wajib disertakan" }, { status: 400 });
+    }
+
+    if (!name || typeof name !== "string" || !name.trim()) {
+      return NextResponse.json({ success: false, error: "Nama tamu wajib diisi" }, { status: 400 });
+    }
+
+    // Verify ownership
+    const guest = await prisma.guest.findUnique({
+      where: { id },
+      include: { invitation: { select: { userId: true } } },
+    });
+
+    if (!guest || guest.invitation.userId !== user.userId) {
+      return NextResponse.json({ success: false, error: "Tamu tidak ditemukan" }, { status: 404 });
+    }
+
+    const updated = await prisma.guest.update({
+      where: { id },
+      data: {
+        name: name.trim(),
+        phoneNumber: phoneNumber ? String(phoneNumber).trim() : null,
+        quota: quota ? Math.max(1, Number(quota)) : 1,
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: "Data tamu berhasil diperbarui",
+      data: updated,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Gagal memperbarui data tamu";
+    const status = message.includes("UNAUTHORIZED") ? 401 : 500;
+    return NextResponse.json({ success: false, error: message }, { status });
+  }
+}
+
 export async function DELETE(request: NextRequest) {
   try {
     const user = await requireAuth();
@@ -147,3 +192,4 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ success: false, error: message }, { status });
   }
 }
+

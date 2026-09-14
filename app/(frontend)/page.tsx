@@ -15,6 +15,7 @@ import ThemeCatalogSection from "@/components/marketing/ThemeCatalogSection";
 import FeaturesPricingFaqSection from "@/components/marketing/FeaturesPricingFaqSection";
 import { WeddingInvitationData } from "@/types/wedding";
 import ThemeRenderer from "@/components/templates/ThemeRenderer";
+import DeviceFrame from "@/components/templates/device/DeviceFrame";
 
 const DEMO_WEDDING_DATA: WeddingInvitationData = {
   id: "demo-showcase",
@@ -162,7 +163,7 @@ export default function HomePage() {
                 className="inline-flex items-center gap-2 py-3 px-5 rounded-xl text-xs font-semibold border border-[#E2E8F0] bg-white hover:bg-slate-50 text-slate-800 transition-colors shadow-xs"
               >
                 <Play className="w-3.5 h-3.5 fill-current text-[#F97316]" />
-                <span>Buka Demo di Tab Baru</span>
+                <span>Preview Undangan</span>
                 <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
               </a>
             </div>
@@ -210,14 +211,8 @@ export default function HomePage() {
               ))}
             </div>
 
-            <div className="relative w-full max-w-[340px] h-[640px] bg-slate-950 rounded-[44px] p-3 shadow-xl border border-slate-800 flex flex-col transition-colors">
-              {/* Top Notch */}
-              <div className="w-28 h-3.5 bg-slate-800 rounded-full mx-auto mb-2 shrink-0 flex items-center justify-center">
-                <div className="w-2 h-2 rounded-full bg-slate-900"></div>
-              </div>
-
-              {/* Screen Viewer */}
-              <div className="flex-1 w-full rounded-[32px] overflow-y-auto overflow-x-hidden no-scrollbar bg-slate-900 shadow-inner relative isolate scroll-smooth">
+            <div className="relative w-full max-w-[340px] sm:max-w-[360px]">
+              <DeviceFrame>
                 <ThemeRenderer
                   data={DEMO_WEDDING_DATA}
                   forcedThemeId={heroTheme}
@@ -225,27 +220,7 @@ export default function HomePage() {
                   showCover={false}
                   isEmbedded={true}
                 />
-              </div>
-
-              {/* Floating Mini Badge */}
-              <a
-                href={`/invitation/demo-${heroTheme}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="absolute -bottom-3 -left-3 bg-white border border-[#E2E8F0] rounded-xl p-3 shadow-md flex items-center gap-2.5 transition-transform hover:scale-105 group"
-                title="Klik untuk membuka demo tema ini di tab baru"
-              >
-                <div className="p-2 rounded-lg bg-orange-50 text-[#F97316] group-hover:bg-[#F97316] group-hover:text-white transition-colors">
-                  <ExternalLink className="w-4 h-4" />
-                </div>
-                <div className="text-left">
-                  <p className="text-[11px] font-bold text-slate-900 flex items-center gap-1">
-                    <span>Demo Layar Penuh</span>
-                    <ArrowRight className="w-3 h-3 text-[#F97316]" />
-                  </p>
-                  <p className="text-[9px] text-slate-500">Klik untuk buka tab baru</p>
-                </div>
-              </a>
+              </DeviceFrame>
             </div>
           </div>
         </div>

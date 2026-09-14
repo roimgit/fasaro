@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
 import prisma from "@/lib/prisma";
 import { getSessionUser } from "@/lib/auth";
-import { redis } from "@/lib/redis";
+import { revalidateInvitationCache } from "@/lib/invitation-cache";
 import { updateInvitationSchema } from "@/lib/validations";
 import { Prisma } from "@prisma/client";
 
@@ -192,16 +191,10 @@ export async function PUT(
       });
     });
 
-    // Invalidate ISR cache & Redis cache for instantaneous updates
-    try {
-      revalidatePath(`/invitation/${updated.slug}`);
-      if (existing.slug !== updated.slug) {
-        revalidatePath(`/invitation/${existing.slug}`);
-        await redis.del(`public:invitation:${existing.slug}`);
-      }
-      await redis.del(`public:invitation:${updated.slug}`);
-    } catch {
-      // Background revalidation failure should not fail response
+    // Invalidate Next.js cache for instantaneous updates
+    revalidateInvitationCache(updated.slug, updated.id);
+    if (existing.slug !== updated.slug) {
+      revalidateInvitationCache(existing.slug, existing.id);
     }
 
     return NextResponse.json({

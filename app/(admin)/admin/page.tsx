@@ -16,7 +16,7 @@ import {
   RefreshCw,
   Search,
   Settings,
-  Sparkles,
+  Heart,
   Trash2,
   Users,
   Wallet,
@@ -350,7 +350,7 @@ export default function MasterAdminPage() {
           <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
             <span>Undangan Aktif</span>
             <div className="p-2 rounded-lg bg-orange-50 text-[#F97316]">
-              <Sparkles className="w-4 h-4" />
+              <Heart className="w-4 h-4" />
             </div>
           </div>
           <p className="text-2xl font-bold font-sans text-slate-900 tracking-tight">

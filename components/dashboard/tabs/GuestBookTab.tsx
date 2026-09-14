@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import {
   Check,
   Copy,
+  Pencil,
   Plus,
   QrCode,
   Search,
@@ -12,6 +13,7 @@ import {
   Upload,
   UserPlus,
   Users,
+  X,
 } from "lucide-react";
 
 export interface GuestItem {
@@ -28,6 +30,7 @@ interface GuestBookTabProps {
   slug: string;
   onAddGuest: (name: string, phone: string, quota: number) => Promise<boolean>;
   onBulkAddGuests: (guestList: Array<{ name: string; phoneNumber?: string; quota?: number }>) => Promise<boolean>;
+  onUpdateGuest?: (id: string, name: string, phone: string, quota: number) => Promise<boolean>;
   onDeleteGuest: (id: string) => Promise<boolean>;
 }
 
@@ -36,11 +39,19 @@ export const GuestBookTab: React.FC<GuestBookTabProps> = ({
   slug,
   onAddGuest,
   onBulkAddGuests,
+  onUpdateGuest,
   onDeleteGuest,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddingSingle, setIsAddingSingle] = useState(false);
   const [isAddingBulk, setIsAddingBulk] = useState(false);
+
+  // Edit Modal State
+  const [editingGuest, setEditingGuest] = useState<GuestItem | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+  const [editQuota, setEditQuota] = useState(1);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   // Form single
   const [name, setName] = useState("");
@@ -104,6 +115,31 @@ export const GuestBookTab: React.FC<GuestBookTabProps> = ({
       }
     }
     setIsSubmitting(false);
+  };
+
+  const startEditing = (guest: GuestItem) => {
+    setEditingGuest(guest);
+    setEditName(guest.name);
+    setEditPhone(guest.phoneNumber || "");
+    setEditQuota(guest.quota || 1);
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingGuest || !editName.trim()) return;
+    if (!onUpdateGuest) return;
+
+    setIsUpdating(true);
+    const ok = await onUpdateGuest(
+      editingGuest.id,
+      editName.trim(),
+      editPhone.trim(),
+      Number(editQuota) || 1
+    );
+    if (ok) {
+      setEditingGuest(null);
+    }
+    setIsUpdating(false);
   };
 
   const getGuestInvitationUrl = (guest: GuestItem) => {
@@ -387,6 +423,18 @@ Hormat kami yang berbahagia.`;
                       )}
                     </button>
 
+                    {/* Edit */}
+                    {onUpdateGuest && (
+                      <button
+                        type="button"
+                        onClick={() => startEditing(guest)}
+                        className="p-2 rounded-lg border border-[#E2E8F0] bg-white hover:bg-orange-50 text-slate-500 hover:text-[#F97316] min-h-[42px] min-w-[42px] flex items-center justify-center transition-colors shadow-xs"
+                        title="Edit data tamu"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                    )}
+
                     {/* Delete */}
                     <button
                       type="button"
@@ -407,6 +455,100 @@ Hormat kami yang berbahagia.`;
           </div>
         )}
       </div>
+
+      {/* Edit Guest Modal */}
+      {editingGuest && (
+        <div
+          onClick={() => setEditingGuest(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md rounded-2xl bg-white border border-[#E2E8F0] shadow-2xl p-5 sm:p-6 space-y-4"
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-orange-50 text-[#F97316] border border-orange-100 flex items-center justify-center">
+                  <Pencil className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base text-slate-900">Edit Data Tamu</h3>
+                  <p className="text-xs text-slate-500">Perbarui nama, nomor WhatsApp, atau kuota</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingGuest(null)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Modal Form */}
+            <form onSubmit={handleEditSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-700">
+                  Nama Tamu Undangan <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  placeholder="Contoh: Keluarga Bpk. Joko"
+                  className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-[#E2E8F0] bg-white text-slate-900 focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none shadow-xs"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-700">
+                  Nomor WhatsApp <span className="text-slate-400 font-normal">(Opsional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={editPhone}
+                  onChange={(e) => setEditPhone(e.target.value)}
+                  placeholder="Contoh: 081234567890"
+                  className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-[#E2E8F0] bg-white text-slate-900 focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none shadow-xs font-mono"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-700">
+                  Jumlah Kuota Kehadiran (Pax)
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={50}
+                  value={editQuota}
+                  onChange={(e) => setEditQuota(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                  className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-[#E2E8F0] bg-white text-slate-900 focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] outline-none shadow-xs font-mono"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setEditingGuest(null)}
+                  className="py-2.5 px-4 rounded-lg border border-[#E2E8F0] text-slate-600 text-xs font-semibold hover:bg-slate-50 transition-colors min-h-[40px]"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isUpdating || !editName.trim()}
+                  className="py-2.5 px-5 rounded-lg bg-[#F97316] hover:bg-[#EA580C] text-white text-xs font-semibold shadow-xs disabled:opacity-50 transition-colors flex items-center gap-1.5 min-h-[40px]"
+                >
+                  {isUpdating ? "Menyimpan..." : "Simpan Perubahan"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -117,7 +117,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     return response;
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Terjadi kesalahan saat memproses login Google";
+    console.error("[Google OAuth Callback Error]:", err);
+    const msg =
+      err instanceof Error
+        ? err.message
+        : "Terjadi kesalahan saat memproses login Google";
     return loginRedirect("google_auth_failed", msg);
   }
 }

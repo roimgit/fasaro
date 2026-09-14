@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
-import { rateLimit } from "@/lib/redis";
-import { generatePresignedUploadUrl } from "@/lib/s3";
+import { rateLimit } from "@/lib/rate-limit";
+import { generateSignedUploadUrl, getPublicStorageUrl } from "@/lib/supabase";
 import { z } from "zod";
 
 const presignedQuerySchema = z.object({
@@ -53,16 +53,14 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       .replace(/-+/g, "-");
 
     const key = `${parsed.data.folder}/${session.userId}/${Date.now()}-${cleanFilename}`;
-    const uploadUrl = await generatePresignedUploadUrl(key, parsed.data.contentType, 300);
-
-    const publicBase =
-      process.env.NEXT_PUBLIC_S3_PUBLIC_URL || "http://localhost:9000/wedding-assets";
-    const fileUrl = `${publicBase}/${key}`;
+    const { signedUrl, token } = await generateSignedUploadUrl(key, { upsert: true });
+    const fileUrl = getPublicStorageUrl(key);
 
     return NextResponse.json({
-      uploadUrl,
+      uploadUrl: signedUrl,
       fileUrl,
       key,
+      token,
       expiresIn: 300,
     });
   } catch (error) {

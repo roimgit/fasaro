@@ -24,6 +24,7 @@ import GuestBookTab, { GuestItem } from "./tabs/GuestBookTab";
 import RsvpRecapTab, { RsvpRecapData, WishItem } from "./tabs/RsvpRecapTab";
 import BillingUpgradeTab from "./tabs/BillingUpgradeTab";
 import ThemeRenderer from "@/components/templates/ThemeRenderer";
+import DeviceFrame from "@/components/templates/device/DeviceFrame";
 import { ThemeId, WeddingInvitationData } from "@/types/wedding";
 
 export default function UserAdminPanel() {
@@ -261,6 +262,15 @@ export default function UserAdminPanel() {
         greetingMessage: greetingMessage || undefined,
         stories: stories.length > 0 ? stories : undefined,
       },
+      schedules: schedules.map((s) => ({
+        eventName: s.eventName,
+        date: s.date,
+        startTime: s.startTime,
+        endTime: s.endTime || undefined,
+        venueName: s.venueName,
+        address: s.address,
+        mapsUrl: s.mapsUrl || undefined,
+      })),
       eventSchedules: schedules.map((s) => ({
         eventName: s.eventName,
         date: s.date,
@@ -394,6 +404,51 @@ export default function UserAdminPanel() {
     }
   };
 
+  const handleUpdateGuest = async (id: string, guestName: string, phone: string, guestQuota: number) => {
+    try {
+      const res = await fetch("/api/dashboard/guests", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id,
+          name: guestName,
+          phoneNumber: phone || null,
+          quota: guestQuota,
+        }),
+      });
+
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.error || "Gagal memperbarui tamu");
+      }
+
+      setGuests((prev) =>
+        prev.map((g) =>
+          g.id === id
+            ? {
+                ...g,
+                name: guestName,
+                phoneNumber: phone || null,
+                quota: guestQuota,
+              }
+            : g
+        )
+      );
+
+      setNotification({
+        type: "success",
+        message: `Data tamu "${guestName}" berhasil diperbarui.`,
+      });
+      return true;
+    } catch (err) {
+      setNotification({
+        type: "error",
+        message: err instanceof Error ? err.message : "Gagal memperbarui tamu.",
+      });
+      return false;
+    }
+  };
+
   // Logout Handler
   const handleLogout = async () => {
     try {
@@ -412,18 +467,18 @@ export default function UserAdminPanel() {
     title,
     themeId,
     coupleInfo: {
-      groomName: groomName || "Rian Pratama",
-      groomNickname: groomNickname || "Rian",
-      groomFather: groomFather || "Bambang Wijaya",
-      groomMother: groomMother || "Sri Wahyuni",
-      groomInstagram: groomInstagram || "rian.pratama",
-      groomPhoto: groomPhoto || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
-      brideName: brideName || "Sinta Anggraini",
-      brideNickname: brideNickname || "Sinta",
-      brideFather: brideFather || "Herman Santoso",
-      brideMother: brideMother || "Dewi Lestari",
-      brideInstagram: brideInstagram || "sinta.anggraini",
-      bridePhoto: bridePhoto || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80",
+      groomName: groomName || "Mempelai Pria",
+      groomNickname: groomNickname || groomName || "Pria",
+      groomFather: groomFather || undefined,
+      groomMother: groomMother || undefined,
+      groomInstagram: groomInstagram || undefined,
+      groomPhoto: groomPhoto || undefined,
+      brideName: brideName || "Mempelai Wanita",
+      brideNickname: brideNickname || brideName || "Wanita",
+      brideFather: brideFather || undefined,
+      brideMother: brideMother || undefined,
+      brideInstagram: brideInstagram || undefined,
+      bridePhoto: bridePhoto || undefined,
       greetingMessage,
       stories,
     },
@@ -595,19 +650,21 @@ export default function UserAdminPanel() {
         {activeTab === "theme" && (
           <ThemeSelectorTab
             currentThemeId={themeId}
+            slug={slug}
             onSelectTheme={async (newThemeId) => {
               setThemeId(newThemeId);
-              // Auto-save theme choice
               try {
-                await fetch("/api/dashboard/invitation", {
-                  method: "PUT",
+                const res = await fetch("/api/dashboard/invitation", {
+                  method: "PATCH",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ themeId: newThemeId }),
                 });
-                setNotification({
-                  type: "success",
-                  message: `Tema berhasil diubah menjadi "${newThemeId}"!`,
-                });
+                if (res.ok) {
+                  setNotification({
+                    type: "success",
+                    message: `Tema berhasil diubah menjadi "${newThemeId}"!`,
+                  });
+                }
               } catch {
                 // Ignore
               }
@@ -622,6 +679,7 @@ export default function UserAdminPanel() {
             slug={slug}
             onAddGuest={handleAddGuest}
             onBulkAddGuests={handleBulkAddGuests}
+            onUpdateGuest={handleUpdateGuest}
             onDeleteGuest={handleDeleteGuest}
           />
         )}
@@ -669,25 +727,26 @@ export default function UserAdminPanel() {
         rsvpCount={rsvpRecap?.totalResponses || 0}
       />
 
-      {/* 5. Modal: Live Smartphone Simulation Preview */}
+      {/* 5. Modal: Live Smartphone Simulation Preview with Template Device */}
       {showMobilePreview && (
         <div
           onClick={() => setShowMobilePreview(false)}
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-slate-900/60 backdrop-blur-xs animate-in fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/70 backdrop-blur-xs animate-in fade-in"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-[360px] h-[720px] max-h-[92vh] bg-slate-950 rounded-[44px] p-3 border border-slate-800 shadow-2xl flex flex-col"
+            className="relative flex flex-col items-center max-h-[96vh]"
           >
             {/* Top Close Button & Bar */}
-            <div className="flex items-center justify-between px-3 py-1 mb-1 shrink-0">
+            <div className="w-full max-w-[340px] sm:max-w-[360px] flex items-center justify-between px-3.5 py-2 mb-2.5 bg-slate-900/90 border border-slate-800 rounded-xl backdrop-blur-md shadow-lg shrink-0">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] text-slate-400 font-mono">Simulasi HP</span>
+                <span className="text-[11px] text-slate-300 font-medium">Simulasi HP</span>
                 <a
                   href={`/invitation/${slug}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-[11px] text-[#F97316] hover:underline font-medium"
+                  title="Buka website undangan di tab baru"
                 >
                   <span>Buka Web</span>
                   <ExternalLink className="w-3 h-3" />
@@ -696,20 +755,15 @@ export default function UserAdminPanel() {
 
               <button
                 onClick={() => setShowMobilePreview(false)}
-                className="p-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+                className="p-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
                 aria-label="Tutup Preview"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Notch */}
-            <div className="w-24 h-3 bg-slate-800 rounded-full mx-auto mb-2 shrink-0 flex items-center justify-center">
-              <div className="w-2 h-2 rounded-full bg-slate-900"></div>
-            </div>
-
-            {/* Screen Content */}
-            <div className="flex-1 w-full rounded-[32px] overflow-y-auto overflow-x-hidden no-scrollbar bg-slate-900 shadow-inner relative isolate scroll-smooth">
+            {/* Template Device Frame using /templates/device/mobile.png */}
+            <DeviceFrame className="w-[320px] sm:w-[350px]">
               <ThemeRenderer
                 data={previewData}
                 forcedThemeId={themeId}
@@ -717,12 +771,12 @@ export default function UserAdminPanel() {
                 showCover={false}
                 isEmbedded={true}
               />
-            </div>
+            </DeviceFrame>
 
             {/* Bottom Info in Preview */}
             <div className="pt-2 shrink-0 text-center">
-              <p className="text-[10px] text-slate-400">
-                Tema Aktif: <span className="text-[#F97316] font-bold">{themeId}</span>
+              <p className="text-[10px] text-slate-300">
+                Tema Aktif: <span className="text-[#F97316] font-bold uppercase">{themeId}</span>
               </p>
             </div>
           </div>

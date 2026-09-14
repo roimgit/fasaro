@@ -7,7 +7,6 @@ import {
   ExternalLink,
   Heart,
   MapPin,
-  Sparkles,
 } from "lucide-react";
 import { WeddingInvitationData } from "@/types/wedding";
 import CountdownTimer from "../shared/CountdownTimer";
@@ -344,7 +343,7 @@ export const MinangTheme: React.FC<MinangThemeProps> = ({
                       {event.eventName}
                     </span>
                     <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
-                      <Sparkles className="w-4 h-4" />
+                      <Heart className="w-4 h-4" />
                     </div>
                   </div>
 
