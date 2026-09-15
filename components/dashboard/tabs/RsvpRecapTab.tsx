@@ -2,7 +2,6 @@
 
 import React from "react";
 import {
-  AlertCircle,
   CheckCircle2,
   HelpCircle,
   MessageSquare,

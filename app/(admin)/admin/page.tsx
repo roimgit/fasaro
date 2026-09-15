@@ -773,6 +773,7 @@ export default function MasterAdminPage() {
                   onChange={(e) => setEditTier(e.target.value)}
                   className="w-full py-2 px-3 rounded-lg bg-white border border-[#E2E8F0] text-slate-800 focus:outline-none focus:border-[#F97316]"
                 >
+                  <option value="FREE">Gratis (Rp 0 - H+7 Acara)</option>
                   <option value="STARTER">Starter (Rp 69.000)</option>
                   <option value="ELEGANT">Elegant (Rp 149.000)</option>
                   <option value="ULTIMATE">Ultimate (Rp 279.000)</option>

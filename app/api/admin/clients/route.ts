@@ -37,7 +37,7 @@ export async function GET() {
 
     const clients = users.map((u) => {
       const inv = u.invitations[0] || null;
-      const latestTier = inv?.paymentTransactions[0]?.tier || SubscriptionTier.STARTER;
+      const latestTier = (inv?.paymentTransactions[0]?.tier as string) || "FREE";
 
       let status = "NO_INVITATION";
       if (inv) {
@@ -128,14 +128,14 @@ export async function PATCH(request: NextRequest) {
     });
 
     // If tier was also updated, record/update transaction
-    if (tier && Object.values(SubscriptionTier).includes(tier)) {
+    if (tier) {
       await prisma.paymentTransaction.create({
         data: {
           orderId: `ADMIN-ADJUST-${Date.now()}`,
           userId: currentInv.userId,
           invitationId: invitationId,
           tier: tier as SubscriptionTier,
-          amount: tier === "ULTIMATE" ? 279000 : tier === "ELEGANT" ? 149000 : 69000,
+          amount: tier === "ULTIMATE" ? 279000 : tier === "ELEGANT" ? 149000 : tier === "STARTER" ? 69000 : 0,
           paymentType: "GATEWAY",
           paymentStatus: "SETTLEMENT",
           verifiedBy: "ADMIN_OVERRIDE",

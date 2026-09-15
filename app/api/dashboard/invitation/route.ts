@@ -7,7 +7,6 @@ import {
   GalleryItemInput,
   BankAccountInput,
 } from "@/lib/validations";
-import { SubscriptionTier } from "@prisma/client";
 import { revalidateInvitationCache } from "@/lib/invitation-cache";
 
 export async function GET() {
@@ -65,13 +64,39 @@ export async function GET() {
       });
     }
 
-    const currentTier = invitation.paymentTransactions?.[0]?.tier || SubscriptionTier.STARTER;
+    let currentTier = invitation.paymentTransactions?.[0]?.tier as string | undefined;
+    if (!currentTier) {
+      currentTier = "FREE";
+    }
+
+    // Auto calculate activeUntil for FREE tier: H+7 of event date
+    let effectiveActiveUntil = invitation.activeUntil;
+    if (currentTier === "FREE") {
+      const schedules = invitation.eventSchedules || [];
+      const latestDate =
+        schedules.length > 0
+          ? new Date(Math.max(...schedules.map((s) => new Date(s.date).getTime())))
+          : invitation.createdAt;
+      const hPlus7 = new Date(latestDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+      hPlus7.setHours(23, 59, 59, 999);
+
+      if (!invitation.activeUntil || Math.abs(new Date(invitation.activeUntil).getTime() - hPlus7.getTime()) > 86400000) {
+        await prisma.invitation.update({
+          where: { id: invitation.id },
+          data: { activeUntil: hPlus7 },
+        });
+        effectiveActiveUntil = hPlus7;
+      }
+    }
 
     return NextResponse.json({
       success: true,
       data: {
         ...invitation,
+        activeUntil: effectiveActiveUntil,
         tier: currentTier,
+        userEmail: user.email,
+        isAdmin: user.email === "admin@admin.com",
       },
     });
   } catch (error) {
@@ -121,9 +146,17 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Find user's invitation
+    // Find user's invitation and current tier
     const userInv = await prisma.invitation.findFirst({
       where: { userId: user.userId },
+      include: {
+        paymentTransactions: {
+          where: { paymentStatus: "SETTLEMENT" },
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          select: { tier: true },
+        },
+      },
     });
 
     if (!userInv) {
@@ -131,6 +164,44 @@ export async function PUT(request: NextRequest) {
         { success: false, error: "Undangan tidak ditemukan" },
         { status: 404 }
       );
+    }
+
+    const currentTier = (userInv.paymentTransactions?.[0]?.tier as string) || "FREE";
+
+    // Enforce tier validation for FREE
+    if (currentTier === "FREE") {
+      if (validData.galleries && validData.galleries.length > 5) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Paket Gratis hanya mengizinkan maksimal 5 foto galeri. Silakan upgrade paket untuk foto tanpa batas.",
+          },
+          { status: 400 }
+        );
+      }
+
+      if (validData.themeId && validData.themeId !== "minimalist") {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Paket Gratis hanya dapat menggunakan 1 pilihan tema (Clean Minimalist). Silakan upgrade paket untuk membuka seluruh tema.",
+          },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Calculate activeUntil for FREE tier: H+7 of latest event date
+    let computedActiveUntil: Date | undefined = undefined;
+    if (currentTier === "FREE") {
+      const scheduleDates = (validData.schedules || [])
+        .map((s: EventScheduleInput) => new Date(s.date).getTime())
+        .filter((t: number) => !isNaN(t));
+
+      const latestTime = scheduleDates.length > 0 ? Math.max(...scheduleDates) : Date.now();
+      const hPlus7 = new Date(latestTime + 7 * 24 * 60 * 60 * 1000);
+      hPlus7.setHours(23, 59, 59, 999);
+      computedActiveUntil = hPlus7;
     }
 
     // Update in transaction to safely sync relations
@@ -144,6 +215,7 @@ export async function PUT(request: NextRequest) {
           themeId: validData.themeId,
           coupleInfo: validData.coupleInfo as object,
           isActive: validData.isActive,
+          ...(computedActiveUntil ? { activeUntil: computedActiveUntil } : {}),
         },
       });
 
@@ -221,15 +293,33 @@ export async function PATCH(request: NextRequest) {
 
     const userInv = await prisma.invitation.findFirst({
       where: { userId: user.userId },
+      include: {
+        paymentTransactions: {
+          where: { paymentStatus: "SETTLEMENT" },
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          select: { tier: true },
+        },
+      },
     });
 
     if (!userInv) {
       return NextResponse.json({ success: false, error: "Undangan tidak ditemukan" }, { status: 404 });
     }
 
+    const currentTier = (userInv.paymentTransactions?.[0]?.tier as string) || "FREE";
     const updateData: Record<string, unknown> = {};
 
     if (body.themeId && typeof body.themeId === "string") {
+      if (currentTier === "FREE" && body.themeId !== "minimalist") {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Tema ini khusus untuk paket berbayar. Silakan upgrade paket Anda untuk menggunakan tema ini.",
+          },
+          { status: 400 }
+        );
+      }
       updateData.themeId = body.themeId;
     }
     if (body.isActive !== undefined) {

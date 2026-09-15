@@ -79,6 +79,22 @@ export const BillingUpgradeTab: React.FC<BillingUpgradeTabProps> = ({
 
   const plans = [
     {
+      id: "FREE",
+      name: "Paket Gratis",
+      price: "Rp 0",
+      rawAmount: 0,
+      period: "Masa Aktif s/d H+7 Acara",
+      desc: "Uji coba platform Fasaro tanpa biaya awal pembuatan.",
+      features: [
+        "1 Pilihan Tema (Modern Editorial)",
+        "Masa Aktif s/d H+7 Tanggal Acara",
+        "Galeri Foto hingga 5 Foto",
+        "Buku Ucapan & Doa Tamu",
+        "Navigasi Peta Google Maps",
+        "Amplop Digital (1 Rekening Bank)",
+      ],
+    },
+    {
       id: "STARTER",
       name: "Paket Starter",
       price: "Rp 69.000",
@@ -337,7 +353,7 @@ export const BillingUpgradeTab: React.FC<BillingUpgradeTabProps> = ({
       )}
 
       {/* Pricing Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {plans.map((p) => {
           const isCurrent = currentTier === p.id;
           const isPendingMidtrans = activeMidtransTier === p.id;
@@ -384,8 +400,12 @@ export const BillingUpgradeTab: React.FC<BillingUpgradeTabProps> = ({
 
               <div className="pt-2 space-y-2">
                 {isCurrent ? (
-                  <div className="w-full py-2 px-3 rounded-lg bg-emerald-50 text-emerald-700 font-semibold text-xs text-center border border-emerald-200">
+                  <div className="w-full py-2.5 px-3 rounded-lg bg-emerald-50 text-emerald-700 font-semibold text-xs text-center border border-emerald-200">
                     Paket Aktif Anda
+                  </div>
+                ) : p.id === "FREE" ? (
+                  <div className="w-full py-2.5 px-3 rounded-lg bg-slate-100 text-slate-500 font-medium text-xs text-center border border-slate-200">
+                    Paket Dasar
                   </div>
                 ) : (
                   <>

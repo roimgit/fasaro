@@ -13,6 +13,7 @@ enum UserRole {
 }
 
 enum SubscriptionTier {
+  FREE
   STARTER
   ELEGANT
   ULTIMATE

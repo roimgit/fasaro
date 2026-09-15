@@ -5,8 +5,6 @@ import {
   Check,
   Copy,
   Pencil,
-  Plus,
-  QrCode,
   Search,
   Send,
   Trash2,

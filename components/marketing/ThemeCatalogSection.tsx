@@ -1,12 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { ExternalLink, Eye, Palette } from "lucide-react";
-import { THEME_LIST, WeddingInvitationData } from "@/types/wedding";
-
-interface ThemeCatalogProps {
-  demoData?: WeddingInvitationData;
-}
+import { THEME_LIST } from "@/types/wedding";
 
 const CATEGORIES = [
   "Semua",
@@ -17,7 +14,7 @@ const CATEGORIES = [
   "Modern Chic",
 ] as const;
 
-export const ThemeCatalogSection: React.FC<ThemeCatalogProps> = () => {
+export const ThemeCatalogSection: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>("Semua");
 
   const filteredThemes = THEME_LIST.filter((theme) => {
@@ -36,7 +33,7 @@ export const ThemeCatalogSection: React.FC<ThemeCatalogProps> = () => {
           Pilihan Desain Tema Undangan Digital
         </h2>
         <p className="text-xs sm:text-sm text-slate-500">
-          Setiap tema dirancang responsif dengan pengalaman visual terbaik di ponsel pintar para tamu undangan Anda.
+          Setiap tema dirancang dengan pengalaman visual terbaik di ponsel pintar para tamu undangan Anda.
         </p>
       </div>
 
@@ -64,26 +61,40 @@ export const ThemeCatalogSection: React.FC<ThemeCatalogProps> = () => {
             key={theme.id}
             className="rounded-2xl bg-white border border-[#E2E8F0] p-5 shadow-xs transition-all flex flex-col justify-between space-y-4"
           >
-            {/* Visual Cover Preview (No hover overlay) */}
-            <div
-              className={`h-48 w-full rounded-xl bg-gradient-to-tr ${theme.bgPreview} relative overflow-hidden flex flex-col items-center justify-center p-4 border border-white/10`}
-            >
-              <span className="text-sm font-bold text-white drop-shadow-sm text-center">
-                {theme.name}
-              </span>
-              <span className="text-[10px] uppercase tracking-wider text-white/90 mt-1 px-2.5 py-0.5 rounded-full bg-black/30 backdrop-blur-xs font-semibold">
-                {theme.category}
-              </span>
+            {/* Visual Cover Preview with Wedding Image */}
+            <div className="relative h-52 w-full rounded-xl overflow-hidden bg-slate-100 border border-[#E2E8F0] group/img">
+              {theme.thumbnail ? (
+                <Image
+                  src={theme.thumbnail}
+                  alt={`Preview Desain ${theme.name}`}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="object-cover transition-transform duration-500 group-hover/img:scale-105"
+                />
+              ) : (
+                <div className={`w-full h-full bg-gradient-to-tr ${theme.bgPreview}`} />
+              )}
+              {/* Bottom gradient overlay for readability */}
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-black/20 to-transparent pointer-events-none" />
+
+              {/* Floating Category Badge */}
+              <div className="absolute top-3 left-3">
+                <span className="text-[10px] uppercase tracking-wider text-white font-semibold px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-xs border border-white/20">
+                  {theme.category}
+                </span>
+              </div>
+
+              {/* Theme Name at bottom of cover image */}
+              <div className="absolute bottom-3 left-3 right-3">
+                <p className="text-white font-bold text-base drop-shadow-md tracking-tight leading-snug">
+                  {theme.name}
+                </p>
+              </div>
             </div>
 
             {/* Content Details */}
             <div className="space-y-1 text-left">
-              <div className="flex items-center justify-between">
-                <h3 className="font-bold text-sm text-slate-900">{theme.name}</h3>
-                <span className="text-[10px] text-[#F97316] font-semibold uppercase">
-                  Responsive
-                </span>
-              </div>
+              <h3 className="font-bold text-sm text-slate-900">{theme.name}</h3>
               <p className="text-xs text-slate-500 line-clamp-2">{theme.description}</p>
             </div>
 

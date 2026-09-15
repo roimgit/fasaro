@@ -2,18 +2,17 @@
 
 import React, { useState } from "react";
 import {
+  AlertCircle,
   Calendar,
   ChevronDown,
   ChevronUp,
   CreditCard,
   Heart,
   Image as ImageIcon,
-  MapPin,
   Music,
   Plus,
   BookOpen,
   Trash2,
-  Upload,
   Video,
 } from "lucide-react";
 
@@ -105,11 +104,17 @@ interface ContentEditorTabProps {
   stories: StoryItem[];
   setStories: React.Dispatch<React.SetStateAction<StoryItem[]>>;
 
+  // Tier & Upgrade
+  tier?: string;
+  onUpgradeClick?: () => void;
+
   onSave: () => void;
   isSaving: boolean;
 }
 
 export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
+  tier,
+  onUpgradeClick,
   title,
   setTitle,
   slug,
@@ -559,6 +564,15 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
                 </div>
               </div>
             ))}
+
+            {tier === "FREE" && (
+              <div className="p-3 rounded-xl bg-orange-50 border border-orange-200 text-orange-950 text-xs flex items-center gap-2.5">
+                <Calendar className="w-4 h-4 text-[#F97316] shrink-0" />
+                <div className="leading-relaxed">
+                  <span className="font-semibold text-[#F97316]">Masa Aktif Paket Gratis:</span> Tautan website undangan Anda otomatis aktif sampai <strong>H+7</strong> setelah tanggal acara pernikahan.
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -619,13 +633,22 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
 
             {/* Galeri Prewedding */}
             <div className="space-y-3 pt-2">
-              <div className="flex items-center justify-between">
-                <h4 className="font-semibold text-slate-800 text-xs">
-                  Daftar Foto Prewedding ({galleries.length} Foto)
-                </h4>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <h4 className="font-semibold text-slate-800 text-xs">
+                    Daftar Foto Prewedding ({galleries.length} Foto)
+                  </h4>
+                  {tier === "FREE" && (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-semibold">
+                      Paket Gratis: Maks. 5 Foto ({galleries.length}/5)
+                    </span>
+                  )}
+                </div>
                 <button
                   type="button"
+                  disabled={tier === "FREE" && galleries.length >= 5}
                   onClick={() => {
+                    if (tier === "FREE" && galleries.length >= 5) return;
                     setGalleries([
                       ...galleries,
                       {
@@ -635,12 +658,36 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
                       },
                     ]);
                   }}
-                  className="inline-flex items-center gap-1.5 py-1 px-3 rounded-lg bg-orange-50 text-[#F97316] hover:bg-blue-100 font-semibold text-xs border border-orange-100 transition-colors"
+                  className={`inline-flex items-center gap-1.5 py-1 px-3 rounded-lg font-semibold text-xs border transition-colors ${
+                    tier === "FREE" && galleries.length >= 5
+                      ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
+                      : "bg-orange-50 text-[#F97316] hover:bg-orange-100 border-orange-100"
+                  }`}
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Tambah Foto</span>
                 </button>
               </div>
+
+              {tier === "FREE" && galleries.length >= 5 && (
+                <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span>
+                      Batas maksimal <strong>5 foto</strong> untuk Paket Gratis telah tercapai. Upgrade paket untuk upload foto galeri tanpa batas.
+                    </span>
+                  </div>
+                  {onUpgradeClick && (
+                    <button
+                      type="button"
+                      onClick={onUpgradeClick}
+                      className="px-3 py-1.5 rounded-lg bg-[#F97316] hover:bg-[#EA580C] text-white font-semibold text-xs shrink-0 transition-colors shadow-2xs cursor-pointer"
+                    >
+                      Upgrade Paket
+                    </button>
+                  )}
+                </div>
+              )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {galleries.map((gal, idx) => (

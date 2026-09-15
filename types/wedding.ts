@@ -91,6 +91,7 @@ export const THEME_LIST: ThemeMeta[] = [
     fontBody: "font-sans",
     accentColor: "#d97706",
     bgPreview: "from-[#382a0f] via-[#5c131a] to-[#1a0f07]",
+    thumbnail: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "minimalist",
@@ -101,6 +102,7 @@ export const THEME_LIST: ThemeMeta[] = [
     fontBody: "font-sans",
     accentColor: "#334155",
     bgPreview: "from-stone-100 to-zinc-200",
+    thumbnail: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "rustic",
@@ -111,6 +113,7 @@ export const THEME_LIST: ThemeMeta[] = [
     fontBody: "font-serif",
     accentColor: "#92400e",
     bgPreview: "from-amber-100 to-orange-200",
+    thumbnail: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "syari",
@@ -121,6 +124,7 @@ export const THEME_LIST: ThemeMeta[] = [
     fontBody: "font-sans",
     accentColor: "#065f46",
     bgPreview: "from-emerald-950 to-teal-900",
+    thumbnail: "https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "royal",
@@ -131,6 +135,7 @@ export const THEME_LIST: ThemeMeta[] = [
     fontBody: "font-sans",
     accentColor: "#d97706",
     bgPreview: "from-slate-950 via-indigo-950 to-amber-900",
+    thumbnail: "https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "adirara",
@@ -141,5 +146,6 @@ export const THEME_LIST: ThemeMeta[] = [
     fontBody: "font-sans",
     accentColor: "#be185d",
     bgPreview: "from-pink-100 via-rose-100 to-amber-50",
+    thumbnail: "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=800&q=80",
   },
 ];

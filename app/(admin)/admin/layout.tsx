@@ -7,6 +7,7 @@ import {
   Globe,
   LayoutDashboard,
   LogOut,
+  Palette,
   Shield,
 } from "lucide-react";
 
@@ -59,6 +60,15 @@ export default async function AdminLayout({
             >
               <CheckSquare className="w-4 h-4 text-[#F97316]" />
               <span>Verifikasi Manual</span>
+            </Link>
+
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
+              title="Buka Studio Editor Undangan"
+            >
+              <Palette className="w-4 h-4 text-[#F97316]" />
+              <span>Buka Studio</span>
             </Link>
 
             <Link

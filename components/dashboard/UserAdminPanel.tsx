@@ -8,10 +8,9 @@ import {
   CreditCard,
   Edit3,
   ExternalLink,
-  Eye,
   Palette,
-  RefreshCw,
   Save,
+  Sparkles,
   UserCheck,
   Users,
   X,
@@ -36,7 +35,6 @@ export default function UserAdminPanel() {
   // Loading & Saving States
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
 
   // Notification Toast
@@ -45,13 +43,18 @@ export default function UserAdminPanel() {
     message: string;
   } | null>(null);
 
+  // User Auth & Session
+  const [userEmail, setUserEmail] = useState<string>("");
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [activeUntil, setActiveUntil] = useState<string | null>(null);
+
   // Invitation General States
   const [invitationId, setInvitationId] = useState<string>("");
   const [title, setTitle] = useState("Pernikahan Mempelai");
   const [slug, setSlug] = useState("mempelai");
-  const [themeId, setThemeId] = useState<ThemeId>("adirara");
+  const [themeId, setThemeId] = useState<ThemeId>("minimalist");
   const [isActive, setIsActive] = useState(true);
-  const [tier, setTier] = useState<string>("STARTER");
+  const [tier, setTier] = useState<string>("FREE");
 
   // Couple Info
   const [groomName, setGroomName] = useState("");
@@ -113,10 +116,10 @@ export default function UserAdminPanel() {
 
   // Load Dashboard Data
   const loadDashboardData = useCallback(async (showIndicator = false) => {
-    if (showIndicator) setIsLoading(true);
-    setNotification(null);
-
     try {
+      if (showIndicator) {
+        setIsLoading(true);
+      }
       const [resInv, resGuests, resRsvp] = await Promise.all([
         fetch("/api/dashboard/invitation"),
         fetch("/api/dashboard/guests"),
@@ -130,9 +133,12 @@ export default function UserAdminPanel() {
           setInvitationId(data.id || "");
           setTitle(data.title || "Pernikahan Mempelai");
           setSlug(data.slug || "mempelai");
-          setThemeId((data.themeId as ThemeId) || "adirara");
+          setThemeId((data.themeId as ThemeId) || "minimalist");
           setIsActive(data.isActive !== undefined ? data.isActive : true);
-          setTier(data.tier || "STARTER");
+          setTier(data.tier || "FREE");
+          setUserEmail(data.userEmail || "");
+          setIsAdmin(Boolean(data.isAdmin || data.userEmail === "admin@admin.com"));
+          setActiveUntil(data.activeUntil || null);
 
           const c = data.coupleInfo || {};
           setGroomName(c.groomName || "");
@@ -232,7 +238,22 @@ export default function UserAdminPanel() {
   }, []);
 
   useEffect(() => {
-    loadDashboardData();
+    let isMounted = true;
+    const fetchInitialData = async () => {
+      try {
+        await loadDashboardData();
+      } catch {
+        // Handled in loadDashboardData
+      }
+    };
+
+    if (isMounted) {
+      void fetchInitialData();
+    }
+
+    return () => {
+      isMounted = false;
+    };
   }, [loadDashboardData]);
 
   // Handle Save Invitation
@@ -305,7 +326,6 @@ export default function UserAdminPanel() {
         throw new Error(json.error || "Gagal menyimpan undangan");
       }
 
-      setHasUnsavedChanges(false);
       setNotification({
         type: "success",
         message: "Perubahan undangan berhasil disimpan & langsung aktif di website!",
@@ -526,9 +546,13 @@ export default function UserAdminPanel() {
         title={title}
         slug={slug}
         tier={tier}
+        isAdmin={isAdmin}
+        userEmail={userEmail}
+        activeUntil={activeUntil}
         isLoading={isLoading}
         onOpenPreview={() => setShowMobilePreview(true)}
         onLogout={handleLogout}
+        onUpgradeClick={() => setActiveTab("billing")}
       />
 
       {/* 2. Main Content Area */}
@@ -555,6 +579,36 @@ export default function UserAdminPanel() {
               className="p-1 text-slate-400 hover:text-slate-700"
             >
               <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        {/* FREE Tier Notice Banner */}
+        {tier === "FREE" && (
+          <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-2xs">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-orange-100 text-[#F97316] flex items-center justify-center shrink-0">
+                <Sparkles className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="font-bold text-slate-900 flex items-center gap-1.5 flex-wrap">
+                  <span>Status: Paket Gratis</span>
+                  <span className="text-[10px] font-semibold text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded border border-amber-200">
+                    Aktif s/d H+7 Acara
+                  </span>
+                </div>
+                <p className="text-slate-600 text-[11px] mt-0.5">
+                  Paket Gratis mencakup 1 pilihan tema (Clean Minimalist) dan maks. 5 foto galeri. Mau aktifkan tema adat/luxury &amp; foto tanpa batas?
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setActiveTab("billing")}
+              className="self-start sm:self-auto inline-flex items-center gap-1.5 py-1.5 px-3 rounded-lg bg-[#F97316] hover:bg-[#EA580C] text-white font-semibold text-xs shadow-xs transition-colors shrink-0 cursor-pointer"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Upgrade Sekarang</span>
             </button>
           </div>
         )}
@@ -600,6 +654,8 @@ export default function UserAdminPanel() {
         {/* Tab Content Display */}
         {activeTab === "editor" && (
           <ContentEditorTab
+            tier={tier}
+            onUpgradeClick={() => setActiveTab("billing")}
             title={title}
             setTitle={setTitle}
             slug={slug}
@@ -651,7 +707,17 @@ export default function UserAdminPanel() {
           <ThemeSelectorTab
             currentThemeId={themeId}
             slug={slug}
+            tier={tier}
+            onUpgradeClick={() => setActiveTab("billing")}
             onSelectTheme={async (newThemeId) => {
+              if (tier === "FREE" && newThemeId !== "minimalist") {
+                setNotification({
+                  type: "error",
+                  message: "Tema ini khusus untuk paket berbayar. Silakan upgrade paket untuk memilih tema ini.",
+                });
+                setActiveTab("billing");
+                return;
+              }
               setThemeId(newThemeId);
               try {
                 const res = await fetch("/api/dashboard/invitation", {
@@ -659,14 +725,19 @@ export default function UserAdminPanel() {
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ themeId: newThemeId }),
                 });
-                if (res.ok) {
-                  setNotification({
-                    type: "success",
-                    message: `Tema berhasil diubah menjadi "${newThemeId}"!`,
-                  });
+                const json = await res.json();
+                if (!res.ok) {
+                  throw new Error(json.error || "Gagal mengubah tema");
                 }
-              } catch {
-                // Ignore
+                setNotification({
+                  type: "success",
+                  message: `Tema berhasil diubah menjadi "${newThemeId}"!`,
+                });
+              } catch (err) {
+                setNotification({
+                  type: "error",
+                  message: err instanceof Error ? err.message : "Gagal mengubah tema",
+                });
               }
             }}
             onOpenPreview={() => setShowMobilePreview(true)}

@@ -1,16 +1,19 @@
 "use client";
 
 import React, { Suspense, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
+  AlertCircle,
+  ArrowLeft,
+  Eye,
+  EyeOff,
   Heart,
+  Home,
+  Loader2,
   Lock,
   Mail,
   User,
-  Eye,
-  EyeOff,
-  AlertCircle,
-  Loader2,
 } from "lucide-react";
 
 function GoogleIcon({ className = "w-4 h-4" }: { className?: string }) {
@@ -105,8 +108,29 @@ function LoginForm() {
   const googleAuthHref = `/api/auth/google?from=${encodeURIComponent(redirectTarget)}`;
 
   return (
-    <div className="w-full max-w-md p-8 rounded-2xl bg-white border border-[#E2E8F0] shadow-xs">
-      <div className="text-center mb-6">
+    <div className="w-full max-w-md space-y-3">
+      {/* Link Kembali ke Beranda */}
+      <div className="flex items-center justify-between px-1">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-[#F97316] transition-colors group"
+        >
+          <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
+          <span>Kembali ke Beranda</span>
+        </Link>
+        <Link
+          href="/"
+          className="text-xs font-bold text-slate-900 tracking-tight flex items-center gap-1.5 hover:opacity-80 transition-opacity"
+        >
+          <div className="w-5 h-5 rounded-md bg-gradient-to-tr from-orange-500 to-amber-500 flex items-center justify-center text-white text-[10px] font-black shadow-2xs">
+            F
+          </div>
+          <span>Fasaro</span>
+        </Link>
+      </div>
+
+      <div className="w-full p-8 rounded-2xl bg-white border border-[#E2E8F0] shadow-xs">
+        <div className="text-center mb-6">
         <div className="inline-flex p-2.5 rounded-xl bg-orange-50 text-[#F97316] border border-orange-100 mb-3">
           <Heart className="w-5 h-5 fill-[#F97316]" />
         </div>
@@ -273,7 +297,19 @@ function LoginForm() {
         </div>
       </div>
     </div>
-  );
+
+    {/* Footer Back Link */}
+    <div className="text-center pt-1">
+      <Link
+        href="/"
+        className="text-[11px] text-slate-500 hover:text-[#F97316] inline-flex items-center gap-1.5 font-medium transition-colors"
+      >
+        <Home className="w-3.5 h-3.5" />
+        <span>Ke Beranda Utama Fasaro</span>
+      </Link>
+    </div>
+  </div>
+);
 }
 
 export default function LoginPage() {

@@ -56,6 +56,22 @@ export const FeaturesPricingFaqSection: React.FC = () => {
 
   const pricingPlans = [
     {
+      name: "Paket Gratis",
+      price: "0",
+      period: "Aktif s/d H+7 Acara",
+      description: "Uji coba platform Fasaro tanpa biaya awal pembuatan.",
+      highlight: false,
+      tier: "FREE",
+      features: [
+        "1 Pilihan Tema (Modern Editorial)",
+        "Masa Aktif s/d H+7 Tanggal Acara",
+        "Galeri Foto hingga 5 Foto",
+        "Buku Ucapan & Doa Tamu",
+        "Navigasi Google Maps Lokasi",
+        "Amplop Digital & Rekening Bank",
+      ],
+    },
+    {
       name: "Paket Starter",
       price: "69.000",
       period: "Masa Aktif 3 Bulan",
@@ -210,11 +226,11 @@ export const FeaturesPricingFaqSection: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
           {pricingPlans.map((plan, idx) => (
             <div
               key={idx}
-              className={`rounded-2xl p-7 flex flex-col justify-between relative transition-all ${
+              className={`rounded-2xl p-6 flex flex-col justify-between relative transition-all ${
                 plan.highlight
                   ? "bg-white border-2 border-[#F97316] shadow-md ring-1 ring-orange-100"
                   : "bg-white border border-[#E2E8F0] hover:border-slate-300 shadow-xs"
@@ -226,7 +242,7 @@ export const FeaturesPricingFaqSection: React.FC = () => {
                 </div>
               )}
 
-              <div className="space-y-4 text-left">
+              <div className="space-y-4">
                 <div>
                   <h3 className="font-bold text-lg text-slate-900">{plan.name}</h3>
                   <p className="text-xs text-slate-500 mt-1">{plan.description}</p>
@@ -254,14 +270,18 @@ export const FeaturesPricingFaqSection: React.FC = () => {
 
               <div className="pt-8">
                 <Link
-                  href={`/login?from=/dashboard&upgradeTier=${plan.tier}`}
+                  href={
+                    plan.price === "0"
+                      ? "/login?from=/dashboard"
+                      : `/login?from=/dashboard&upgradeTier=${plan.tier}`
+                  }
                   className={`w-full block text-center py-2.5 px-4 rounded-xl text-xs font-semibold transition-colors ${
                     plan.highlight
                       ? "bg-[#F97316] hover:bg-[#EA580C] text-white shadow-xs"
                       : "bg-[#F8FAFC] border border-[#E2E8F0] hover:bg-slate-100 text-slate-800"
                   }`}
                 >
-                  Pilih {plan.name}
+                  {plan.price === "0" ? "Mulai Gratis Sekarang" : `Pilih ${plan.name}`}
                 </Link>
               </div>
             </div>
