@@ -104,11 +104,15 @@ export async function GET() {
     }
 
     const effectiveActiveUntil = isPaid ? invitation.activeUntil : null;
+    const musicUrl = (coupleInfo.musicUrl as string) || null;
+    const youtubeVideoUrl = (coupleInfo.youtubeVideoUrl as string) || null;
 
     return NextResponse.json({
       success: true,
       data: {
         ...invitation,
+        musicUrl,
+        youtubeVideoUrl,
         activeUntil: effectiveActiveUntil,
         tier: currentTier,
         isPaid,
@@ -137,10 +141,26 @@ export async function PUT(request: NextRequest) {
 
     const parseResult = invitationSchema.safeParse(normalizedBody);
     if (!parseResult.success) {
+      console.error(
+        "[API Dashboard Invitation] Validasi gagal:",
+        JSON.stringify(parseResult.error.flatten(), null, 2)
+      );
+
+      const fieldErrors = parseResult.error.flatten().fieldErrors;
+      const errorList: string[] = [];
+      for (const [field, msgs] of Object.entries(fieldErrors)) {
+        if (msgs && msgs.length > 0) {
+          errorList.push(`${field}: ${msgs.join(", ")}`);
+        }
+      }
+
       return NextResponse.json(
         {
           success: false,
-          error: "Validasi data gagal",
+          error:
+            errorList.length > 0
+              ? `Validasi gagal pada: ${errorList.join("; ")}`
+              : "Validasi data gagal",
           details: parseResult.error.flatten(),
         },
         { status: 400 }
@@ -184,11 +204,24 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const rawTier = (userInv.paymentTransactions?.[0]?.tier as string) || "STARTER";
-    const currentTier = rawTier === "FREE" ? "STARTER" : rawTier;
+    const hasActiveSettlement = userInv.paymentTransactions && userInv.paymentTransactions.length > 0;
+    const isAdmin = user.email === "admin@admin.com";
+
+    if (!hasActiveSettlement && !isAdmin) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "Akun Anda belum memiliki paket aktif. Silakan pilih dan aktifkan paket di menu Langganan & Paket untuk mulai mengedit dan menyimpan undangan.",
+        },
+        { status: 403 }
+      );
+    }
+
+    const currentTier = (userInv.paymentTransactions?.[0]?.tier as string) || "STARTER";
 
     // Enforce tier validation for STARTER
-    if (currentTier === "STARTER") {
+    if (currentTier === "STARTER" && !isAdmin) {
       if (validData.galleries && validData.galleries.length > 10) {
         return NextResponse.json(
           {
@@ -209,6 +242,22 @@ export async function PUT(request: NextRequest) {
         );
       }
 
+      if (
+        validData.bankAccounts &&
+        validData.bankAccounts.some(
+          (b) => b.qrisImageUrl && b.qrisImageUrl.trim() !== ""
+        )
+      ) {
+        return NextResponse.json(
+          {
+            success: false,
+            error:
+              "Paket Starter tidak mendukung foto QRIS. Silakan upgrade ke Paket Elegant atau Ultimate untuk menggunakan scan QRIS.",
+          },
+          { status: 400 }
+        );
+      }
+
       if (validData.themeId && validData.themeId !== "minimalist") {
         return NextResponse.json(
           {
@@ -222,6 +271,12 @@ export async function PUT(request: NextRequest) {
 
     // Update in transaction to safely sync relations
     const updated = await prisma.$transaction(async (tx) => {
+      const coupleInfoData = {
+        ...(validData.coupleInfo as object),
+        musicUrl: validData.musicUrl || validData.coupleInfo.musicUrl || null,
+        youtubeVideoUrl: validData.youtubeVideoUrl || validData.coupleInfo.youtubeVideoUrl || null,
+      };
+
       // 1. Update main invitation
       const inv = await tx.invitation.update({
         where: { id: userInv.id },
@@ -229,7 +284,7 @@ export async function PUT(request: NextRequest) {
           title: validData.title,
           slug: validData.slug,
           themeId: validData.themeId,
-          coupleInfo: validData.coupleInfo as object,
+          coupleInfo: coupleInfoData,
           isActive: validData.isActive,
           ...(validData.activeUntil ? { activeUntil: new Date(validData.activeUntil) } : {}),
         },
@@ -276,7 +331,10 @@ export async function PUT(request: NextRequest) {
             bankName: b.bankName,
             accountNumber: b.accountNumber,
             accountHolder: b.accountHolder,
-            qrisImageUrl: b.qrisImageUrl || null,
+            qrisImageUrl:
+              currentTier === "STARTER" && !isAdmin
+                ? null
+                : b.qrisImageUrl || null,
           })),
         });
       }

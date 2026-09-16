@@ -117,13 +117,15 @@ export const HeroCover: React.FC<HeroCoverProps> = ({
           >
             {guestName || "Tamu Undangan"}
           </p>
-          <p
-            className={`text-[11px] mt-1 italic ${
-              themeStyle?.guestSubtextClass ?? "opacity-60"
-            }`}
-          >
-            *Mohon maaf jika ada kesalahan penulisan nama/gelar
-          </p>
+          {guestName && guestName.trim() !== "" && guestName.trim().toLowerCase() !== "tamu undangan" && (
+            <p
+              className={`text-[11px] mt-1 italic ${
+                themeStyle?.guestSubtextClass ?? "opacity-60"
+              }`}
+            >
+              *Mohon maaf jika ada kesalahan penulisan nama/gelar
+            </p>
+          )}
         </div>
 
         <p

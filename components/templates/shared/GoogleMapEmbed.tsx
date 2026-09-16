@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Compass, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 
 interface GoogleMapEmbedProps {
   venueName: string;
@@ -34,11 +34,6 @@ export const GoogleMapEmbed: React.FC<GoogleMapEmbedProps> = ({
           `${venueName} ${address}`
         )}`);
 
-  const wazeTarget =
-    latitude && longitude
-      ? `https://waze.com/ul?ll=${latitude},${longitude}&navigate=yes`
-      : `https://waze.com/ul?q=${encodeURIComponent(`${venueName} ${address}`)}`;
-
   return (
     <div className="w-full space-y-4 my-4">
       <div
@@ -62,12 +57,12 @@ export const GoogleMapEmbed: React.FC<GoogleMapEmbedProps> = ({
         </p>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+      <div className="flex items-center justify-center">
         <a
           href={gmapsTarget}
           target="_blank"
           rel="noopener noreferrer"
-          className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 py-2.5 px-5 rounded-full text-sm font-semibold transition-all shadow-sm hover:scale-105 active:scale-95 ${
+          className={`inline-flex items-center justify-center gap-2 py-2.5 px-6 rounded-full text-sm font-semibold transition-all shadow-sm hover:scale-105 active:scale-95 ${
             themeStyle?.buttonClass ??
             "bg-stone-900 hover:bg-stone-800 text-white"
           }`}
@@ -75,22 +70,10 @@ export const GoogleMapEmbed: React.FC<GoogleMapEmbedProps> = ({
           <MapPin className="w-4 h-4 text-rose-500" />
           <span>Buka Google Maps</span>
         </a>
-
-        <a
-          href={wazeTarget}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 py-2.5 px-5 rounded-full text-sm font-semibold transition-all shadow-sm border hover:scale-105 active:scale-95 ${
-            themeStyle?.secondaryButtonClass ??
-            "border-stone-300 bg-white/90 hover:bg-white text-stone-800"
-          }`}
-        >
-          <Compass className="w-4 h-4 text-cyan-600" />
-          <span>Buka Waze</span>
-        </a>
       </div>
     </div>
   );
 };
 
 export default GoogleMapEmbed;
+

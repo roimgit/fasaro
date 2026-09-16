@@ -13,6 +13,9 @@ export interface CoupleInfo {
   bridePhoto?: string | null;
   greetingMessage?: string | null;
   stories?: Array<{ date: string; title: string; story: string }> | null;
+  musicUrl?: string | null;
+  youtubeVideoUrl?: string | null;
+  desktopCoverImage?: string | null;
 }
 
 

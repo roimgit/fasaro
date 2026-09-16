@@ -113,7 +113,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         invitationId: invitationId ?? null,
         tier,
         amount,
-        paymentType,
+        paymentType: paymentType === "MANUAL_QRIS" ? "MANUAL_QRIS" : "MANUAL_BANK",
         paymentStatus: "WAITING_VERIFICATION",
         proofImageUrl,
       },

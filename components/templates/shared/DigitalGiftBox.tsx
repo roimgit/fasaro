@@ -34,6 +34,14 @@ export const DigitalGiftBox: React.FC<DigitalGiftBoxProps> = ({
     return null;
   }
 
+  const hasAnyQris = bankAccounts.some(
+    (account) =>
+      typeof account.qrisImageUrl === "string" &&
+      account.qrisImageUrl.trim() !== "" &&
+      !account.qrisImageUrl.includes("FASARO-DEMO-QRIS") &&
+      !account.qrisImageUrl.includes("demo-qris")
+  );
+
   const handleCopy = async (accountNumber: string, index: number) => {
     try {
       await navigator.clipboard.writeText(accountNumber);
@@ -68,47 +76,55 @@ export const DigitalGiftBox: React.FC<DigitalGiftBoxProps> = ({
             }`}
           >
             Doa restu Anda merupakan karunia terindah bagi kami. Bagi yang berkenan memberikan
-            tanda kasih, dapat melalui rekening/QRIS berikut:
+            tanda kasih, dapat melalui rekening{hasAnyQris ? "/QRIS" : ""} berikut:
           </p>
         </div>
       )}
 
       <div className="grid grid-cols-1 gap-4 max-w-md mx-auto">
-        {bankAccounts.map((account, index) => (
-          <div
-            key={account.id ?? `${account.bankName}-${index}`}
-            className={`p-5 rounded-2xl border shadow-sm transition-all hover:shadow-md ${
-              themeStyle?.cardClass ??
-              "bg-white/90 border-stone-200 text-stone-900"
-            }`}
-          >
-            <div className="flex items-center justify-between mb-3">
-              <span
-                className={`text-xs font-semibold uppercase tracking-wider px-2.5 py-1 rounded-md ${
-                  themeStyle?.badgeClass ??
-                  "bg-stone-100 text-stone-800 border border-stone-200"
-                }`}
-              >
-                {account.bankName}
-              </span>
-              {account.qrisImageUrl && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    setSelectedQris({
-                      url: account.qrisImageUrl as string,
-                      bank: account.bankName,
-                    })
-                  }
-                  className={`inline-flex items-center gap-1 text-xs font-semibold cursor-pointer transition-colors ${
-                    themeStyle?.qrisButtonClass ?? "text-amber-600 hover:text-amber-700"
+        {bankAccounts.map((account, index) => {
+          const hasValidAccountQris = Boolean(
+            account.qrisImageUrl &&
+              account.qrisImageUrl.trim() !== "" &&
+              !account.qrisImageUrl.includes("FASARO-DEMO-QRIS") &&
+              !account.qrisImageUrl.includes("demo-qris")
+          );
+
+          return (
+            <div
+              key={account.id ?? `${account.bankName}-${index}`}
+              className={`p-5 rounded-2xl border shadow-sm transition-all hover:shadow-md ${
+                themeStyle?.cardClass ??
+                "bg-white/90 border-stone-200 text-stone-900"
+              }`}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span
+                  className={`text-xs font-semibold uppercase tracking-wider px-2.5 py-1 rounded-md ${
+                    themeStyle?.badgeClass ??
+                    "bg-stone-100 text-stone-800 border border-stone-200"
                   }`}
                 >
-                  <QrCode className="w-3.5 h-3.5" />
-                  <span>Lihat QRIS</span>
-                </button>
-              )}
-            </div>
+                  {account.bankName}
+                </span>
+                {hasValidAccountQris && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setSelectedQris({
+                        url: account.qrisImageUrl as string,
+                        bank: account.bankName,
+                      })
+                    }
+                    className={`inline-flex items-center gap-1 text-xs font-semibold cursor-pointer transition-colors ${
+                      themeStyle?.qrisButtonClass ?? "text-amber-600 hover:text-amber-700"
+                    }`}
+                  >
+                    <QrCode className="w-3.5 h-3.5" />
+                    <span>Lihat QRIS</span>
+                  </button>
+                )}
+              </div>
 
             <div className="my-2">
               <p
@@ -148,8 +164,9 @@ export const DigitalGiftBox: React.FC<DigitalGiftBoxProps> = ({
                 </>
               )}
             </button>
-          </div>
-        ))}
+            </div>
+          );
+        })}
       </div>
 
       {/* QRIS Modal */}

@@ -198,7 +198,7 @@ export const WishesWallSection: React.FC<WishesWallSectionProps> = ({
           </div>
 
           <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-1 overflow-x-auto py-1">
+          <div className="flex items-center gap-1 flex-wrap py-1">
               {REACTIONS.map((emoji) => (
                 <button
                   key={emoji}

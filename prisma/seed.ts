@@ -230,7 +230,7 @@ async function main() {
     },
     {
       key: "manual_qris_image_url",
-      value: "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=FASARO-DEMO-QRIS",
+      value: "",
       description: "URL gambar QRIS manual toko",
     },
     {

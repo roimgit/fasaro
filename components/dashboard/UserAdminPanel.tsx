@@ -9,6 +9,7 @@ import {
   CreditCard,
   Edit3,
   ExternalLink,
+  Lock,
   Palette,
   Save,
   Sparkles,
@@ -74,6 +75,7 @@ export default function UserAdminPanel() {
   const [brideInstagram, setBrideInstagram] = useState("");
   const [bridePhoto, setBridePhoto] = useState("");
   const [greetingMessage, setGreetingMessage] = useState("");
+  const [desktopCoverImage, setDesktopCoverImage] = useState("");
 
   // Schedules
   const [schedules, setSchedules] = useState<
@@ -166,10 +168,11 @@ export default function UserAdminPanel() {
           setBrideInstagram(c.brideInstagram || "");
           setBridePhoto(c.bridePhoto || "");
           setGreetingMessage(c.greetingMessage || "");
+          setDesktopCoverImage(c.desktopCoverImage || "");
           setStories(Array.isArray(c.stories) ? c.stories : []);
 
-          setMusicUrl(data.musicUrl || "");
-          setYoutubeVideoUrl(data.youtubeVideoUrl || "");
+          setMusicUrl(data.musicUrl || c.musicUrl || "");
+          setYoutubeVideoUrl(data.youtubeVideoUrl || c.youtubeVideoUrl || "");
 
           if (Array.isArray(data.eventSchedules)) {
             setSchedules(
@@ -291,6 +294,23 @@ export default function UserAdminPanel() {
 
   // Handle Save Invitation
   const handleSaveInvitation = async () => {
+    if (!isPaid && !isAdmin) {
+      setNotification({
+        type: "error",
+        message: "Akun Anda belum memiliki paket aktif. Silakan pilih dan aktifkan paket di menu Langganan & Paket untuk menyimpan perubahan.",
+      });
+      return;
+    }
+
+    if (!groomNickname.trim() || !brideNickname.trim()) {
+      setNotification({
+        type: "error",
+        message: "Nama panggilan mempelai pria dan wanita wajib diisi — nama panggilan digunakan untuk tautan undangan.",
+      });
+      setActiveTab("editor");
+      return;
+    }
+
     setIsSaving(true);
     setNotification(null);
 
@@ -300,21 +320,25 @@ export default function UserAdminPanel() {
       themeId,
       isActive,
       musicUrl: musicUrl || undefined,
+      youtubeVideoUrl: youtubeVideoUrl || undefined,
       coupleInfo: {
         groomName,
-        groomNickname: groomNickname || undefined,
+        groomNickname,
         groomFather: groomFather || undefined,
         groomMother: groomMother || undefined,
         groomInstagram: groomInstagram || undefined,
         groomPhoto: groomPhoto || undefined,
         brideName,
-        brideNickname: brideNickname || undefined,
+        brideNickname,
         brideFather: brideFather || undefined,
         brideMother: brideMother || undefined,
         brideInstagram: brideInstagram || undefined,
         bridePhoto: bridePhoto || undefined,
         greetingMessage: greetingMessage || undefined,
+        desktopCoverImage: desktopCoverImage || undefined,
         stories: stories.length > 0 ? stories : undefined,
+        musicUrl: musicUrl || undefined,
+        youtubeVideoUrl: youtubeVideoUrl || undefined,
       },
       schedules: schedules.map((s) => ({
         eventName: s.eventName,
@@ -334,17 +358,28 @@ export default function UserAdminPanel() {
         address: s.address,
         mapsUrl: s.mapsUrl || undefined,
       })),
-      galleries: galleries.map((g, idx) => ({
-        imageUrl: g.imageUrl,
-        caption: g.caption || undefined,
-        sortOrder: idx,
-      })),
-      bankAccounts: bankAccounts.map((b) => ({
-        bankName: b.bankName,
-        accountNumber: b.accountNumber,
-        accountHolder: b.accountHolder,
-        qrisImageUrl: b.qrisImageUrl || undefined,
-      })),
+      galleries: galleries
+        .filter((g) => g.imageUrl && g.imageUrl.trim() !== "")
+        .map((g, idx) => ({
+          imageUrl: g.imageUrl.trim(),
+          caption: g.caption || undefined,
+          sortOrder: idx,
+        })),
+      bankAccounts: bankAccounts
+        .filter(
+          (b) =>
+            b.bankName &&
+            (b.accountNumber.trim() !== "" || b.accountHolder.trim() !== "")
+        )
+        .map((b) => ({
+          bankName: b.bankName,
+          accountNumber: b.accountNumber.trim(),
+          accountHolder: b.accountHolder.trim(),
+          qrisImageUrl:
+            tier === "STARTER" && !isAdmin
+              ? undefined
+              : b.qrisImageUrl || undefined,
+        })),
     };
 
     try {
@@ -533,6 +568,7 @@ export default function UserAdminPanel() {
       brideInstagram: brideInstagram || undefined,
       bridePhoto: bridePhoto || undefined,
       greetingMessage,
+      desktopCoverImage: desktopCoverImage || undefined,
       stories,
     },
     isActive,
@@ -716,11 +752,24 @@ export default function UserAdminPanel() {
             <button
               type="button"
               onClick={handleSaveInvitation}
-              disabled={isSaving}
-              className="inline-flex items-center gap-2 py-2 px-4 rounded-lg bg-[#F97316] hover:bg-[#EA580C] text-white text-xs font-semibold min-h-[40px] shadow-xs disabled:opacity-50 transition-colors"
+              disabled={isSaving || (!isPaid && !isAdmin)}
+              className={`inline-flex items-center gap-2 py-2 px-4 rounded-lg text-white text-xs font-semibold min-h-[40px] shadow-xs transition-colors ${
+                !isPaid && !isAdmin
+                  ? "bg-slate-400 cursor-not-allowed opacity-80"
+                  : "bg-[#F97316] hover:bg-[#EA580C] disabled:opacity-50 cursor-pointer"
+              }`}
             >
-              <Save className={`w-3.5 h-3.5 ${isSaving ? "animate-spin" : ""}`} />
-              <span>{isSaving ? "Menyimpan..." : "Simpan Undangan"}</span>
+              {!isPaid && !isAdmin ? (
+                <>
+                  <Lock className="w-3.5 h-3.5" />
+                  <span>Mode Pratinjau (Terkunci)</span>
+                </>
+              ) : (
+                <>
+                  <Save className={`w-3.5 h-3.5 ${isSaving ? "animate-spin" : ""}`} />
+                  <span>{isSaving ? "Menyimpan..." : "Simpan Undangan"}</span>
+                </>
+              )}
             </button>
           )}
         </div>
@@ -730,6 +779,7 @@ export default function UserAdminPanel() {
           <ContentEditorTab
             tier={tier}
             onUpgradeClick={() => setActiveTab("billing")}
+            isReadOnly={!isPaid && !isAdmin}
             title={title}
             setTitle={setTitle}
             slug={slug}
@@ -760,6 +810,8 @@ export default function UserAdminPanel() {
             setBridePhoto={setBridePhoto}
             greetingMessage={greetingMessage}
             setGreetingMessage={setGreetingMessage}
+            desktopCoverImage={desktopCoverImage}
+            setDesktopCoverImage={setDesktopCoverImage}
             schedules={schedules}
             setSchedules={setSchedules}
             galleries={galleries}
@@ -784,6 +836,14 @@ export default function UserAdminPanel() {
             tier={tier}
             onUpgradeClick={() => setActiveTab("billing")}
             onSelectTheme={async (newThemeId) => {
+              if (!isPaid && !isAdmin) {
+                setNotification({
+                  type: "error",
+                  message: "Pilihan tema hanya dapat disimpan setelah akun memiliki paket aktif. Silakan lakukan pembayaran di menu Langganan & Paket.",
+                });
+                setActiveTab("billing");
+                return;
+              }
               if (tier === "FREE" && newThemeId !== "minimalist") {
                 setNotification({
                   type: "error",
@@ -853,11 +913,24 @@ export default function UserAdminPanel() {
           <button
             type="button"
             onClick={handleSaveInvitation}
-            disabled={isSaving}
-            className="pointer-events-auto w-full py-3 px-4 rounded-xl bg-[#F97316] hover:bg-[#EA580C] text-white font-semibold text-xs shadow-md flex items-center justify-center gap-2 min-h-[46px] transition-colors"
+            disabled={isSaving || (!isPaid && !isAdmin)}
+            className={`pointer-events-auto w-full py-3 px-4 rounded-xl font-semibold text-xs shadow-md flex items-center justify-center gap-2 min-h-[46px] transition-colors ${
+              !isPaid && !isAdmin
+                ? "bg-slate-400 text-white cursor-not-allowed opacity-90"
+                : "bg-[#F97316] hover:bg-[#EA580C] text-white"
+            }`}
           >
-            <Save className={`w-4 h-4 ${isSaving ? "animate-spin" : ""}`} />
-            <span>{isSaving ? "Menyimpan Perubahan..." : "Simpan Perubahan Undangan"}</span>
+            {!isPaid && !isAdmin ? (
+              <>
+                <Lock className="w-4 h-4" />
+                <span>Mode Pratinjau (Terkunci)</span>
+              </>
+            ) : (
+              <>
+                <Save className={`w-4 h-4 ${isSaving ? "animate-spin" : ""}`} />
+                <span>{isSaving ? "Menyimpan Perubahan..." : "Simpan Perubahan Undangan"}</span>
+              </>
+            )}
           </button>
         </div>
       )}

@@ -478,7 +478,7 @@ export const SYSTEM_SETTING_DEFINITIONS: SystemSettingDefinition[] = [
   },
   {
     key: "manual_payment_instructions",
-    defaultValue: "Transfer sesuai nominal paket ke rekening atau QRIS di atas. Setelah transfer, upload bukti transfer di form ini atau kirimkan konfirmasi via WhatsApp agar paket Anda segera diaktifkan.",
+    defaultValue: "Transfer sesuai nominal paket ke rekening di atas. Setelah transfer, upload bukti transfer di form ini atau kirimkan konfirmasi via WhatsApp agar paket Anda segera diaktifkan.",
     category: "gateway",
     label: "Instruksi Transfer Manual",
     description: "Catatan panduan langkah pembayaran transfer manual bagi klien",
@@ -494,7 +494,7 @@ export const SYSTEM_SETTING_DEFINITIONS: SystemSettingDefinition[] = [
   },
   {
     key: "manual_qris_image_url",
-    defaultValue: "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=FASARO-DEMO-QRIS",
+    defaultValue: "",
     category: "gateway",
     label: "URL Gambar QRIS Fasaro",
     description: "Link gambar QRIS statis resmi Fasaro",

@@ -10,7 +10,8 @@ import GoogleMapEmbed from "../shared/GoogleMapEmbed";
 import DigitalGiftBox from "../shared/DigitalGiftBox";
 import RsvpFormSection from "../shared/RsvpFormSection";
 import WishesWallSection from "../shared/WishesWallSection";
-import { Calendar, Camera, Clock, Heart, Moon } from "lucide-react";
+import { Calendar, Clock, Heart, Moon } from "lucide-react";
+import InstagramIcon from "../shared/InstagramIcon";
 
 interface ThemeProps {
   data: WeddingInvitationData;
@@ -66,7 +67,7 @@ export const SyariTheme: React.FC<ThemeProps> = ({
           </div>
 
           <p className="text-sm font-serif text-[#5eead4] tracking-widest">
-            بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+            磨?卍??? 碼?????? 碼?邈??幕???鳴?? 碼?邈??幕????
           </p>
 
           <p className="text-xs uppercase tracking-[0.35em] text-emerald-400 font-medium">
@@ -95,8 +96,8 @@ export const SyariTheme: React.FC<ThemeProps> = ({
         <section className="space-y-6">
           <div className="p-6 rounded-3xl bg-[#0d342c]/70 border border-[#134e4a] text-center max-w-lg mx-auto space-y-3">
             <p className="text-xs font-serif text-emerald-300 leading-loose">
-              وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُمْ مِنْ أَنْفُسِكُمْ أَزْوَاجًا لِتَسْكُنُوا إِلَيْهَا
-              وَجَعَلَ بَيْنَكُمْ مَوَدَّةً وَرَحْمَةً
+              ?????? 笠??碼魔??? 粒??? 漠????? ?????? ???? 粒?????卍????? 粒?万???碼寞?碼 ??魔?卍??????碼 瑪???????碼
+              ??寞?晩??? 磨????????? ????膜??馬? ??邈?幕???馬?
             </p>
             <p className="text-xs text-emerald-100 italic leading-relaxed">
               &quot;{data.coupleInfo.greetingMessage ||
@@ -126,7 +127,7 @@ export const SyariTheme: React.FC<ThemeProps> = ({
         )}
 
         {/* Couple Info */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 gap-8 items-center">
+        <section id="couple" className="grid grid-cols-1 sm:grid-cols-2 gap-8 items-center">
           {/* Groom */}
           <div className="p-6 rounded-3xl bg-[#0d342c]/70 border border-[#134e4a] space-y-3">
             <div className="w-24 h-24 mx-auto rounded-full overflow-hidden bg-[#071d18] border-2 border-emerald-500/40 flex items-center justify-center">
@@ -157,7 +158,7 @@ export const SyariTheme: React.FC<ThemeProps> = ({
                 rel="noreferrer"
                 className="inline-flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300"
               >
-                <Camera className="w-3.5 h-3.5" />
+                <InstagramIcon className="w-3.5 h-3.5" />
                 <span>@{data.coupleInfo.groomInstagram}</span>
               </a>
             )}
@@ -193,7 +194,7 @@ export const SyariTheme: React.FC<ThemeProps> = ({
                 rel="noreferrer"
                 className="inline-flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300"
               >
-                <Camera className="w-3.5 h-3.5" />
+                <InstagramIcon className="w-3.5 h-3.5" />
                 <span>@{data.coupleInfo.brideInstagram}</span>
               </a>
             )}
@@ -201,7 +202,7 @@ export const SyariTheme: React.FC<ThemeProps> = ({
         </section>
 
         {/* Schedules */}
-        <section className="space-y-8">
+        <section id="event" className="space-y-8">
           <div className="space-y-1">
             <p className="text-xs uppercase tracking-widest text-emerald-400">
               Waktu &amp; Tempat
@@ -242,7 +243,6 @@ export const SyariTheme: React.FC<ThemeProps> = ({
                     venueNameClass: "text-emerald-200 font-serif font-bold",
                     addressClass: "text-emerald-200/90 text-xs",
                     buttonClass: "bg-emerald-600 hover:bg-emerald-500 text-white font-semibold",
-                    secondaryButtonClass: "border border-[#134e4a] bg-[#0d342c] hover:bg-[#114238] text-emerald-200 font-semibold",
                   }}
                 />
               </div>
@@ -252,24 +252,22 @@ export const SyariTheme: React.FC<ThemeProps> = ({
 
         {/* Gallery */}
         {data.galleries && data.galleries.length > 0 && (
-          <section className="space-y-6">
+          <section id="gallery" className="space-y-6">
             <div className="space-y-1">
               <p className="text-xs uppercase tracking-widest text-emerald-400">Galeri Foto</p>
               <h2 className="text-2xl font-serif text-emerald-100">Dokumentasi Kenangan</h2>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="columns-2 gap-3 space-y-3">
               {data.galleries.map((img, idx) => (
                 <div
                   key={img.id ?? idx}
-                  className="relative aspect-square rounded-2xl overflow-hidden bg-[#071d18] border border-[#134e4a]"
+                  className="break-inside-avoid rounded-2xl overflow-hidden bg-[#071d18] border border-[#134e4a]"
                 >
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={img.imageUrl}
                     alt={img.caption || `Gallery ${idx + 1}`}
-                    fill
-                    sizes="(max-width: 640px) 50vw, 300px"
-                    priority={false}
-                    className="object-cover hover:scale-105 transition-transform duration-500"
+                    className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500 block"
                   />
                 </div>
               ))}
@@ -278,56 +276,61 @@ export const SyariTheme: React.FC<ThemeProps> = ({
         )}
 
         {/* Digital Gift Box */}
-        <DigitalGiftBox
-          bankAccounts={data.bankAccounts}
-          themeStyle={{
-            titleClass: "text-emerald-100 font-serif",
-            subtitleClass: "text-emerald-200",
-            cardClass: "bg-[#0d342c]/90 border border-[#134e4a] text-emerald-100",
-            badgeClass: "bg-[#071d18] text-[#5eead4] border border-[#134e4a]",
-            accountNumberClass: "text-[#5eead4] font-mono font-bold",
-            accountHolderClass: "text-emerald-200",
-            qrisButtonClass: "text-[#5eead4] hover:text-emerald-200 font-semibold",
-            buttonClass: "bg-emerald-600 hover:bg-emerald-500 text-white font-semibold",
-          }}
-        />
+        <section id="gift">
+          <DigitalGiftBox
+            bankAccounts={data.bankAccounts}
+            themeStyle={{
+              titleClass: "text-emerald-100 font-serif",
+              subtitleClass: "text-emerald-200",
+              cardClass: "bg-[#0d342c]/90 border border-[#134e4a] text-emerald-100",
+              badgeClass: "bg-[#071d18] text-[#5eead4] border border-[#134e4a]",
+              accountNumberClass: "text-[#5eead4] font-mono font-bold",
+              accountHolderClass: "text-emerald-200",
+              qrisButtonClass: "text-[#5eead4] hover:text-emerald-200 font-semibold",
+              buttonClass: "bg-emerald-600 hover:bg-emerald-500 text-white font-semibold",
+            }}
+          />
+        </section>
 
-        {/* RSVP Form */}
-        <RsvpFormSection
-          invitationId={data.id}
-          defaultGuestName={guestName}
-          themeStyle={{
-            cardClass: "bg-[#0d342c]/90 border border-[#134e4a] text-emerald-100",
-            titleClass: "text-emerald-100 font-serif",
-            subtitleClass: "text-emerald-200",
-            labelClass: "text-emerald-200 font-medium",
-            statusButtonClass: "bg-[#071d18] border-[#134e4a] text-emerald-200 hover:border-emerald-400",
-            statusButtonActiveClass: "bg-emerald-600 border-emerald-600 text-white font-semibold shadow-sm",
-            buttonClass: "bg-emerald-600 hover:bg-emerald-500 text-white font-semibold",
-            inputClass: "bg-[#071d18] border-[#134e4a] text-emerald-100 focus:ring-emerald-500 placeholder:text-emerald-400/40",
-            submittedTitleClass: "text-emerald-200 font-serif",
-            submittedSubtitleClass: "text-emerald-100",
-          }}
-        />
+        {/* Wishes & RSVP */}
+        <section id="wishes" className="space-y-12">
+          {/* RSVP Form */}
+          <RsvpFormSection
+            invitationId={data.id}
+            defaultGuestName={guestName}
+            themeStyle={{
+              cardClass: "bg-[#0d342c]/90 border border-[#134e4a] text-emerald-100",
+              titleClass: "text-emerald-100 font-serif",
+              subtitleClass: "text-emerald-200",
+              labelClass: "text-emerald-200 font-medium",
+              statusButtonClass: "bg-[#071d18] border-[#134e4a] text-emerald-200 hover:border-emerald-400",
+              statusButtonActiveClass: "bg-emerald-600 border-emerald-600 text-white font-semibold shadow-sm",
+              buttonClass: "bg-emerald-600 hover:bg-emerald-500 text-white font-semibold",
+              inputClass: "bg-[#071d18] border-[#134e4a] text-emerald-100 focus:ring-emerald-500 placeholder:text-emerald-400/40",
+              submittedTitleClass: "text-emerald-200 font-serif",
+              submittedSubtitleClass: "text-emerald-100",
+            }}
+          />
 
-        {/* Wishes Wall */}
-        <WishesWallSection
-          invitationId={data.id}
-          themeStyle={{
-            cardClass: "bg-[#0d342c]/90 border border-[#134e4a] text-emerald-100",
-            titleClass: "text-emerald-100 font-serif",
-            subtitleClass: "text-emerald-200",
-            bubbleClass: "bg-[#071d18] border border-[#134e4a] text-emerald-100",
-            senderClass: "text-[#5eead4] font-bold",
-            messageClass: "text-emerald-100",
-            dateClass: "text-emerald-300 font-mono",
-            emptyTextClass: "text-emerald-300/80",
-            loadingTextClass: "text-emerald-300/80",
-            reactionButtonClass: "hover:bg-[#071d18]",
-            buttonClass: "bg-emerald-600 hover:bg-emerald-500 text-white font-semibold",
-            inputClass: "bg-[#071d18] border-[#134e4a] text-emerald-100 focus:ring-emerald-500 placeholder:text-emerald-400/40",
-          }}
-        />
+          {/* Wishes Wall */}
+          <WishesWallSection
+            invitationId={data.id}
+            themeStyle={{
+              cardClass: "bg-[#0d342c]/90 border border-[#134e4a] text-emerald-100",
+              titleClass: "text-emerald-100 font-serif",
+              subtitleClass: "text-emerald-200",
+              bubbleClass: "bg-[#071d18] border border-[#134e4a] text-emerald-100",
+              senderClass: "text-[#5eead4] font-bold",
+              messageClass: "text-emerald-100",
+              dateClass: "text-emerald-300 font-mono",
+              emptyTextClass: "text-emerald-300/80",
+              loadingTextClass: "text-emerald-300/80",
+              reactionButtonClass: "hover:bg-[#071d18]",
+              buttonClass: "bg-emerald-600 hover:bg-emerald-500 text-white font-semibold",
+              inputClass: "bg-[#071d18] border-[#134e4a] text-emerald-100 focus:ring-emerald-500 placeholder:text-emerald-400/40",
+            }}
+          />
+        </section>
 
         <footer className="pt-12 pb-8 text-emerald-400 text-xs tracking-wider">
           <p>FASARO &bull; Syar&apos;i Islamic Wedding Theme</p>

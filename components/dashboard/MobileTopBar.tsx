@@ -1,8 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import {
+  Check,
+  Copy,
   ExternalLink,
   Eye,
   Heart,
@@ -40,6 +42,19 @@ export const MobileTopBar: React.FC<MobileTopBarProps> = ({
   onUpgradeClick,
   onSelectPlanClick,
 }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = async () => {
+    if (typeof window === "undefined") return;
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/invitation/${slug}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback
+    }
+  };
+
   return (
     <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-[#E2E8F0]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
@@ -144,6 +159,26 @@ export const MobileTopBar: React.FC<MobileTopBarProps> = ({
           >
             <Eye className="w-4 h-4 text-[#F97316]" />
             <span className="hidden sm:inline">Preview HP</span>
+          </button>
+
+          {/* Salin Link Umum Button */}
+          <button
+            type="button"
+            onClick={handleCopyLink}
+            className="inline-flex items-center gap-1.5 py-1.5 px-2.5 sm:px-3 rounded-lg border border-[#E2E8F0] bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold min-h-[38px] transition-colors shadow-2xs cursor-pointer"
+            title="Salin link undangan umum"
+          >
+            {copied ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                <span className="hidden sm:inline text-emerald-600 font-bold">Tersalin</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-3.5 h-3.5 text-[#F97316]" />
+                <span className="hidden sm:inline">Salin Link</span>
+              </>
+            )}
           </button>
 
           {/* Open Public Web */}

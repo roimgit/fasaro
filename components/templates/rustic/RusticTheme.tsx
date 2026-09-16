@@ -10,7 +10,8 @@ import GoogleMapEmbed from "../shared/GoogleMapEmbed";
 import DigitalGiftBox from "../shared/DigitalGiftBox";
 import RsvpFormSection from "../shared/RsvpFormSection";
 import WishesWallSection from "../shared/WishesWallSection";
-import { Calendar, Camera, Clock, Feather, Heart } from "lucide-react";
+import { Calendar, Clock, Feather, Heart } from "lucide-react";
+import InstagramIcon from "../shared/InstagramIcon";
 
 interface ThemeProps {
   data: WeddingInvitationData;
@@ -102,7 +103,7 @@ export const RusticTheme: React.FC<ThemeProps> = ({
         )}
 
         {/* Story / Greeting */}
-        <section className="space-y-12">
+        <section id="couple" className="space-y-12">
           <div className="max-w-md mx-auto px-4">
             <p className="text-sm text-[#5c4333] italic leading-relaxed">
               &quot;{data.coupleInfo.greetingMessage ||
@@ -141,7 +142,7 @@ export const RusticTheme: React.FC<ThemeProps> = ({
                   rel="noreferrer"
                   className="inline-flex items-center gap-1 text-xs font-sans text-[#966b43] hover:underline"
                 >
-                  <Camera className="w-3.5 h-3.5" />
+                  <InstagramIcon className="w-3.5 h-3.5" />
                   <span>@{data.coupleInfo.groomInstagram}</span>
                 </a>
               )}
@@ -177,7 +178,7 @@ export const RusticTheme: React.FC<ThemeProps> = ({
                   rel="noreferrer"
                   className="inline-flex items-center gap-1 text-xs font-sans text-[#966b43] hover:underline"
                 >
-                  <Camera className="w-3.5 h-3.5" />
+                  <InstagramIcon className="w-3.5 h-3.5" />
                   <span>@{data.coupleInfo.brideInstagram}</span>
                 </a>
               )}
@@ -186,7 +187,7 @@ export const RusticTheme: React.FC<ThemeProps> = ({
         </section>
 
         {/* Schedules */}
-        <section className="space-y-8">
+        <section id="event" className="space-y-8">
           <div className="space-y-1">
             <p className="text-xs uppercase tracking-widest text-[#966b43] font-sans">
               Waktu &amp; Lokasi
@@ -229,7 +230,6 @@ export const RusticTheme: React.FC<ThemeProps> = ({
                     venueNameClass: "text-[#382b24] font-serif font-bold text-base",
                     addressClass: "text-[#5c4333] text-xs font-sans",
                     buttonClass: "bg-[#966b43] hover:bg-[#835b36] text-white font-semibold font-sans",
-                    secondaryButtonClass: "border border-[#dfcdb9] bg-white/90 hover:bg-white text-[#382b24] font-semibold font-sans",
                   }}
                 />
               </div>
@@ -239,26 +239,24 @@ export const RusticTheme: React.FC<ThemeProps> = ({
 
         {/* Gallery */}
         {data.galleries && data.galleries.length > 0 && (
-          <section className="space-y-6">
+          <section id="gallery" className="space-y-6">
             <div className="space-y-1">
               <p className="text-xs uppercase tracking-widest text-[#966b43] font-sans">
                 Kenangan Indah
               </p>
               <h2 className="text-3xl font-serif text-[#382b24]">Galeri Momen</h2>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="columns-2 gap-3 space-y-3">
               {data.galleries.map((img, idx) => (
                 <div
                   key={img.id ?? idx}
-                  className="relative aspect-square rounded-2xl overflow-hidden bg-[#ecd9c6] border-2 border-[#dfcdb9] shadow-inner"
+                  className="break-inside-avoid rounded-2xl overflow-hidden bg-[#ecd9c6] border-2 border-[#dfcdb9] shadow-inner"
                 >
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={img.imageUrl}
                     alt={img.caption || `Gallery ${idx + 1}`}
-                    fill
-                    sizes="(max-width: 640px) 50vw, 300px"
-                    priority={false}
-                    className="object-cover hover:scale-105 transition-transform duration-500"
+                    className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500 block"
                   />
                 </div>
               ))}
@@ -267,40 +265,44 @@ export const RusticTheme: React.FC<ThemeProps> = ({
         )}
 
         {/* Digital Gift Box */}
-        <DigitalGiftBox
-          bankAccounts={data.bankAccounts}
-          themeStyle={{
-            titleClass: "text-[#382b24] font-serif",
-            subtitleClass: "text-[#5c4333]",
-            cardClass: "bg-[#f7eedf] border border-[#dfcdb9] text-[#382b24]",
-            badgeClass: "bg-[#ecd9c6] text-[#382b24] font-bold border border-[#dfcdb9]",
-            accountNumberClass: "text-[#382b24] font-mono font-bold",
-            accountHolderClass: "text-[#5c4333]",
-            qrisButtonClass: "text-[#966b43] hover:text-[#835b36] font-semibold",
-            buttonClass: "bg-[#966b43] hover:bg-[#835b36] text-white font-medium",
-          }}
-        />
+        <section id="gift">
+          <DigitalGiftBox
+            bankAccounts={data.bankAccounts}
+            themeStyle={{
+              titleClass: "text-[#382b24] font-serif",
+              subtitleClass: "text-[#5c4333]",
+              cardClass: "bg-[#f7eedf] border border-[#dfcdb9] text-[#382b24]",
+              badgeClass: "bg-[#ecd9c6] text-[#382b24] font-bold border border-[#dfcdb9]",
+              accountNumberClass: "text-[#382b24] font-mono font-bold",
+              accountHolderClass: "text-[#5c4333]",
+              qrisButtonClass: "text-[#966b43] hover:text-[#835b36] font-semibold",
+              buttonClass: "bg-[#966b43] hover:bg-[#835b36] text-white font-medium",
+            }}
+          />
+        </section>
 
-        {/* RSVP Form */}
-        <RsvpFormSection
-          invitationId={data.id}
-          defaultGuestName={guestName}
-          themeStyle={{
-            cardClass: "bg-[#f7eedf] border border-[#dfcdb9] text-[#382b24]",
-            titleClass: "text-[#382b24] font-serif",
-            subtitleClass: "text-[#5c4333]",
-            labelClass: "text-[#382b24] font-semibold font-sans",
-            statusButtonClass: "bg-[#faf5ee] border-[#dfcdb9] text-[#382b24] hover:border-[#966b43]",
-            statusButtonActiveClass: "bg-[#966b43] border-[#966b43] text-white font-semibold shadow-sm",
-            buttonClass: "bg-[#966b43] hover:bg-[#835b36] text-white font-semibold font-sans",
-            inputClass: "bg-[#faf5ee] border-[#dfcdb9] text-[#382b24] placeholder:text-[#8a7263]",
-            submittedTitleClass: "text-[#382b24] font-serif",
-            submittedSubtitleClass: "text-[#5c4333]",
-          }}
-        />
+        {/* Wishes & RSVP */}
+        <section id="wishes" className="space-y-12">
+          {/* RSVP Form */}
+          <RsvpFormSection
+            invitationId={data.id}
+            defaultGuestName={guestName}
+            themeStyle={{
+              cardClass: "bg-[#f7eedf] border border-[#dfcdb9] text-[#382b24]",
+              titleClass: "text-[#382b24] font-serif",
+              subtitleClass: "text-[#5c4333]",
+              labelClass: "text-[#382b24] font-semibold font-sans",
+              statusButtonClass: "bg-[#faf5ee] border-[#dfcdb9] text-[#382b24] hover:border-[#966b43]",
+              statusButtonActiveClass: "bg-[#966b43] border-[#966b43] text-white font-semibold shadow-sm",
+              buttonClass: "bg-[#966b43] hover:bg-[#835b36] text-white font-semibold font-sans",
+              inputClass: "bg-[#faf5ee] border-[#dfcdb9] text-[#382b24] placeholder:text-[#8a7263]",
+              submittedTitleClass: "text-[#382b24] font-serif",
+              submittedSubtitleClass: "text-[#5c4333]",
+            }}
+          />
 
-        {/* Wishes Wall */}
-        <WishesWallSection
+          {/* Wishes Wall */}
+          <WishesWallSection
           invitationId={data.id}
           themeStyle={{
             cardClass: "bg-[#f7eedf] border border-[#dfcdb9] text-[#382b24]",
@@ -317,6 +319,7 @@ export const RusticTheme: React.FC<ThemeProps> = ({
             inputClass: "bg-[#faf5ee] border-[#dfcdb9] text-[#382b24] placeholder:text-[#8a7263]",
           }}
         />
+      </section>
 
         <footer className="pt-12 pb-8 text-[#966b43] text-xs font-sans tracking-wider">
           <p>FASARO &bull; Rustic Wedding Theme</p>

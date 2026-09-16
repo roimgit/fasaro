@@ -1,20 +1,62 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   AlertCircle,
   Calendar,
+  CheckCircle2,
   ChevronDown,
   ChevronUp,
   CreditCard,
+  ExternalLink,
   Heart,
   Image as ImageIcon,
+  Loader2,
+  Lock,
+  Monitor,
   Music,
+  Pause,
+  Play,
   Plus,
   BookOpen,
+  QrCode,
+  Sparkles,
   Trash2,
+  Upload,
+  User,
   Video,
+  Volume2,
 } from "lucide-react";
+import { WEDDING_QUOTES } from "@/lib/weddingQuotes";
+
+interface MusicPreset {
+  title: string;
+  category: string;
+  url: string;
+}
+
+const MUSIC_PRESETS: MusicPreset[] = [
+  {
+    title: "SoundHelix Romantic Piano",
+    category: "Piano Romantis",
+    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+  },
+  {
+    title: "Warm Acoustic Melody",
+    category: "Akustik Hangat",
+    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+  },
+  {
+    title: "Cinematic Wedding Strings",
+    category: "Orkestra Mewah",
+    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+  },
+  {
+    title: "Traditional Soft Serenade",
+    category: "Tradisional Syahdu",
+    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
+  },
+];
 
 interface ScheduleItem {
   id?: string;
@@ -83,6 +125,8 @@ interface ContentEditorTabProps {
 
   greetingMessage: string;
   setGreetingMessage: (v: string) => void;
+  desktopCoverImage: string;
+  setDesktopCoverImage: (v: string) => void;
 
   // Schedules
   schedules: ScheduleItem[];
@@ -107,6 +151,7 @@ interface ContentEditorTabProps {
   // Tier & Upgrade
   tier?: string | null;
   onUpgradeClick?: () => void;
+  isReadOnly?: boolean;
 
   onSave: () => void;
   isSaving: boolean;
@@ -115,6 +160,7 @@ interface ContentEditorTabProps {
 export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
   tier,
   onUpgradeClick,
+  isReadOnly = false,
   title,
   setTitle,
   slug,
@@ -157,8 +203,268 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
   setBankAccounts,
   stories,
   setStories,
+  desktopCoverImage,
+  setDesktopCoverImage,
 }) => {
   const [openSection, setOpenSection] = useState<number | null>(0);
+  const [isUploadingMusic, setIsUploadingMusic] = useState(false);
+  const [uploadMusicError, setUploadMusicError] = useState<string | null>(null);
+  const [uploadMusicSuccess, setUploadMusicSuccess] = useState<string | null>(null);
+  const [isPreviewPlaying, setIsPreviewPlaying] = useState(false);
+  const audioPreviewRef = useRef<HTMLAudioElement | null>(null);
+
+  // States for Photo Uploads
+  const [isUploadingGroomPhoto, setIsUploadingGroomPhoto] = useState(false);
+  const [isUploadingBridePhoto, setIsUploadingBridePhoto] = useState(false);
+  const [isUploadingQrisIndex, setIsUploadingQrisIndex] = useState<number | null>(null);
+  const [isUploadingGalleryIndex, setIsUploadingGalleryIndex] = useState<number | null>(null);
+
+  const isStarterTier = tier === "STARTER" || tier === "FREE" || !tier;
+
+  // Image compression: Starter max 800px & 72% quality, Elegant/Ultimate original HD
+  const compressImageIfNeeded = async (file: File, isStarter: boolean): Promise<Blob> => {
+    if (!isStarter) {
+      return file;
+    }
+    return new Promise((resolve) => {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        const maxDimension = 800;
+        let { width, height } = img;
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          } else {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          canvas.toBlob(
+            (blob) => {
+              resolve(blob || file);
+            },
+            "image/jpeg",
+            0.72
+          );
+        } else {
+          resolve(file);
+        }
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        resolve(file);
+      };
+      img.src = objectUrl;
+    });
+  };
+
+  const handleGroomPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingGroomPhoto(true);
+    try {
+      const blobToUpload = await compressImageIfNeeded(file, isStarterTier);
+      const formData = new FormData();
+      formData.append("file", blobToUpload, file.name);
+      formData.append("folder", "couples");
+
+      const res = await fetch("/api/upload/image", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Gagal mengunggah foto mempelai pria");
+      }
+      setGroomPhoto(data.url);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Gagal mengunggah foto mempelai pria");
+    } finally {
+      setIsUploadingGroomPhoto(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleBridePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingBridePhoto(true);
+    try {
+      const blobToUpload = await compressImageIfNeeded(file, isStarterTier);
+      const formData = new FormData();
+      formData.append("file", blobToUpload, file.name);
+      formData.append("folder", "couples");
+
+      const res = await fetch("/api/upload/image", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Gagal mengunggah foto mempelai wanita");
+      }
+      setBridePhoto(data.url);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Gagal mengunggah foto mempelai wanita");
+    } finally {
+      setIsUploadingBridePhoto(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleQrisUpload = async (idx: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingQrisIndex(idx);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", "qris");
+
+      const res = await fetch("/api/upload/image", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Gagal mengunggah foto QRIS");
+      }
+      const updated = [...bankAccounts];
+      updated[idx].qrisImageUrl = data.url;
+      setBankAccounts(updated);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Gagal mengunggah foto QRIS");
+    } finally {
+      setIsUploadingQrisIndex(null);
+      e.target.value = "";
+    }
+  };
+
+  const handleGalleryPhotoUpload = async (idx: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingGalleryIndex(idx);
+    try {
+      const blobToUpload = await compressImageIfNeeded(file, isStarterTier);
+      const formData = new FormData();
+      formData.append("file", blobToUpload, file.name);
+      formData.append("folder", "galleries");
+
+      const res = await fetch("/api/upload/image", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Gagal mengunggah foto galeri");
+      }
+      const updated = [...galleries];
+      updated[idx].imageUrl = data.url;
+      setGalleries(updated);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Gagal mengunggah foto galeri");
+    } finally {
+      setIsUploadingGalleryIndex(null);
+      e.target.value = "";
+    }
+  };
+
+  const getYouTubeVideoId = (url: string): string | null => {
+    if (!url) return null;
+    const regExp = /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/;
+    const match = url.match(regExp);
+    return match ? match[1] : null;
+  };
+
+  const handleMusicUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadMusicError(null);
+    setUploadMusicSuccess(null);
+    setIsUploadingMusic(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/upload/music", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Gagal mengunggah file audio");
+      }
+
+      setMusicUrl(data.url);
+      setUploadMusicSuccess(`Berhasil mengunggah: ${data.fileName || file.name}`);
+      if (audioPreviewRef.current) {
+        audioPreviewRef.current.pause();
+        setIsPreviewPlaying(false);
+      }
+    } catch (err) {
+      setUploadMusicError(
+        err instanceof Error ? err.message : "Terjadi kesalahan saat mengunggah musik"
+      );
+    } finally {
+      setIsUploadingMusic(false);
+      e.target.value = "";
+    }
+  };
+
+  const toggleAudioPreview = () => {
+    if (!musicUrl) return;
+    if (!audioPreviewRef.current) return;
+
+    if (isPreviewPlaying) {
+      audioPreviewRef.current.pause();
+      setIsPreviewPlaying(false);
+    } else {
+      audioPreviewRef.current.src = musicUrl;
+      audioPreviewRef.current
+        .play()
+        .then(() => setIsPreviewPlaying(true))
+        .catch(() => {
+          setIsPreviewPlaying(false);
+          setUploadMusicError(
+            "Tidak dapat memutar audio. Pastikan URL berupa direct link file audio (.mp3)."
+          );
+        });
+    }
+  };
+
+  const handleApplyPreset = (url: string) => {
+    setMusicUrl(url);
+    setUploadMusicError(null);
+    setUploadMusicSuccess("Preset lagu berhasil dipilih!");
+    if (audioPreviewRef.current) {
+      audioPreviewRef.current.pause();
+      setIsPreviewPlaying(false);
+    }
+  };
+
+  const isYouTubeUrl = (url: string) => {
+    return (
+      url.includes("youtube.com/") ||
+      url.includes("youtu.be/") ||
+      url.includes("m.youtube.com/")
+    );
+  };
 
   const toggleSection = (idx: number) => {
     setOpenSection(openSection === idx ? null : idx);
@@ -167,13 +473,37 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
   const sections = [
     { id: 0, title: "1. Informasi Pasangan Mempelai", icon: Heart, badge: "Wajib" },
     { id: 1, title: "2. Jadwal & Lokasi Acara", icon: Calendar, badge: `${schedules.length} Sesi` },
-    { id: 2, title: "3. Galeri Foto & Musik Latar", icon: ImageIcon, badge: `${galleries.length} Foto` },
-    { id: 3, title: "4. Amplop Digital & QRIS", icon: CreditCard, badge: `${bankAccounts.length} Rekening` },
-    { id: 4, title: "5. Cerita Cinta (Love Story)", icon: BookOpen, badge: `${stories.length} Momen` },
+    { id: 2, title: "3. Musik Latar Undangan (.mp3)", icon: Music, badge: musicUrl ? "Terpasang" : "Opsional" },
+    { id: 3, title: "4. Video Teaser Prewedding (YouTube)", icon: Video, badge: youtubeVideoUrl ? "Tersedia" : "Opsional" },
+    { id: 4, title: "5. Galeri Foto Prewedding", icon: ImageIcon, badge: `${galleries.length} Foto` },
+    { id: 5, title: "6. Amplop Digital & QRIS", icon: CreditCard, badge: `${bankAccounts.length} Rekening` },
+    { id: 6, title: "7. Cerita Cinta (Love Story)", icon: BookOpen, badge: `${stories.length} Momen` },
   ];
 
   return (
     <div className="space-y-4">
+      {/* Read-Only Warning Banner if user has no paid package */}
+      {isReadOnly && (
+        <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-3 shadow-xs animate-in fade-in">
+          <Lock className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <h4 className="font-bold text-xs sm:text-sm">Mode Pratinjau (Hanya Lihat)</h4>
+            <p className="text-xs text-amber-800 leading-relaxed">
+              Akun Anda belum memiliki paket aktif. Anda dapat melihat-lihat tata letak form &amp; pratinjau tema, namun perubahan tidak dapat disimpan. Silakan pilih paket di menu Langganan &amp; Paket untuk mulai mengedit.
+            </p>
+            {onUpgradeClick && (
+              <button
+                type="button"
+                onClick={onUpgradeClick}
+                className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F97316] hover:bg-[#EA580C] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+              >
+                <span>Pilih &amp; Aktifkan Paket</span>
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Intro Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-1">
         <div>
@@ -221,7 +551,21 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Tautan / Subdomain Undangan:</label>
+                <div className="flex items-center gap-1">
+                  <label className="font-semibold text-slate-700">Tautan / Subdomain Undangan:</label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (groomNickname.trim() && brideNickname.trim()) {
+                        const auto = `${groomNickname.trim().toLowerCase().replace(/[^a-z0-9]/g, "")}-${brideNickname.trim().toLowerCase().replace(/[^a-z0-9]/g, "")}`;
+                        setSlug(auto);
+                      }
+                    }}
+                    className="text-[10px] px-2 py-0.5 rounded-full bg-orange-50 text-[#F97316] border border-orange-200 font-semibold hover:bg-orange-100 transition-colors"
+                  >
+                    Sinkronkan dari Nama Panggilan
+                  </button>
+                </div>
                 <div className="flex items-center rounded-lg border border-[#E2E8F0] bg-white px-3 min-h-[44px] focus-within:border-[#F97316] focus-within:ring-1 focus-within:ring-[#F97316]">
                   <span className="text-slate-400 font-mono text-xs">fasaro.id/</span>
                   <input
@@ -252,14 +596,16 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="text-slate-600 block mb-1">Nama Panggilan:</label>
+                  <label className="text-slate-600 block mb-1">Nama Panggilan: <span className="text-red-500">*</span></label>
                   <input
                     type="text"
                     value={groomNickname}
                     onChange={(e) => setGroomNickname(e.target.value)}
                     placeholder="Rian"
+                    required
                     className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white text-slate-900 min-h-[42px] focus:border-[#F97316] outline-none"
                   />
+                  <p className="text-[10px] text-slate-400 mt-0.5">Wajib diisi &mdash; digunakan untuk tautan undangan</p>
                 </div>
                 <div>
                   <label className="text-slate-600 block mb-1">Nama Ayah:</label>
@@ -291,15 +637,87 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
                     className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white text-slate-900 min-h-[42px] focus:border-[#F97316] outline-none"
                   />
                 </div>
-                <div>
-                  <label className="text-slate-600 block mb-1">URL Foto Mempelai Pria:</label>
-                  <input
-                    type="text"
-                    value={groomPhoto}
-                    onChange={(e) => setGroomPhoto(e.target.value)}
-                    placeholder="https://..."
-                    className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white text-slate-900 min-h-[42px] focus:border-[#F97316] outline-none"
-                  />
+                <div className="sm:col-span-2 space-y-2 pt-1 border-t border-slate-200/70">
+                  <div className="flex items-center justify-between">
+                    <label className="text-slate-700 font-semibold block text-xs">
+                      Foto Mempelai Pria:
+                    </label>
+                    <span
+                      className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                        isStarterTier
+                          ? "bg-amber-50 text-amber-800 border border-amber-200"
+                          : "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                      }`}
+                    >
+                      {isStarterTier
+                        ? "Kompresi Aktif (Maks 800px)"
+                        : "Kualitas HD Asli (Tanpa Kompresi)"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="w-16 h-16 rounded-xl border-2 border-dashed border-slate-300 bg-white overflow-hidden flex items-center justify-center relative shrink-0">
+                      {groomPhoto ? (
+                        <img
+                          src={groomPhoto}
+                          alt="Foto Mempelai Pria"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <User className="w-7 h-7 text-slate-300" />
+                      )}
+                    </div>
+
+                    <div className="flex-1 space-y-1.5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <label
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition-colors ${
+                            isUploadingGroomPhoto
+                              ? "bg-slate-100 text-slate-400 border-slate-200 cursor-wait"
+                              : "bg-white hover:bg-orange-50 text-[#F97316] border-orange-200 hover:border-[#F97316]"
+                          }`}
+                        >
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleGroomPhotoUpload}
+                            disabled={isUploadingGroomPhoto}
+                            className="sr-only"
+                          />
+                          {isUploadingGroomPhoto ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin text-[#F97316]" />
+                              <span>Mengunggah...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="w-3.5 h-3.5" />
+                              <span>Upload Foto Pria</span>
+                            </>
+                          )}
+                        </label>
+
+                        {groomPhoto && (
+                          <button
+                            type="button"
+                            onClick={() => setGroomPhoto("")}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100 text-xs font-semibold transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Hapus</span>
+                          </button>
+                        )}
+                      </div>
+
+                      <input
+                        type="text"
+                        value={groomPhoto}
+                        onChange={(e) => setGroomPhoto(e.target.value)}
+                        placeholder="Atau tempel URL gambar (https://...)"
+                        className="w-full px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-slate-700 text-xs focus:border-[#F97316] outline-none"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -321,14 +739,16 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="text-slate-600 block mb-1">Nama Panggilan:</label>
+                  <label className="text-slate-600 block mb-1">Nama Panggilan: <span className="text-red-500">*</span></label>
                   <input
                     type="text"
                     value={brideNickname}
                     onChange={(e) => setBrideNickname(e.target.value)}
                     placeholder="Sinta"
+                    required
                     className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white text-slate-900 min-h-[42px] focus:border-[#F97316] outline-none"
                   />
+                  <p className="text-[10px] text-slate-400 mt-0.5">Wajib diisi &mdash; digunakan untuk tautan undangan</p>
                 </div>
                 <div>
                   <label className="text-slate-600 block mb-1">Nama Ayah:</label>
@@ -360,29 +780,198 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
                     className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white text-slate-900 min-h-[42px] focus:border-[#F97316] outline-none"
                   />
                 </div>
-                <div>
-                  <label className="text-slate-600 block mb-1">URL Foto Mempelai Wanita:</label>
-                  <input
-                    type="text"
-                    value={bridePhoto}
-                    onChange={(e) => setBridePhoto(e.target.value)}
-                    placeholder="https://..."
-                    className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white text-slate-900 min-h-[42px] focus:border-[#F97316] outline-none"
-                  />
+                <div className="sm:col-span-2 space-y-2 pt-1 border-t border-slate-200/70">
+                  <div className="flex items-center justify-between">
+                    <label className="text-slate-700 font-semibold block text-xs">
+                      Foto Mempelai Wanita:
+                    </label>
+                    <span
+                      className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                        isStarterTier
+                          ? "bg-amber-50 text-amber-800 border border-amber-200"
+                          : "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                      }`}
+                    >
+                      {isStarterTier
+                        ? "Kompresi Aktif (Maks 800px)"
+                        : "Kualitas HD Asli (Tanpa Kompresi)"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="w-16 h-16 rounded-xl border-2 border-dashed border-slate-300 bg-white overflow-hidden flex items-center justify-center relative shrink-0">
+                      {bridePhoto ? (
+                        <img
+                          src={bridePhoto}
+                          alt="Foto Mempelai Wanita"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <User className="w-7 h-7 text-slate-300" />
+                      )}
+                    </div>
+
+                    <div className="flex-1 space-y-1.5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <label
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition-colors ${
+                            isUploadingBridePhoto
+                              ? "bg-slate-100 text-slate-400 border-slate-200 cursor-wait"
+                              : "bg-white hover:bg-orange-50 text-[#F97316] border-orange-200 hover:border-[#F97316]"
+                          }`}
+                        >
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleBridePhotoUpload}
+                            disabled={isUploadingBridePhoto}
+                            className="sr-only"
+                          />
+                          {isUploadingBridePhoto ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin text-[#F97316]" />
+                              <span>Mengunggah...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="w-3.5 h-3.5" />
+                              <span>Upload Foto Wanita</span>
+                            </>
+                          )}
+                        </label>
+
+                        {bridePhoto && (
+                          <button
+                            type="button"
+                            onClick={() => setBridePhoto("")}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100 text-xs font-semibold transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Hapus</span>
+                          </button>
+                        )}
+                      </div>
+
+                      <input
+                        type="text"
+                        value={bridePhoto}
+                        onChange={(e) => setBridePhoto(e.target.value)}
+                        placeholder="Atau tempel URL gambar (https://...)"
+                        className="w-full px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-slate-700 text-xs focus:border-[#F97316] outline-none"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Pesan Pembuka */}
-            <div className="space-y-1">
+            <div className="space-y-2">
               <label className="font-semibold text-slate-700">Pesan Pembuka / Salam Hangat:</label>
+              <select
+                className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white text-slate-700 text-xs focus:border-[#F97316] outline-none"
+                defaultValue=""
+                onChange={(e) => {
+                  const selected = WEDDING_QUOTES.find((q) => q.id === e.target.value);
+                  if (selected) setGreetingMessage(selected.text);
+                }}
+              >
+                <option value="">— Pilih Template Quote Pernikahan —</option>
+                {WEDDING_QUOTES.map((q) => (
+                  <option key={q.id} value={q.id}>{q.label}</option>
+                ))}
+              </select>
               <textarea
-                rows={3}
+                rows={4}
                 value={greetingMessage}
                 onChange={(e) => setGreetingMessage(e.target.value)}
                 placeholder="Maha Suci Allah yang telah menciptakan makhluk-Nya berpasang-pasangan..."
                 className="w-full p-3 rounded-lg border border-[#E2E8F0] bg-white text-slate-900 text-xs sm:text-sm focus:border-[#F97316] outline-none"
               />
+              <p className="text-[10px] text-slate-400">Pilih template dari daftar di atas atau ketik pesan pembuka kustom Anda.</p>
+            </div>
+
+            {/* Cover Layar Desktop */}
+            <div className="space-y-2 pt-2 border-t border-slate-100">
+              <div className="flex items-center gap-2">
+                <Monitor className="w-4 h-4 text-[#F97316]" />
+                <label className="font-semibold text-slate-700">Cover Layar Desktop (Split Screen):</label>
+              </div>
+              <p className="text-xs text-slate-500">Foto ini akan muncul di bagian kiri layar pada tampilan desktop. Jika kosong, sistem akan menggunakan foto galeri pertama.</p>
+              <div className="flex flex-col gap-2">
+                {desktopCoverImage && (
+                  <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-slate-100 border border-[#E2E8F0]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={desktopCoverImage} alt="Cover Desktop" className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => setDesktopCoverImage("")}
+                      className="absolute top-2 right-2 bg-white/90 text-slate-700 rounded-full p-1 hover:bg-red-50 hover:text-red-600 transition-colors text-xs"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+                <div className="flex flex-col gap-2">
+                  <div>
+                    <label className="text-xs text-slate-600 block mb-1">Upload Foto Cover Desktop:</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const compressed = await compressImageIfNeeded(file, isStarterTier);
+                        const form = new FormData();
+                        form.append("file", compressed, file.name);
+                        const res = await fetch("/api/upload/image", { method: "POST", body: form });
+                        if (res.ok) {
+                          const data = await res.json();
+                          setDesktopCoverImage(data.url);
+                        }
+                      }}
+                      className="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-orange-50 file:text-[#F97316] file:font-semibold hover:file:bg-orange-100 file:cursor-pointer"
+                    />
+                  </div>
+                  {galleries.length > 0 && (
+                    <div>
+                      <label className="text-xs text-slate-600 block mb-1">Atau pilih dari galeri foto yang sudah ada:</label>
+                      <div className="grid grid-cols-4 gap-1.5">
+                        {galleries.slice(0, 8).map((g, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => setDesktopCoverImage(g.imageUrl)}
+                            className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${
+                              desktopCoverImage === g.imageUrl
+                                ? "border-[#F97316] scale-95"
+                                : "border-transparent hover:border-slate-300"
+                            }`}
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={g.imageUrl} alt="" className="w-full h-full object-cover" />
+                            {desktopCoverImage === g.imageUrl && (
+                              <div className="absolute inset-0 bg-[#F97316]/20 flex items-center justify-center">
+                                <CheckCircle2 className="w-5 h-5 text-[#F97316]" />
+                              </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  <div>
+                    <label className="text-xs text-slate-500 block mb-1">Atau tempel URL gambar cover desktop:</label>
+                    <input
+                      type="url"
+                      value={desktopCoverImage}
+                      onChange={(e) => setDesktopCoverImage(e.target.value)}
+                      placeholder="https://..."
+                      className="w-full px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-slate-700 text-xs focus:border-[#F97316] outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -577,7 +1166,7 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
         )}
       </div>
 
-      {/* Accordion 3: Galeri & Musik Latar */}
+      {/* Accordion 3: Musik Latar Undangan (.mp3) */}
       <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-xs overflow-hidden">
         <button
           type="button"
@@ -585,36 +1174,226 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
           className="w-full flex items-center justify-between p-4 text-left font-semibold text-sm sm:text-base text-slate-900 hover:bg-slate-50 min-h-[52px] transition-colors"
         >
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-purple-50 text-purple-600">
-              <ImageIcon className="w-4 h-4" />
+            <div className="p-2 rounded-lg bg-orange-50 text-[#F97316]">
+              <Music className="w-4 h-4" />
             </div>
             <div>
               <span className="block">{sections[2].title}</span>
-              <span className="text-[11px] text-slate-400 font-normal">Foto prewedding, background audio &amp; YouTube video</span>
+              <span className="text-[11px] text-slate-400 font-normal">
+                Background audio, upload file musik &amp; preset romantis
+              </span>
             </div>
           </div>
-          {openSection === 2 ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
+          <div className="flex items-center gap-2">
+            {musicUrl && (
+              <span className="text-[11px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                Terpasang
+              </span>
+            )}
+            {openSection === 2 ? (
+              <ChevronUp className="w-4 h-4 text-slate-500" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-slate-500" />
+            )}
+          </div>
         </button>
 
         {openSection === 2 && (
           <div className="p-4 sm:p-5 pt-0 border-t border-[#E2E8F0] space-y-4 text-xs animate-in fade-in">
-            {/* Background Musik & Video */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-4">
-              <div className="space-y-1">
-                <label className="font-semibold text-slate-700 flex items-center gap-1.5">
+            <div className="p-3.5 rounded-xl border border-[#E2E8F0] bg-slate-50/70 space-y-3 mt-4">
+              <div className="flex items-center justify-between">
+                <label className="font-semibold text-slate-800 flex items-center gap-1.5 text-xs">
                   <Music className="w-3.5 h-3.5 text-[#F97316]" />
-                  <span>URL Background Music (.mp3):</span>
+                  <span>Background Music (.mp3)</span>
                 </label>
-                <input
-                  type="text"
-                  value={musicUrl}
-                  onChange={(e) => setMusicUrl(e.target.value)}
-                  placeholder="https://.../lagu-romantis.mp3"
-                  className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white text-slate-900 min-h-[42px] focus:border-[#F97316] outline-none"
-                />
-                <p className="text-[10px] text-slate-400">Musik berputar otomatis saat tamu menekan Buka Undangan.</p>
+                {musicUrl && (
+                  <span className="text-[10px] text-emerald-600 font-medium flex items-center gap-1">
+                    <Volume2 className="w-3 h-3" />
+                    Lagu Terpasang
+                  </span>
+                )}
               </div>
 
+              {/* Input URL + Play Preview Button */}
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="text"
+                    value={musicUrl}
+                    onChange={(e) => {
+                      setMusicUrl(e.target.value);
+                      setUploadMusicError(null);
+                      setUploadMusicSuccess(null);
+                      if (isPreviewPlaying && audioPreviewRef.current) {
+                        audioPreviewRef.current.pause();
+                        setIsPreviewPlaying(false);
+                      }
+                    }}
+                    placeholder="https://.../lagu-romantis.mp3"
+                    className="flex-1 px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white text-slate-900 text-xs min-h-[38px] focus:border-[#F97316] outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={toggleAudioPreview}
+                    disabled={!musicUrl}
+                    title={isPreviewPlaying ? "Pause Preview" : "Dengarkan Lagu"}
+                    className={`h-[38px] px-3 rounded-lg border text-xs font-medium flex items-center gap-1.5 transition-colors shrink-0 ${
+                      !musicUrl
+                        ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
+                        : isPreviewPlaying
+                        ? "bg-amber-500 text-white border-amber-600 shadow-sm"
+                        : "bg-white text-slate-700 border-[#E2E8F0] hover:bg-orange-50 hover:text-[#F97316] hover:border-orange-200 cursor-pointer"
+                    }`}
+                  >
+                    {isPreviewPlaying ? (
+                      <>
+                        <Pause className="w-3.5 h-3.5" />
+                        <span>Stop</span>
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-3.5 h-3.5 fill-current" />
+                        <span>Test Lagu</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+                <audio
+                  ref={audioPreviewRef}
+                  onEnded={() => setIsPreviewPlaying(false)}
+                  className="hidden"
+                />
+                <p className="text-[10px] text-slate-500">
+                  Musik berputar otomatis saat tamu menekan tombol &quot;Buka Undangan&quot;.
+                </p>
+              </div>
+
+              {/* YouTube Link Warning if pasted into music field */}
+              {isYouTubeUrl(musicUrl) && (
+                <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-[11px] flex items-start gap-2 animate-in fade-in">
+                  <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <p className="font-semibold">
+                      Perhatian: Link YouTube Tidak Bisa Diputar Langsung Sebagai Musik Latar
+                    </p>
+                    <p className="text-[10px] text-amber-800 leading-relaxed">
+                      Kebijakan keamanan browser melarang pemutaran audio latar dari YouTube secara otomatis. Silakan <strong>Upload File (.mp3)</strong> di bawah atau masukkan tautan YouTube pada bagian <em>&quot;Video Teaser Prewedding&quot;</em>.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Action: Upload MP3 File */}
+              <div className="pt-1">
+                <label
+                  className={`relative flex items-center justify-center gap-2 w-full py-2.5 px-3 rounded-lg border border-dashed text-xs font-semibold cursor-pointer transition-colors ${
+                    isUploadingMusic
+                      ? "bg-slate-100 text-slate-400 border-slate-300 cursor-wait"
+                      : "bg-white hover:bg-orange-50/50 text-[#F97316] border-orange-300 hover:border-[#F97316]"
+                  }`}
+                >
+                  <input
+                    type="file"
+                    accept="audio/*,.mp3,.m4a,.wav,.ogg,.aac"
+                    onChange={handleMusicUpload}
+                    disabled={isUploadingMusic}
+                    className="sr-only"
+                  />
+                  {isUploadingMusic ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-[#F97316]" />
+                      <span>Mengunggah file musik...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-3.5 h-3.5 text-[#F97316]" />
+                      <span>Upload File Musik Sendiri (.mp3 / .m4a)</span>
+                    </>
+                  )}
+                </label>
+                <p className="text-[9.5px] text-slate-400 text-center mt-1">
+                  Maks. 15MB • Format: MP3, M4A, WAV, OGG (disimpan aman di Cloud)
+                </p>
+              </div>
+
+              {/* Upload Status Alerts */}
+              {uploadMusicSuccess && (
+                <div className="p-2 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10.5px] flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>{uploadMusicSuccess}</span>
+                </div>
+              )}
+              {uploadMusicError && (
+                <div className="p-2 rounded-md bg-rose-50 border border-rose-200 text-rose-800 text-[10.5px] flex items-center gap-1.5">
+                  <AlertCircle className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                  <span>{uploadMusicError}</span>
+                </div>
+              )}
+
+              {/* Preset Songs Picker */}
+              <div className="pt-2 border-t border-slate-200/80 space-y-1.5">
+                <div className="flex items-center gap-1 text-[10.5px] font-semibold text-slate-600">
+                  <Sparkles className="w-3 h-3 text-[#F97316]" />
+                  <span>Atau Pilih Lagu Siap Pakai (Bebas Hak Cipta):</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                  {MUSIC_PRESETS.map((preset, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => handleApplyPreset(preset.url)}
+                      className={`text-left p-2 rounded-lg border text-[10.5px] transition-all flex flex-col justify-between cursor-pointer ${
+                        musicUrl === preset.url
+                          ? "bg-orange-50 border-[#F97316] text-[#F97316] font-medium shadow-xs"
+                          : "bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                      }`}
+                    >
+                      <span className="font-semibold truncate">{preset.title}</span>
+                      <span className="text-[9px] text-slate-400 mt-0.5">{preset.category}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Accordion 4: Video Teaser Prewedding (YouTube) */}
+      <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-xs overflow-hidden">
+        <button
+          type="button"
+          onClick={() => toggleSection(3)}
+          className="w-full flex items-center justify-between p-4 text-left font-semibold text-sm sm:text-base text-slate-900 hover:bg-slate-50 min-h-[52px] transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-rose-50 text-rose-600">
+              <Video className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="block">{sections[3].title}</span>
+              <span className="text-[11px] text-slate-400 font-normal">
+                Sematkan video sinematik YouTube di halaman undangan
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {youtubeVideoUrl && (
+              <span className="text-[11px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                Tersedia
+              </span>
+            )}
+            {openSection === 3 ? (
+              <ChevronUp className="w-4 h-4 text-slate-500" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-slate-500" />
+            )}
+          </div>
+        </button>
+
+        {openSection === 3 && (
+          <div className="p-4 sm:p-5 pt-0 border-t border-[#E2E8F0] space-y-4 text-xs animate-in fade-in">
+            <div className="pt-4 space-y-3">
               <div className="space-y-1">
                 <label className="font-semibold text-slate-700 flex items-center gap-1.5">
                   <Video className="w-3.5 h-3.5 text-rose-500" />
@@ -624,101 +1403,238 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
                   type="text"
                   value={youtubeVideoUrl}
                   onChange={(e) => setYoutubeVideoUrl(e.target.value)}
-                  placeholder="https://youtube.com/watch?v=..."
-                  className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white text-slate-900 min-h-[42px] focus:border-[#F97316] outline-none"
+                  placeholder="https://www.youtube.com/watch?v=... atau https://youtu.be/..."
+                  className="w-full px-3 py-2.5 rounded-lg border border-[#E2E8F0] bg-white text-slate-900 min-h-[42px] focus:border-[#F97316] outline-none"
                 />
-                <p className="text-[10px] text-slate-400">Opsional: sematkan video prewedding sinematik.</p>
+                <p className="text-[10px] text-slate-400">
+                  Salin tautan video prewedding dari YouTube (mendukung format youtube.com atau youtu.be).
+                </p>
               </div>
+
+              {/* YouTube Video Live Preview if URL is valid */}
+              {(() => {
+                const videoId = getYouTubeVideoId(youtubeVideoUrl);
+                if (!videoId) return null;
+                return (
+                  <div className="p-3.5 rounded-xl bg-slate-50 border border-[#E2E8F0] space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-slate-800 text-[11px] flex items-center gap-1.5">
+                        <Video className="w-3.5 h-3.5 text-rose-500" />
+                        Pratinjau Video YouTube
+                      </span>
+                      <a
+                        href={youtubeVideoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[10.5px] text-[#F97316] hover:underline flex items-center gap-1 font-medium"
+                      >
+                        <span>Buka di YouTube</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                    <div className="relative aspect-video w-full rounded-xl overflow-hidden shadow-sm bg-black border border-slate-200">
+                      <iframe
+                        src={`https://www.youtube-nocookie.com/embed/${videoId}?rel=0`}
+                        title="Pratinjau Video Prewedding"
+                        className="absolute inset-0 w-full h-full border-0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Accordion 5: Galeri Foto Prewedding */}
+      <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-xs overflow-hidden">
+        <button
+          type="button"
+          onClick={() => toggleSection(4)}
+          className="w-full flex items-center justify-between p-4 text-left font-semibold text-sm sm:text-base text-slate-900 hover:bg-slate-50 min-h-[52px] transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-purple-50 text-purple-600">
+              <ImageIcon className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="block">{sections[4].title}</span>
+              <span className="text-[11px] text-slate-400 font-normal">
+                Foto prewedding &amp; dokumentasi momen indah
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">
+              {galleries.length} Foto
+            </span>
+            {openSection === 4 ? (
+              <ChevronUp className="w-4 h-4 text-slate-500" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-slate-500" />
+            )}
+          </div>
+        </button>
+
+        {openSection === 4 && (
+          <div className="p-4 sm:p-5 pt-0 border-t border-[#E2E8F0] space-y-4 text-xs animate-in fade-in">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-4">
+              <div className="flex items-center gap-2">
+                <h4 className="font-semibold text-slate-800 text-xs">
+                  Daftar Foto Prewedding ({galleries.length} Foto)
+                </h4>
+                {(tier === "STARTER" || tier === "FREE") && (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-semibold">
+                    Paket Starter: Maks. 10 Foto ({galleries.length}/10)
+                  </span>
+                )}
+              </div>
+              <button
+                type="button"
+                disabled={(tier === "STARTER" || tier === "FREE") && galleries.length >= 10}
+                onClick={() => {
+                  if ((tier === "STARTER" || tier === "FREE") && galleries.length >= 10) return;
+                  setGalleries([
+                    ...galleries,
+                    {
+                      imageUrl: "",
+                      caption: `Momen Manis #${galleries.length + 1}`,
+                      sortOrder: galleries.length,
+                    },
+                  ]);
+                }}
+                className={`inline-flex items-center gap-1.5 py-1.5 px-3 rounded-lg font-semibold text-xs border transition-colors ${
+                  (tier === "STARTER" || tier === "FREE") && galleries.length >= 10
+                    ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
+                    : "bg-orange-50 text-[#F97316] hover:bg-orange-100 border-orange-100 cursor-pointer"
+                }`}
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Tambah Foto</span>
+              </button>
             </div>
 
-            {/* Galeri Prewedding */}
-            <div className="space-y-3 pt-2">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            {(tier === "STARTER" || tier === "FREE") && galleries.length >= 10 && (
+              <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <h4 className="font-semibold text-slate-800 text-xs">
-                    Daftar Foto Prewedding ({galleries.length} Foto)
-                  </h4>
-                  {(tier === "STARTER" || tier === "FREE") && (
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-semibold">
-                      Paket Starter: Maks. 10 Foto ({galleries.length}/10)
-                    </span>
-                  )}
+                  <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>
+                    Batas maksimal <strong>10 foto</strong> untuk Paket Starter telah tercapai. Upgrade paket untuk upload foto galeri tanpa batas.
+                  </span>
                 </div>
-                <button
-                  type="button"
-                  disabled={(tier === "STARTER" || tier === "FREE") && galleries.length >= 10}
-                  onClick={() => {
-                    if ((tier === "STARTER" || tier === "FREE") && galleries.length >= 10) return;
-                    setGalleries([
-                      ...galleries,
-                      {
-                        imageUrl: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80",
-                        caption: `Momen Manis #${galleries.length + 1}`,
-                        sortOrder: galleries.length,
-                      },
-                    ]);
-                  }}
-                  className={`inline-flex items-center gap-1.5 py-1 px-3 rounded-lg font-semibold text-xs border transition-colors ${
-                    (tier === "STARTER" || tier === "FREE") && galleries.length >= 10
-                      ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
-                      : "bg-orange-50 text-[#F97316] hover:bg-orange-100 border-orange-100"
-                  }`}
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Tambah Foto</span>
-                </button>
+                {onUpgradeClick && (
+                  <button
+                    type="button"
+                    onClick={onUpgradeClick}
+                    className="px-3 py-1.5 rounded-lg bg-[#F97316] hover:bg-[#EA580C] text-white font-semibold text-xs shrink-0 transition-colors shadow-2xs cursor-pointer"
+                  >
+                    Upgrade Paket
+                  </button>
+                )}
               </div>
+            )}
 
-              {(tier === "STARTER" || tier === "FREE") && galleries.length >= 10 && (
-                <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
-                    <span>
-                      Batas maksimal <strong>10 foto</strong> untuk Paket Starter telah tercapai. Upgrade paket untuk upload foto galeri tanpa batas.
-                    </span>
-                  </div>
-                  {onUpgradeClick && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              {galleries.map((gal, idx) => (
+                <div
+                  key={idx}
+                  className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-2.5 relative"
+                >
+                  <div className="flex items-center justify-between pb-1.5 border-b border-[#E2E8F0]">
+                    <span className="text-[11px] font-semibold text-slate-800">Foto #{idx + 1}</span>
                     <button
                       type="button"
-                      onClick={onUpgradeClick}
-                      className="px-3 py-1.5 rounded-lg bg-[#F97316] hover:bg-[#EA580C] text-white font-semibold text-xs shrink-0 transition-colors shadow-2xs cursor-pointer"
+                      onClick={() => setGalleries(galleries.filter((_, i) => i !== idx))}
+                      className="text-rose-500 hover:text-rose-700 p-1 cursor-pointer flex items-center gap-1 text-[11px] font-medium"
+                      title="Hapus foto"
                     >
-                      Upgrade Paket
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Hapus</span>
                     </button>
-                  )}
-                </div>
-              )}
+                  </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {galleries.map((gal, idx) => (
-                  <div
-                    key={idx}
-                    className="p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-2 relative"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-semibold text-slate-700">Foto #{idx + 1}</span>
-                      <button
-                        type="button"
-                        onClick={() => setGalleries(galleries.filter((_, i) => i !== idx))}
-                        className="text-rose-500 hover:text-rose-700 p-1"
-                        title="Hapus foto"
+                  {/* Thumbnail / Image Preview */}
+                  <div className="relative aspect-video w-full rounded-lg overflow-hidden bg-white border border-slate-200 flex items-center justify-center">
+                    {gal.imageUrl ? (
+                      <img
+                        src={gal.imageUrl}
+                        alt={gal.caption || `Foto #${idx + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-slate-400 gap-1 p-2 text-center">
+                        <ImageIcon className="w-6 h-6 text-slate-300" />
+                        <span className="text-[10px]">Belum ada foto</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action: Direct Upload or Link */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2">
+                      <label
+                        className={`flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg border text-xs font-semibold cursor-pointer transition-colors ${
+                          isUploadingGalleryIndex === idx
+                            ? "bg-slate-100 text-slate-400 border-slate-200 cursor-wait"
+                            : "bg-white hover:bg-orange-50 text-[#F97316] border-orange-200 hover:border-[#F97316]"
+                        }`}
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleGalleryPhotoUpload(idx, e)}
+                          disabled={isUploadingGalleryIndex === idx}
+                          className="sr-only"
+                        />
+                        {isUploadingGalleryIndex === idx ? (
+                          <>
+                            <Loader2 className="w-3.5 h-3.5 animate-spin text-[#F97316]" />
+                            <span>Mengunggah...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-3.5 h-3.5" />
+                            <span>Upload Foto</span>
+                          </>
+                        )}
+                      </label>
+
+                      {gal.imageUrl && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = [...galleries];
+                            updated[idx].imageUrl = "";
+                            setGalleries(updated);
+                          }}
+                          className="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 text-[10.5px] font-medium transition-colors cursor-pointer"
+                          title="Kosongkan foto"
+                        >
+                          Clear
+                        </button>
+                      )}
                     </div>
 
-                    <input
-                      type="text"
-                      value={gal.imageUrl}
-                      onChange={(e) => {
-                        const updated = [...galleries];
-                        updated[idx].imageUrl = e.target.value;
-                        setGalleries(updated);
-                      }}
-                      placeholder="URL Gambar (https://...)"
-                      className="w-full px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-slate-900 text-xs focus:border-[#F97316] outline-none"
-                    />
+                    <div>
+                      <input
+                        type="text"
+                        value={gal.imageUrl}
+                        onChange={(e) => {
+                          const updated = [...galleries];
+                          updated[idx].imageUrl = e.target.value;
+                          setGalleries(updated);
+                        }}
+                        placeholder="Atau link foto (https://...)"
+                        className="w-full px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-slate-900 text-xs focus:border-[#F97316] outline-none"
+                      />
+                    </div>
+                  </div>
 
+                  <div>
+                    <label className="text-slate-500 block mb-0.5 text-[10.5px]">Keterangan Foto (Opsional):</label>
                     <input
                       type="text"
                       value={gal.caption}
@@ -731,18 +1647,18 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
                       className="w-full px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-slate-900 text-xs focus:border-[#F97316] outline-none"
                     />
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
       </div>
 
-      {/* Accordion 4: Amplop Digital & QRIS */}
+      {/* Accordion 6: Amplop Digital & QRIS */}
       <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-xs overflow-hidden">
         <button
           type="button"
-          onClick={() => toggleSection(3)}
+          onClick={() => toggleSection(5)}
           className="w-full flex items-center justify-between p-4 text-left font-semibold text-sm sm:text-base text-slate-900 hover:bg-slate-50 min-h-[52px] transition-colors"
         >
           <div className="flex items-center gap-3">
@@ -750,19 +1666,30 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
               <CreditCard className="w-4 h-4" />
             </div>
             <div>
-              <span className="block">{sections[3].title}</span>
-              <span className="text-[11px] text-slate-400 font-normal">Rekening bank, e-wallet &amp; scan QRIS donasi</span>
+              <span className="block">{sections[5].title}</span>
+              <span className="text-[11px] text-slate-400 font-normal">
+                Rekening bank, e-wallet &amp; upload foto scan QRIS donasi
+              </span>
             </div>
           </div>
-          {openSection === 3 ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">
+              {bankAccounts.length} Rekening
+            </span>
+            {openSection === 5 ? (
+              <ChevronUp className="w-4 h-4 text-slate-500" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-slate-500" />
+            )}
+          </div>
         </button>
 
-        {openSection === 3 && (
+        {openSection === 5 && (
           <div className="p-4 sm:p-5 pt-0 border-t border-[#E2E8F0] space-y-4 text-xs animate-in fade-in">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-4">
               <div>
                 <p className="text-slate-500 text-xs">
-                  Tamu dapat mengirimkan hadiah tanda kasih langsung via rekening bank atau scan QRIS.
+                  Tamu dapat mengirimkan hadiah tanda kasih langsung via transfer rekening bank atau scan foto QRIS.
                 </p>
                 {(tier === "STARTER" || tier === "FREE") && (
                   <span className="inline-block mt-1 text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-semibold">
@@ -827,7 +1754,7 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
                   <button
                     type="button"
                     onClick={() => setBankAccounts(bankAccounts.filter((_, i) => i !== idx))}
-                    className="text-rose-500 hover:text-rose-700 text-xs font-semibold flex items-center gap-1"
+                    className="text-rose-500 hover:text-rose-700 text-xs font-semibold flex items-center gap-1 cursor-pointer"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Hapus</span>
@@ -890,19 +1817,117 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
                   </div>
                 </div>
 
-                <div>
-                  <label className="text-slate-600 block mb-1">URL Foto Kode QRIS (Opsional):</label>
-                  <input
-                    type="text"
-                    value={b.qrisImageUrl || ""}
-                    onChange={(e) => {
-                      const updated = [...bankAccounts];
-                      updated[idx].qrisImageUrl = e.target.value;
-                      setBankAccounts(updated);
-                    }}
-                    placeholder="https://.../qris-donasi.png"
-                    className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white text-slate-900 min-h-[42px] focus:border-[#F97316] outline-none"
-                  />
+                {/* QRIS Upload & Preview Section */}
+                <div className="pt-2.5 border-t border-slate-200/80 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-slate-700 font-semibold block text-xs flex items-center gap-1.5">
+                      <QrCode className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Foto QRIS Donasi:</span>
+                    </label>
+                    {isStarterTier ? (
+                      <span className="text-[10px] text-amber-800 font-semibold bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200 flex items-center gap-1">
+                        <Lock className="w-3 h-3" />
+                        Khusus Paket Elegant &amp; Ultimate
+                      </span>
+                    ) : b.qrisImageUrl ? (
+                      <span className="text-[10px] text-emerald-600 font-medium bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                        QRIS Aktif
+                      </span>
+                    ) : null}
+                  </div>
+
+                  {isStarterTier ? (
+                    <div className="p-3 rounded-xl bg-amber-50/70 border border-amber-200 text-amber-900 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                      <div className="flex items-start sm:items-center gap-2">
+                        <Lock className="w-4 h-4 text-amber-600 shrink-0 mt-0.5 sm:mt-0" />
+                        <span className="leading-relaxed text-[11px]">
+                          Fitur upload foto QRIS hanya tersedia pada <strong>Paket Elegant &amp; Ultimate</strong>. Paket Starter menggunakan nomor rekening transfer bank.
+                        </span>
+                      </div>
+                      {onUpgradeClick && (
+                        <button
+                          type="button"
+                          onClick={onUpgradeClick}
+                          className="self-start sm:self-auto px-2.5 py-1 rounded-lg bg-[#F97316] hover:bg-[#EA580C] text-white font-semibold text-[11px] shrink-0 transition-colors shadow-2xs cursor-pointer"
+                        >
+                          Upgrade Paket
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-3">
+                      {/* QR Thumbnail if exists */}
+                      <div className="w-14 h-14 rounded-lg border border-slate-200 bg-white overflow-hidden flex items-center justify-center shrink-0">
+                        {b.qrisImageUrl ? (
+                          <img
+                            src={b.qrisImageUrl}
+                            alt="QRIS"
+                            className="w-full h-full object-contain p-1"
+                          />
+                        ) : (
+                          <QrCode className="w-6 h-6 text-slate-300" />
+                        )}
+                      </div>
+
+                      <div className="flex-1 space-y-1.5">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <label
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition-colors ${
+                              isUploadingQrisIndex === idx
+                                ? "bg-slate-100 text-slate-400 border-slate-200 cursor-wait"
+                                : "bg-white hover:bg-emerald-50 text-emerald-600 border-emerald-200 hover:border-emerald-400"
+                            }`}
+                          >
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleQrisUpload(idx, e)}
+                              disabled={isUploadingQrisIndex === idx}
+                              className="sr-only"
+                            />
+                            {isUploadingQrisIndex === idx ? (
+                              <>
+                                <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-600" />
+                                <span>Mengunggah QRIS...</span>
+                              </>
+                            ) : (
+                              <>
+                                <Upload className="w-3.5 h-3.5" />
+                                <span>Upload Foto QRIS</span>
+                              </>
+                            )}
+                          </label>
+
+                          {b.qrisImageUrl && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const updated = [...bankAccounts];
+                                updated[idx].qrisImageUrl = undefined;
+                                setBankAccounts(updated);
+                              }}
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100 text-xs font-semibold transition-colors cursor-pointer"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>Hapus QRIS</span>
+                            </button>
+                          )}
+                        </div>
+
+                        <input
+                          type="text"
+                          value={b.qrisImageUrl || ""}
+                          onChange={(e) => {
+                            const updated = [...bankAccounts];
+                            updated[idx].qrisImageUrl = e.target.value;
+                            setBankAccounts(updated);
+                          }}
+                          placeholder="Atau tempel URL gambar QRIS (https://...)"
+                          className="w-full px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-slate-700 text-xs focus:border-[#F97316] outline-none"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -910,11 +1935,11 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
         )}
       </div>
 
-      {/* Accordion 5: Kisah Cinta (Love Story) */}
+      {/* Accordion 7: Kisah Cinta (Love Story) */}
       <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-xs overflow-hidden">
         <button
           type="button"
-          onClick={() => toggleSection(4)}
+          onClick={() => toggleSection(6)}
           className="w-full flex items-center justify-between p-4 text-left font-semibold text-sm sm:text-base text-slate-900 hover:bg-slate-50 min-h-[52px] transition-colors"
         >
           <div className="flex items-center gap-3">
@@ -922,14 +1947,25 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
               <BookOpen className="w-4 h-4" />
             </div>
             <div>
-              <span className="block">{sections[4].title}</span>
-              <span className="text-[11px] text-slate-400 font-normal">Timeline perjalanan cinta dari pertama kenal hingga lamaran</span>
+              <span className="block">{sections[6].title}</span>
+              <span className="text-[11px] text-slate-400 font-normal">
+                Timeline perjalanan cinta dari pertama kenal hingga lamaran
+              </span>
             </div>
           </div>
-          {openSection === 4 ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">
+              {stories.length} Momen
+            </span>
+            {openSection === 6 ? (
+              <ChevronUp className="w-4 h-4 text-slate-500" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-slate-500" />
+            )}
+          </div>
         </button>
 
-        {openSection === 4 && (
+        {openSection === 6 && (
           <div className="p-4 sm:p-5 pt-0 border-t border-[#E2E8F0] space-y-4 text-xs animate-in fade-in">
             <div className="flex items-center justify-between pt-4">
               <p className="text-slate-500 text-xs">
@@ -947,7 +1983,7 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
                     },
                   ]);
                 }}
-                className="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-lg bg-orange-50 text-[#F97316] hover:bg-blue-100 font-semibold text-xs border border-orange-100 transition-colors"
+                className="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-lg bg-orange-50 text-[#F97316] hover:bg-orange-100 font-semibold text-xs border border-orange-100 transition-colors cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Tambah Momen</span>
@@ -964,7 +2000,7 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
                   <button
                     type="button"
                     onClick={() => setStories(stories.filter((_, i) => i !== idx))}
-                    className="text-rose-500 hover:text-rose-700 text-xs font-semibold flex items-center gap-1"
+                    className="text-rose-500 hover:text-rose-700 text-xs font-semibold flex items-center gap-1 cursor-pointer"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Hapus</span>

@@ -2,19 +2,33 @@ import { z } from "zod";
 
 export const eventScheduleSchema = z.object({
   eventName: z.string().min(1, "Nama acara wajib diisi").max(100),
-  date: z.string().datetime({ offset: true }).or(z.string().regex(/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2}(\.\d{3})?)?(Z|[+-]\d{2}:\d{2})?)?$/)),
-  startTime: z.string().min(1, "Waktu mulai wajib diisi").max(20),
-  endTime: z.string().max(20).optional().nullable(),
-  venueName: z.string().min(1, "Nama tempat wajib diisi").max(150),
-  address: z.string().min(1, "Alamat wajib diisi").max(300),
-  mapsUrl: z.string().url("Format URL maps tidak valid").optional().nullable().or(z.literal("")),
+  date: z.string().min(1, "Tanggal acara wajib diisi"),
+  startTime: z.string().min(1, "Waktu mulai wajib diisi").max(50),
+  endTime: z.string().max(50).optional().nullable(),
+  venueName: z.string().min(1, "Nama tempat wajib diisi").max(200),
+  address: z.string().min(1, "Alamat wajib diisi").max(500),
+  mapsUrl: z
+    .string()
+    .refine(
+      (val) => !val || val.startsWith("/") || /^https?:\/\//.test(val) || val.includes("maps"),
+      "Format link Google Maps tidak valid"
+    )
+    .optional()
+    .nullable()
+    .or(z.literal("")),
   latitude: z.number().optional().nullable(),
   longitude: z.number().optional().nullable(),
 });
 
 export const galleryItemSchema = z.object({
-  imageUrl: z.string().url("Format URL gambar tidak valid"),
-  caption: z.string().max(200).optional().nullable(),
+  imageUrl: z
+    .string()
+    .min(1, "URL atau file gambar wajib diisi")
+    .refine(
+      (val) => val.startsWith("/") || /^https?:\/\//.test(val) || val.startsWith("blob:"),
+      "Format URL atau path gambar tidak valid"
+    ),
+  caption: z.string().max(300).optional().nullable(),
   sortOrder: z.number().int().default(0),
 });
 
@@ -22,7 +36,15 @@ export const bankAccountSchema = z.object({
   bankName: z.string().min(1, "Nama bank/e-wallet wajib diisi").max(50),
   accountNumber: z.string().min(1, "Nomor rekening wajib diisi").max(50),
   accountHolder: z.string().min(1, "Nama pemilik rekening wajib diisi").max(100),
-  qrisImageUrl: z.string().url("Format URL QRIS tidak valid").optional().nullable().or(z.literal("")),
+  qrisImageUrl: z
+    .string()
+    .refine(
+      (val) => !val || val.startsWith("/") || /^https?:\/\//.test(val),
+      "Format URL atau file QRIS tidak valid"
+    )
+    .optional()
+    .nullable()
+    .or(z.literal("")),
 });
 
 export type EventScheduleInput = z.infer<typeof eventScheduleSchema>;
@@ -33,18 +55,45 @@ export type CoupleInfoInput = z.infer<typeof coupleInfoSchema>;
 
 export const coupleInfoSchema = z.object({
   groomName: z.string().min(1, "Nama pengantin pria wajib diisi").max(100),
-  groomNickname: z.string().max(50).optional().nullable(),
+  groomNickname: z.string().min(1, "Nama panggilan mempelai pria wajib diisi").max(50),
   groomFather: z.string().max(100).optional().nullable(),
   groomMother: z.string().max(100).optional().nullable(),
   groomInstagram: z.string().max(50).optional().nullable(),
-  groomPhoto: z.string().url().optional().nullable().or(z.literal("")),
+  groomPhoto: z
+    .string()
+    .refine(
+      (val) => !val || val.startsWith("/") || /^https?:\/\//.test(val),
+      "Format URL atau file foto tidak valid"
+    )
+    .optional()
+    .nullable()
+    .or(z.literal("")),
   brideName: z.string().min(1, "Nama pengantin wanita wajib diisi").max(100),
-  brideNickname: z.string().max(50).optional().nullable(),
+  brideNickname: z.string().min(1, "Nama panggilan mempelai wanita wajib diisi").max(50),
   brideFather: z.string().max(100).optional().nullable(),
   brideMother: z.string().max(100).optional().nullable(),
   brideInstagram: z.string().max(50).optional().nullable(),
-  bridePhoto: z.string().url().optional().nullable().or(z.literal("")),
-  greetingMessage: z.string().max(500).optional().nullable(),
+  bridePhoto: z
+    .string()
+    .refine(
+      (val) => !val || val.startsWith("/") || /^https?:\/\//.test(val),
+      "Format URL atau file foto tidak valid"
+    )
+    .optional()
+    .nullable()
+    .or(z.literal("")),
+  greetingMessage: z.string().max(3000).optional().nullable(),
+  musicUrl: z.string().optional().nullable(),
+  youtubeVideoUrl: z.string().optional().nullable(),
+  desktopCoverImage: z
+    .string()
+    .refine(
+      (val) => !val || val.startsWith("/") || /^https?:\/\//.test(val),
+      "Format URL atau file foto cover desktop tidak valid"
+    )
+    .optional()
+    .nullable()
+    .or(z.literal("")),
   stories: z
     .array(
       z.object({
@@ -58,14 +107,16 @@ export const coupleInfoSchema = z.object({
 });
 
 export const invitationSchema = z.object({
-  title: z.string().min(3, "Judul undangan minimal 3 karakter").max(150),
+  title: z.string().min(1, "Judul undangan minimal 1 karakter").max(150),
   slug: z
     .string()
-    .min(3, "Slug minimal 3 karakter")
+    .min(2, "Slug minimal 2 karakter")
     .max(100)
     .regex(/^[a-z0-9-]+$/, "Slug hanya boleh berisi huruf kecil, angka, dan tanda strip"),
   themeId: z.string().min(1, "Tema wajib dipilih").max(50),
   coupleInfo: coupleInfoSchema,
+  musicUrl: z.string().optional().nullable(),
+  youtubeVideoUrl: z.string().optional().nullable(),
   activeUntil: z.string().datetime().optional().nullable(),
   isActive: z.boolean().default(true),
   schedules: z.array(eventScheduleSchema).default([]),
@@ -119,8 +170,15 @@ export const createOrderSchema = z.object({
   invitationId: z.string().min(1, "ID undangan wajib diisi").optional().nullable(),
   tier: z.enum(["STARTER", "ELEGANT", "ULTIMATE"]),
   amount: z.number().positive("Nominal harus lebih dari 0"),
-  paymentType: z.enum(["GATEWAY", "MANUAL_QRIS", "MANUAL_BANK"]),
-  proofImageUrl: z.string().url("Format URL bukti transfer tidak valid").optional().nullable(),
+  paymentType: z.enum(["GATEWAY", "MANUAL_QRIS", "MANUAL_BANK", "MANUAL"]).default("MANUAL_BANK"),
+  proofImageUrl: z
+    .string()
+    .refine(
+      (val) => !val || val.startsWith("/") || /^https?:\/\//.test(val),
+      "Format URL atau path bukti transfer tidak valid"
+    )
+    .optional()
+    .nullable(),
 });
 
 export type InvitationInput = z.infer<typeof invitationSchema>;

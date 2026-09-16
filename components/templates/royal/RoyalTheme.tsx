@@ -10,7 +10,8 @@ import GoogleMapEmbed from "../shared/GoogleMapEmbed";
 import DigitalGiftBox from "../shared/DigitalGiftBox";
 import RsvpFormSection from "../shared/RsvpFormSection";
 import WishesWallSection from "../shared/WishesWallSection";
-import { Calendar, Camera, Clock, Crown, Heart } from "lucide-react";
+import { Calendar, Clock, Crown, Heart } from "lucide-react";
+import InstagramIcon from "../shared/InstagramIcon";
 
 interface ThemeProps {
   data: WeddingInvitationData;
@@ -111,7 +112,7 @@ export const RoyalTheme: React.FC<ThemeProps> = ({
         )}
 
         {/* Couple Info */}
-        <section className="space-y-12">
+        <section id="couple" className="space-y-12">
           <div className="max-w-md mx-auto">
             <p className="text-xs text-slate-200/90 italic leading-relaxed">
               &quot;{data.coupleInfo.greetingMessage ||
@@ -150,7 +151,7 @@ export const RoyalTheme: React.FC<ThemeProps> = ({
                   rel="noreferrer"
                   className="inline-flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300"
                 >
-                  <Camera className="w-3.5 h-3.5" />
+                  <InstagramIcon className="w-3.5 h-3.5" />
                   <span>@{data.coupleInfo.groomInstagram}</span>
                 </a>
               )}
@@ -186,7 +187,7 @@ export const RoyalTheme: React.FC<ThemeProps> = ({
                   rel="noreferrer"
                   className="inline-flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300"
                 >
-                  <Camera className="w-3.5 h-3.5" />
+                  <InstagramIcon className="w-3.5 h-3.5" />
                   <span>@{data.coupleInfo.brideInstagram}</span>
                 </a>
               )}
@@ -195,7 +196,7 @@ export const RoyalTheme: React.FC<ThemeProps> = ({
         </section>
 
         {/* Schedules */}
-        <section className="space-y-8">
+        <section id="event" className="space-y-8">
           <div className="space-y-1">
             <p className="text-xs uppercase tracking-widest text-amber-400">Agenda Acara</p>
             <h2 className="text-2xl font-serif text-amber-100">Waktu &amp; Kehormatan Kehadiran</h2>
@@ -232,13 +233,10 @@ export const RoyalTheme: React.FC<ThemeProps> = ({
                   latitude={schedule.latitude}
                   longitude={schedule.longitude}
                   themeStyle={{
-                    cardClass: "bg-slate-950/80 border border-amber-500/30 text-slate-100",
-                    venueNameClass: "text-amber-200 font-serif font-bold",
-                    addressClass: "text-slate-300 text-xs",
-                    buttonClass:
-                      "bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold",
-                    secondaryButtonClass:
-                      "border border-amber-500/40 bg-slate-900/80 hover:bg-slate-800 text-amber-200",
+                    cardClass: "bg-slate-950 border border-amber-500/20 text-slate-100",
+                    venueNameClass: "text-amber-200 font-medium",
+                    addressClass: "text-slate-400 text-xs",
+                    buttonClass: "bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold",
                   }}
                 />
               </div>
@@ -248,24 +246,22 @@ export const RoyalTheme: React.FC<ThemeProps> = ({
 
         {/* Gallery */}
         {data.galleries && data.galleries.length > 0 && (
-          <section className="space-y-6">
+          <section id="gallery" className="space-y-6">
             <div className="space-y-1">
               <p className="text-xs uppercase tracking-widest text-amber-400">Galeri Abadi</p>
               <h2 className="text-2xl font-serif text-amber-100">Potret Kebahagiaan</h2>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="columns-2 gap-3 space-y-3">
               {data.galleries.map((img, idx) => (
                 <div
                   key={img.id ?? idx}
-                  className="relative aspect-square rounded-2xl overflow-hidden bg-slate-950 border border-amber-500/30"
+                  className="break-inside-avoid rounded-2xl overflow-hidden bg-slate-950 border border-amber-500/30"
                 >
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={img.imageUrl}
                     alt={img.caption || `Gallery ${idx + 1}`}
-                    fill
-                    sizes="(max-width: 640px) 50vw, 300px"
-                    priority={false}
-                    className="object-cover hover:scale-105 transition-transform duration-500"
+                    className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500 block"
                   />
                 </div>
               ))}
@@ -274,59 +270,63 @@ export const RoyalTheme: React.FC<ThemeProps> = ({
         )}
 
         {/* Digital Gift Box */}
-        <DigitalGiftBox
-          bankAccounts={data.bankAccounts}
-          themeStyle={{
-            titleClass: "text-amber-100 font-serif",
-            subtitleClass: "text-slate-300",
-            cardClass: "bg-slate-900/90 border-amber-500/30 text-slate-100",
-            badgeClass: "bg-amber-500/20 text-amber-300 border border-amber-400/40",
-            accountNumberClass: "text-amber-200",
-            accountHolderClass: "text-slate-300",
-            qrisButtonClass: "text-amber-300 hover:text-amber-200 font-semibold",
-            buttonClass:
-              "bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold",
-          }}
-        />
+        <section id="gift">
+          <DigitalGiftBox
+            bankAccounts={data.bankAccounts}
+            themeStyle={{
+              titleClass: "text-amber-100 font-serif",
+              subtitleClass: "text-slate-300",
+              cardClass: "bg-slate-900/90 border-amber-500/30 text-slate-100",
+              badgeClass: "bg-amber-500/20 text-amber-300 border border-amber-400/40",
+              accountNumberClass: "text-amber-200",
+              accountHolderClass: "text-slate-300",
+              qrisButtonClass: "text-amber-300 hover:text-amber-200 font-semibold",
+              buttonClass:
+                "bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold",
+            }}
+          />
+        </section>
 
-        {/* RSVP Form */}
-        <RsvpFormSection
-          invitationId={data.id}
-          defaultGuestName={guestName}
-          themeStyle={{
-            cardClass: "bg-slate-900/95 border-amber-500/30 text-slate-100 shadow-[0_0_30px_rgba(245,158,11,0.1)]",
-            titleClass: "text-amber-100 font-serif",
-            subtitleClass: "text-slate-300",
-            labelClass: "text-amber-200 font-medium",
-            statusButtonClass: "bg-slate-950 border-slate-700 text-slate-200 hover:border-amber-400",
-            statusButtonActiveClass: "bg-amber-500 border-amber-500 text-slate-950 font-bold shadow-md",
-            buttonClass:
-              "bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold",
-            inputClass: "bg-slate-950 border-slate-800 text-slate-100 focus:ring-amber-500 placeholder:text-slate-500",
-            submittedTitleClass: "text-amber-200 font-serif",
-            submittedSubtitleClass: "text-slate-300",
-          }}
-        />
+        {/* Wishes & RSVP */}
+        <section id="wishes" className="space-y-12">
+          {/* RSVP Form */}
+          <RsvpFormSection
+            invitationId={data.id}
+            defaultGuestName={guestName}
+            themeStyle={{
+              cardClass: "bg-slate-900/95 border-amber-500/30 text-slate-100 shadow-[0_0_30px_rgba(245,158,11,0.1)]",
+              titleClass: "text-amber-100 font-serif",
+              subtitleClass: "text-slate-300",
+              labelClass: "text-amber-200 font-medium",
+              statusButtonClass: "bg-slate-950 border-slate-700 text-slate-200 hover:border-amber-400",
+              statusButtonActiveClass: "bg-amber-500 border-amber-500 text-slate-950 font-bold shadow-md",
+              buttonClass:
+                "bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold",
+              inputClass: "bg-slate-950 border-slate-800 text-slate-100 focus:ring-amber-500 placeholder:text-slate-500",
+              submittedTitleClass: "text-amber-200 font-serif",
+              submittedSubtitleClass: "text-slate-300",
+            }}
+          />
 
-        {/* Wishes Wall */}
-        <WishesWallSection
-          invitationId={data.id}
-          themeStyle={{
-            cardClass: "bg-slate-900/95 border-amber-500/30 text-slate-100 shadow-[0_0_30px_rgba(245,158,11,0.1)]",
-            titleClass: "text-amber-100 font-serif",
-            subtitleClass: "text-slate-300",
-            bubbleClass: "bg-slate-950 border-slate-800 text-slate-200",
-            senderClass: "text-amber-300 font-bold",
-            messageClass: "text-slate-200",
-            dateClass: "text-slate-400",
-            emptyTextClass: "text-slate-400",
-            loadingTextClass: "text-slate-400",
-            reactionButtonClass: "hover:bg-slate-800",
-            buttonClass:
-              "bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold",
-            inputClass: "bg-slate-950 border-slate-800 text-slate-100 focus:ring-amber-500 placeholder:text-slate-500",
-          }}
-        />
+          {/* Wishes Wall */}
+          <WishesWallSection
+            invitationId={data.id}
+            themeStyle={{
+              cardClass: "bg-slate-900/95 border-amber-500/30 text-slate-100 shadow-[0_0_30px_rgba(245,158,11,0.1)]",
+              titleClass: "text-amber-100 font-serif",
+              subtitleClass: "text-slate-300",
+              bubbleClass: "bg-slate-950 border-slate-800 text-slate-200",
+              senderClass: "text-amber-300 font-bold",
+              messageClass: "text-slate-200",
+              dateClass: "text-slate-400",
+              emptyTextClass: "text-slate-400",
+              loadingTextClass: "text-slate-400",
+              buttonClass:
+                "bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold",
+              inputClass: "bg-slate-950 border-slate-800 text-slate-100 focus:ring-amber-500 placeholder:text-slate-500",
+            }}
+          />
+        </section>
 
         <footer className="pt-12 pb-8 text-amber-400/80 text-xs tracking-widest uppercase">
           <p>FASARO &bull; Royal Luxury Wedding Edition</p>

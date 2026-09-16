@@ -261,6 +261,7 @@ export default async function PublicInvitationPage(props: InvitationPageProps) {
     coupleInfo,
     activeUntil: invitation.activeUntil,
     isActive: invitation.isActive,
+    musicUrl: coupleInfo?.musicUrl || null,
     eventSchedules: invitation.eventSchedules.map((s) => ({
       id: s.id,
       eventName: s.eventName,

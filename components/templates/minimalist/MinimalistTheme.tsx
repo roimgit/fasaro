@@ -10,7 +10,8 @@ import GoogleMapEmbed from "../shared/GoogleMapEmbed";
 import DigitalGiftBox from "../shared/DigitalGiftBox";
 import RsvpFormSection from "../shared/RsvpFormSection";
 import WishesWallSection from "../shared/WishesWallSection";
-import { Calendar, Camera, Clock, Heart } from "lucide-react";
+import { Calendar, Clock, Heart } from "lucide-react";
+import InstagramIcon from "../shared/InstagramIcon";
 
 interface ThemeProps {
   data: WeddingInvitationData;
@@ -97,7 +98,7 @@ export const MinimalistTheme: React.FC<ThemeProps> = ({
         )}
 
         {/* Couple Info */}
-        <section className="space-y-12">
+        <section id="couple" className="space-y-12">
           <div className="max-w-md mx-auto">
             <p className="text-xs text-stone-700 italic leading-relaxed font-serif">
               &quot;{data.coupleInfo.greetingMessage ||
@@ -134,7 +135,7 @@ export const MinimalistTheme: React.FC<ThemeProps> = ({
                   rel="noreferrer"
                   className="inline-flex items-center gap-1 text-xs text-stone-600 hover:text-stone-900 font-medium"
                 >
-                  <Camera className="w-3.5 h-3.5" />
+                  <InstagramIcon className="w-3.5 h-3.5" />
                   <span>@{data.coupleInfo.groomInstagram}</span>
                 </a>
               )}
@@ -168,7 +169,7 @@ export const MinimalistTheme: React.FC<ThemeProps> = ({
                   rel="noreferrer"
                   className="inline-flex items-center gap-1 text-xs text-stone-600 hover:text-stone-900 font-medium"
                 >
-                  <Camera className="w-3.5 h-3.5" />
+                  <InstagramIcon className="w-3.5 h-3.5" />
                   <span>@{data.coupleInfo.brideInstagram}</span>
                 </a>
               )}
@@ -177,7 +178,7 @@ export const MinimalistTheme: React.FC<ThemeProps> = ({
         </section>
 
         {/* Schedules */}
-        <section className="space-y-8">
+        <section id="event" className="space-y-8">
           <div className="space-y-1">
             <p className="text-xs uppercase tracking-widest text-stone-600 font-semibold">Rangkaian Acara</p>
             <h2 className="text-2xl font-serif font-light text-stone-900">Agenda Bahagia</h2>
@@ -216,7 +217,6 @@ export const MinimalistTheme: React.FC<ThemeProps> = ({
                     venueNameClass: "text-stone-900 font-semibold",
                     addressClass: "text-stone-600 text-xs",
                     buttonClass: "bg-stone-900 hover:bg-stone-800 text-white font-medium",
-                    secondaryButtonClass: "border border-stone-300 bg-white hover:bg-stone-50 text-stone-900 font-medium",
                   }}
                 />
               </div>
@@ -226,24 +226,22 @@ export const MinimalistTheme: React.FC<ThemeProps> = ({
 
         {/* Gallery */}
         {data.galleries && data.galleries.length > 0 && (
-          <section className="space-y-6">
+          <section id="gallery" className="space-y-6">
             <div className="space-y-1">
               <p className="text-xs uppercase tracking-widest text-stone-600 font-semibold">Galeri Foto</p>
               <h2 className="text-2xl font-serif font-light text-stone-900">Momen Bahagia</h2>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="columns-2 gap-3 space-y-3">
               {data.galleries.map((img, idx) => (
                 <div
                   key={img.id ?? idx}
-                  className="relative aspect-square rounded-2xl overflow-hidden bg-stone-100 border border-stone-200"
+                  className="break-inside-avoid rounded-2xl overflow-hidden bg-stone-100 border border-stone-200"
                 >
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={img.imageUrl}
                     alt={img.caption || `Gallery ${idx + 1}`}
-                    fill
-                    sizes="(max-width: 640px) 50vw, 300px"
-                    priority={false}
-                    className="object-cover hover:scale-105 transition-transform duration-500"
+                    className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500 block"
                   />
                 </div>
               ))}
@@ -252,55 +250,60 @@ export const MinimalistTheme: React.FC<ThemeProps> = ({
         )}
 
         {/* Digital Gift Box */}
-        <DigitalGiftBox
-          bankAccounts={data.bankAccounts}
-          themeStyle={{
-            titleClass: "text-stone-900 font-serif",
-            subtitleClass: "text-stone-600",
-            cardClass: "bg-white border border-stone-200 text-stone-900",
-            badgeClass: "bg-stone-100 text-stone-800 font-bold border border-stone-200",
-            accountNumberClass: "text-stone-900 font-mono font-bold",
-            accountHolderClass: "text-stone-600",
-            qrisButtonClass: "text-amber-700 hover:text-amber-800 font-semibold",
-            buttonClass: "bg-stone-900 hover:bg-stone-800 text-white font-medium",
-          }}
-        />
+        <section id="gift">
+          <DigitalGiftBox
+            bankAccounts={data.bankAccounts}
+            themeStyle={{
+              titleClass: "text-stone-900 font-serif",
+              subtitleClass: "text-stone-600",
+              cardClass: "bg-white border border-stone-200 text-stone-900",
+              badgeClass: "bg-stone-100 text-stone-800 font-bold border border-stone-200",
+              accountNumberClass: "text-stone-900 font-mono font-bold",
+              accountHolderClass: "text-stone-600",
+              qrisButtonClass: "text-amber-700 hover:text-amber-800 font-semibold",
+              buttonClass: "bg-stone-900 hover:bg-stone-800 text-white font-medium",
+            }}
+          />
+        </section>
 
-        {/* RSVP Form */}
-        <RsvpFormSection
-          invitationId={data.id}
-          defaultGuestName={guestName}
-          themeStyle={{
-            cardClass: "bg-white border border-stone-200 text-stone-900 shadow-sm",
-            titleClass: "text-stone-900 font-serif",
-            subtitleClass: "text-stone-600",
-            labelClass: "text-stone-800 font-medium",
-            statusButtonClass: "bg-white border-stone-300 text-stone-700 hover:border-stone-900",
-            statusButtonActiveClass: "bg-stone-900 border-stone-900 text-white font-semibold shadow-sm",
-            buttonClass: "bg-stone-900 hover:bg-stone-800 text-white font-medium",
-            inputClass: "bg-stone-50 border-stone-300 text-stone-900 placeholder:text-stone-400",
-            submittedTitleClass: "text-stone-900 font-serif",
-            submittedSubtitleClass: "text-stone-600",
-          }}
-        />
+        {/* Wishes & RSVP */}
+        <section id="wishes" className="space-y-12">
+          {/* RSVP Form */}
+          <RsvpFormSection
+            invitationId={data.id}
+            defaultGuestName={guestName}
+            themeStyle={{
+              cardClass: "bg-white border border-stone-200 text-stone-900 shadow-sm",
+              titleClass: "text-stone-900 font-serif",
+              subtitleClass: "text-stone-600",
+              labelClass: "text-stone-800 font-medium",
+              statusButtonClass: "bg-white border-stone-300 text-stone-700 hover:border-stone-900",
+              statusButtonActiveClass: "bg-stone-900 border-stone-900 text-white font-semibold shadow-sm",
+              buttonClass: "bg-stone-900 hover:bg-stone-800 text-white font-medium",
+              inputClass: "bg-stone-50 border-stone-300 text-stone-900 placeholder:text-stone-400",
+              submittedTitleClass: "text-stone-900 font-serif",
+              submittedSubtitleClass: "text-stone-600",
+            }}
+          />
 
-        {/* Wishes Wall */}
-        <WishesWallSection
-          invitationId={data.id}
-          themeStyle={{
-            cardClass: "bg-white border border-stone-200 text-stone-900 shadow-sm",
-            titleClass: "text-stone-900 font-serif",
-            subtitleClass: "text-stone-600",
-            bubbleClass: "bg-stone-50 border border-stone-200 text-stone-800",
-            senderClass: "text-stone-900 font-bold",
-            messageClass: "text-stone-800",
-            dateClass: "text-stone-500 font-medium",
-            emptyTextClass: "text-stone-500",
-            loadingTextClass: "text-stone-500",
-            buttonClass: "bg-stone-900 hover:bg-stone-800 text-white font-medium",
-            inputClass: "bg-stone-50 border-stone-300 text-stone-900 placeholder:text-stone-400",
-          }}
-        />
+          {/* Wishes Wall */}
+          <WishesWallSection
+            invitationId={data.id}
+            themeStyle={{
+              cardClass: "bg-white border border-stone-200 text-stone-900 shadow-sm",
+              titleClass: "text-stone-900 font-serif",
+              subtitleClass: "text-stone-600",
+              bubbleClass: "bg-stone-50 border border-stone-200 text-stone-800",
+              senderClass: "text-stone-900 font-bold",
+              messageClass: "text-stone-800",
+              dateClass: "text-stone-500 font-medium",
+              emptyTextClass: "text-stone-500",
+              loadingTextClass: "text-stone-500",
+              buttonClass: "bg-stone-900 hover:bg-stone-800 text-white font-medium",
+              inputClass: "bg-stone-50 border-stone-300 text-stone-900 placeholder:text-stone-400",
+            }}
+          />
+        </section>
 
         <footer className="pt-12 pb-8 text-stone-600 text-xs tracking-wider font-medium">
           <p>FASARO &bull; Digital Wedding Invitation</p>

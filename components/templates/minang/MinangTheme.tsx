@@ -204,7 +204,7 @@ export const MinangTheme: React.FC<MinangThemeProps> = ({
         </section>
 
         {/* Section 3: Kedua Mempelai (Anak Daro & Marapulai) */}
-        <section id="mempelai" className="space-y-12">
+        <section id="couple" className="space-y-12">
           <div className="space-y-2">
             <span className="text-[11px] uppercase tracking-[0.25em] text-amber-400 font-semibold">
               Pasangan Pengantin
@@ -325,7 +325,7 @@ export const MinangTheme: React.FC<MinangThemeProps> = ({
         </section>
 
         {/* Section 4: Runtunan Acara Adat & Ijab Qabul (Jadwal Acara) */}
-        <section id="acara" className="space-y-10">
+        <section id="event" className="space-y-10">
           <div className="space-y-2">
             <span className="text-[11px] uppercase tracking-[0.25em] text-amber-400 font-semibold">
               Runtunan Acara
@@ -441,7 +441,7 @@ export const MinangTheme: React.FC<MinangThemeProps> = ({
 
         {/* Section 6: Galeri Foto Adat Minangkabau */}
         {data.galleries && data.galleries.length > 0 && (
-          <section id="galeri" className="space-y-8">
+          <section id="gallery" className="space-y-8">
             <div className="space-y-2">
               <span className="text-[11px] uppercase tracking-[0.25em] text-amber-400 font-semibold">
                 Momen Bahagia
@@ -454,21 +454,21 @@ export const MinangTheme: React.FC<MinangThemeProps> = ({
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            <div className="columns-2 gap-3 sm:gap-4 space-y-3">
               {data.galleries.map((img, idx) => (
                 <div
                   key={img.id || idx}
-                  className="group relative h-48 sm:h-64 rounded-2xl overflow-hidden border border-amber-500/40 bg-[#22120a] shadow-lg"
+                  className="group break-inside-avoid rounded-2xl overflow-hidden border border-amber-500/40 bg-[#22120a] shadow-lg"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={img.imageUrl}
                     alt={img.caption || `Galeri Foto ${idx + 1}`}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500 block"
                     loading="lazy"
                   />
                   {img.caption && (
-                    <div className="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/80 to-transparent text-[11px] text-amber-200 italic text-center">
+                    <div className="px-2.5 py-2 bg-gradient-to-t from-black/80 to-transparent text-[11px] text-amber-200 italic text-center">
                       {img.caption}
                     </div>
                   )}
@@ -480,7 +480,7 @@ export const MinangTheme: React.FC<MinangThemeProps> = ({
 
         {/* Section 7: Carano Tanda Kasih (Amplop Digital & QRIS) */}
         {data.bankAccounts && data.bankAccounts.length > 0 && (
-          <section id="kado" className="space-y-6">
+          <section id="gift" className="space-y-6">
             <div className="space-y-2">
               <span className="text-[11px] uppercase tracking-[0.25em] text-amber-400 font-semibold">
                 Tanda Kasih

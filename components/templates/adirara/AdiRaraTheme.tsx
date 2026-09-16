@@ -11,15 +11,12 @@ import DigitalGiftBox from "../shared/DigitalGiftBox";
 import RsvpFormSection from "../shared/RsvpFormSection";
 import WishesWallSection from "../shared/WishesWallSection";
 import {
-  BookOpen,
   Calendar,
   CalendarPlus,
   Clock,
-  Gift,
   Heart,
-  Image as ImageIcon,
-  MessageSquare,
 } from "lucide-react";
+import InstagramIcon from "../shared/InstagramIcon";
 
 interface ThemeProps {
   data: WeddingInvitationData;
@@ -173,8 +170,9 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
                     href={`https://instagram.com/${data.coupleInfo.brideInstagram}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-rose-700 hover:text-rose-900 font-medium"
+                    className="inline-flex items-center gap-1.5 text-xs text-rose-700 hover:text-rose-900 font-medium bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200 transition-colors"
                   >
+                    <InstagramIcon className="w-3.5 h-3.5" />
                     <span>@{data.coupleInfo.brideInstagram}</span>
                   </a>
                 )}
@@ -212,8 +210,9 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
                     href={`https://instagram.com/${data.coupleInfo.groomInstagram}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-stone-700 hover:text-stone-900 font-medium"
+                    className="inline-flex items-center gap-1.5 text-xs text-stone-700 hover:text-stone-900 font-medium bg-stone-100 px-2.5 py-1 rounded-full border border-stone-200 transition-colors"
                   >
+                    <InstagramIcon className="w-3.5 h-3.5" />
                     <span>@{data.coupleInfo.groomInstagram}</span>
                   </a>
                 )}
@@ -321,7 +320,6 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
                     venueNameClass: "text-stone-900 font-semibold",
                     addressClass: "text-stone-700 text-xs",
                     buttonClass: "bg-rose-800 hover:bg-rose-900 text-white font-medium",
-                    secondaryButtonClass: "border border-[#ebd6c4] bg-white hover:bg-[#fffaf5] text-stone-800 font-medium",
                   }}
                 />
               </div>
@@ -341,19 +339,17 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 max-w-lg mx-auto">
+            <div className="columns-2 gap-3 space-y-3 max-w-lg mx-auto">
               {data.galleries.map((img, idx) => (
                 <div
                   key={img.id ?? idx}
-                  className="relative aspect-square rounded-2xl overflow-hidden bg-rose-50 border border-rose-100 shadow-sm"
+                  className="break-inside-avoid rounded-2xl overflow-hidden bg-rose-50 border border-rose-100 shadow-sm"
                 >
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={img.imageUrl}
                     alt={img.caption || `Galeri ${idx + 1}`}
-                    fill
-                    sizes="(max-width: 640px) 50vw, 350px"
-                    priority={false}
-                    className="object-cover hover:scale-105 transition-transform duration-500"
+                    className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500 block"
                   />
                 </div>
               ))}
@@ -424,66 +420,6 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
           <p className="text-[11px] text-stone-600">Terima kasih atas doa &amp; restu Anda</p>
         </footer>
       </main>
-
-      {/* 2. Floating Bottom Navigation Bar (Khas WebNikah) */}
-      {!isEmbedded && (
-        <nav
-          className={`fixed bottom-3 left-1/2 -translate-x-1/2 z-40 transform-gpu will-change-transform bg-white/95 backdrop-blur-sm px-4 py-2 rounded-full border border-stone-200 shadow-xl flex items-center gap-3 sm:gap-5 text-stone-800 transition-all duration-500 ${
-            isOpen
-              ? "opacity-100 translate-y-0 pointer-events-auto"
-              : "opacity-0 translate-y-10 pointer-events-none"
-          }`}
-        >
-          <a
-            href="#home"
-            className="flex flex-col items-center justify-center p-1 hover:text-rose-700 transition-colors"
-            title="Home"
-          >
-            <Heart className="w-4 h-4" />
-            <span className="text-[9px] mt-0.5">Mempelai</span>
-          </a>
-          <a
-            href="#cerita"
-            className="flex flex-col items-center justify-center p-1 hover:text-rose-700 transition-colors"
-            title="Cerita"
-          >
-            <BookOpen className="w-4 h-4" />
-            <span className="text-[9px] mt-0.5">Cerita</span>
-          </a>
-          <a
-            href="#undangan"
-            className="flex flex-col items-center justify-center p-1 hover:text-rose-700 transition-colors"
-            title="Acara"
-          >
-            <Calendar className="w-4 h-4" />
-            <span className="text-[9px] mt-0.5">Acara</span>
-          </a>
-          <a
-            href="#galeri"
-            className="flex flex-col items-center justify-center p-1 hover:text-rose-700 transition-colors"
-            title="Galeri"
-          >
-            <ImageIcon className="w-4 h-4" />
-            <span className="text-[9px] mt-0.5">Photo</span>
-          </a>
-          <a
-            href="#kado"
-            className="flex flex-col items-center justify-center p-1 hover:text-rose-700 transition-colors"
-            title="Kado"
-          >
-            <Gift className="w-4 h-4" />
-            <span className="text-[9px] mt-0.5">Kado</span>
-          </a>
-          <a
-            href="#doa"
-            className="flex flex-col items-center justify-center p-1 hover:text-rose-700 transition-colors"
-            title="Ucapan"
-          >
-            <MessageSquare className="w-4 h-4" />
-            <span className="text-[9px] mt-0.5">Ucapan</span>
-          </a>
-        </nav>
-      )}
     </div>
   );
 };

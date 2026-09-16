@@ -39,6 +39,18 @@ interface BillingUpgradeTabProps {
   onPaymentSubmitted?: () => void;
 }
 
+interface PaymentHistoryItem {
+  id: string;
+  orderId: string;
+  tier: string;
+  amount: number;
+  paymentType: "GATEWAY" | "MANUAL_QRIS" | "MANUAL_BANK";
+  paymentStatus: "PENDING" | "WAITING_VERIFICATION" | "SETTLEMENT" | "EXPIRED" | "CANCELLED";
+  proofImageUrl: string | null;
+  verifiedAt: string | null;
+  createdAt: string;
+}
+
 interface DevOrderSimulation {
   orderId: string;
   tier: string;
@@ -88,9 +100,8 @@ export const BillingUpgradeTab: React.FC<BillingUpgradeTabProps> = ({
     manual_account_holder: "PT Fasaro Digital",
     manual_whatsapp_confirmation: "085716697416",
     manual_payment_instructions:
-      "Transfer sesuai nominal paket ke rekening atau QRIS di atas. Setelah transfer, upload bukti transfer di form ini atau kirimkan konfirmasi via WhatsApp agar paket Anda segera diaktifkan.",
-    manual_qris_image_url:
-      "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=FASARO-DEMO-QRIS",
+      "Transfer sesuai nominal paket ke rekening di atas. Setelah transfer, upload bukti transfer di form ini atau kirimkan konfirmasi via WhatsApp agar paket Anda segera diaktifkan.",
+    manual_qris_image_url: "",
     feature_midtrans_payment: "false",
     feature_manual_payment: "true",
   });
@@ -109,6 +120,16 @@ export const BillingUpgradeTab: React.FC<BillingUpgradeTabProps> = ({
 
   const [isSubmittingManual, setIsSubmittingManual] = useState(false);
   const [activeMidtransTier, setActiveMidtransTier] = useState<string | null>(null);
+  const [activePaymentMethodTab, setActivePaymentMethodTab] = useState<"MANUAL" | "GATEWAY">(
+    "MANUAL"
+  );
+
+  const hasValidQris = Boolean(
+    settings.manual_qris_image_url &&
+      settings.manual_qris_image_url.trim() !== "" &&
+      !settings.manual_qris_image_url.includes("FASARO-DEMO-QRIS") &&
+      !settings.manual_qris_image_url.includes("create-qr-code")
+  );
   const [devSimulation, setDevSimulation] = useState<DevOrderSimulation | null>(null);
   const [isSimulating, setIsSimulating] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -120,10 +141,11 @@ export const BillingUpgradeTab: React.FC<BillingUpgradeTabProps> = ({
     amount: number;
   } | null>(null);
 
-  // Active payment sub-tab if both modes are enabled
-  const [activePaymentMethodTab, setActivePaymentMethodTab] = useState<"MANUAL" | "GATEWAY">(
-    "MANUAL"
-  );
+
+  const [paymentHistory, setPaymentHistory] = useState<PaymentHistoryItem[]>([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [previewProof, setPreviewProof] = useState<string | null>(null);
+
 
   // Fetch public settings on mount
   useEffect(() => {
@@ -139,6 +161,26 @@ export const BillingUpgradeTab: React.FC<BillingUpgradeTabProps> = ({
         // Fallback to default
       });
 
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  // Fetch payment history
+  useEffect(() => {
+    let ignore = false;
+    setIsLoadingHistory(true);
+    fetch("/api/dashboard/payments")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => {
+        if (!ignore && json?.transactions) {
+          setPaymentHistory(json.transactions);
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!ignore) setIsLoadingHistory(false);
+      });
     return () => {
       ignore = true;
     };
@@ -449,6 +491,7 @@ export const BillingUpgradeTab: React.FC<BillingUpgradeTabProps> = ({
   };
 
   return (
+    <>
     <div className="space-y-6 max-w-5xl">
       {/* Header Info */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-xl bg-white border border-[#E2E8F0] shadow-xs">
@@ -483,7 +526,7 @@ export const BillingUpgradeTab: React.FC<BillingUpgradeTabProps> = ({
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              Transfer Manual (Bank/QRIS)
+              Transfer Manual {hasValidQris ? "(Bank/QRIS)" : "(Bank)"}
             </button>
             <button
               type="button"
@@ -710,7 +753,7 @@ export const BillingUpgradeTab: React.FC<BillingUpgradeTabProps> = ({
                 </div>
                 <div>
                   <h3 className="font-bold text-sm sm:text-base text-slate-900">
-                    Langkah Pembayaran Manual: Transfer Bank / QRIS
+                    Langkah Pembayaran Manual: Transfer Bank{hasValidQris ? " / QRIS" : ""}
                   </h3>
                   <p className="text-xs text-slate-500">
                     Paket yang dipilih:{" "}
@@ -787,7 +830,7 @@ export const BillingUpgradeTab: React.FC<BillingUpgradeTabProps> = ({
                   </div>
 
                   {/* QRIS Code Image */}
-                  {settings.manual_qris_image_url && (
+                  {hasValidQris && (
                     <div className="pt-2 border-t border-slate-200 flex items-center gap-4">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
@@ -819,7 +862,7 @@ export const BillingUpgradeTab: React.FC<BillingUpgradeTabProps> = ({
                   <span className="font-bold text-slate-900 block">Panduan Transfer:</span>
                   <p className="text-[11px] leading-relaxed">
                     {settings.manual_payment_instructions ||
-                      "Transfer sesuai nominal paket ke rekening atau QRIS di atas. Setelah transfer, upload bukti transfer di form ini atau kirimkan konfirmasi via WhatsApp agar paket Anda segera diaktifkan."}
+                      `Transfer sesuai nominal paket ke rekening${hasValidQris ? " atau QRIS" : ""} di atas. Setelah transfer, upload bukti transfer di form ini atau kirimkan konfirmasi via WhatsApp agar paket Anda segera diaktifkan.`}
                   </p>
                 </div>
               </div>
@@ -948,6 +991,75 @@ export const BillingUpgradeTab: React.FC<BillingUpgradeTabProps> = ({
           </div>
         )}
     </div>
+
+      {/* Riwayat Pembayaran */}
+      <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-xs overflow-hidden mt-4">
+        <div className="p-4 border-b border-[#E2E8F0] flex items-center justify-between">
+          <div>
+            <h3 className="font-bold text-slate-900 text-sm">Riwayat Pembayaran</h3>
+            <p className="text-xs text-slate-500 mt-0.5">Seluruh riwayat transaksi pembayaran paket undangan Anda</p>
+          </div>
+          <RefreshCw className="w-4 h-4 text-slate-400" />
+        </div>
+        {isLoadingHistory ? (
+          <div className="p-8 text-center text-slate-400 text-sm">Memuat riwayat...</div>
+        ) : paymentHistory.length === 0 ? (
+          <div className="p-8 text-center text-slate-400 text-sm">Belum ada transaksi pembayaran.</div>
+        ) : (
+          <div className="divide-y divide-[#E2E8F0]">
+            {paymentHistory.map((tx) => (
+              <div key={tx.id} className="p-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs font-mono text-slate-500 truncate max-w-[120px]">{tx.orderId}</span>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
+                      tx.tier === "ULTIMATE" ? "bg-purple-50 text-purple-700 border border-purple-200" :
+                      tx.tier === "ELEGANT" ? "bg-blue-50 text-blue-700 border border-blue-200" :
+                      "bg-amber-50 text-amber-700 border border-amber-200"
+                    }`}>{tx.tier}</span>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
+                      tx.paymentStatus === "SETTLEMENT" ? "bg-emerald-50 text-emerald-700 border border-emerald-200" :
+                      tx.paymentStatus === "WAITING_VERIFICATION" ? "bg-blue-50 text-blue-700 border border-blue-200" :
+                      tx.paymentStatus === "EXPIRED" || tx.paymentStatus === "CANCELLED" ? "bg-red-50 text-red-600 border border-red-200" :
+                      "bg-slate-100 text-slate-600 border border-slate-200"
+                    }`}>{tx.paymentStatus === "SETTLEMENT" ? "Lunas" : tx.paymentStatus === "WAITING_VERIFICATION" ? "Menunggu Verifikasi" : tx.paymentStatus === "PENDING" ? "Pending" : tx.paymentStatus === "CANCELLED" ? "Dibatalkan" : "Kadaluarsa"}</span>
+                  </div>
+                  <div className="flex items-center gap-3 mt-1">
+                    <span className="text-xs text-slate-400">{new Date(tx.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}</span>
+                    <span className="text-xs font-semibold text-slate-700">{new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(tx.amount)}</span>
+                    <span className="text-xs text-slate-400">{tx.paymentType === "GATEWAY" ? "Gateway" : tx.paymentType === "MANUAL_QRIS" ? "QRIS" : "Transfer Bank"}</span>
+                  </div>
+                </div>
+                {tx.proofImageUrl && (
+                  <button
+                    type="button"
+                    onClick={() => setPreviewProof(tx.proofImageUrl!)}
+                    className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 transition-colors"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    Lihat Bukti
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Proof Preview Modal */}
+      {previewProof && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setPreviewProof(null)}>
+          <div className="bg-white rounded-2xl overflow-hidden max-w-sm w-full shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-3 border-b border-[#E2E8F0]">
+              <span className="font-semibold text-sm text-slate-900">Bukti Pembayaran</span>
+              <button type="button" onClick={() => setPreviewProof(null)} className="text-slate-400 hover:text-slate-700"><X className="w-4 h-4" /></button>
+            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={previewProof} alt="Bukti Pembayaran" className="w-full h-auto max-h-[70vh] object-contain" />
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

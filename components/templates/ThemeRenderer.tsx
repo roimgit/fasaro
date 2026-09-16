@@ -8,6 +8,7 @@ import SyariTheme from "./syari/SyariTheme";
 import RoyalTheme from "./royal/RoyalTheme";
 import AdiRaraTheme from "./adirara/AdiRaraTheme";
 import MinangTheme from "./minang/MinangTheme";
+import PublicInvitationLayout from "./shared/PublicInvitationLayout";
 
 interface ThemeRendererProps {
   data: WeddingInvitationData;
@@ -26,63 +27,77 @@ export const ThemeRenderer: React.FC<ThemeRendererProps> = ({
 }) => {
   const activeTheme = forcedThemeId || data.themeId;
 
-  switch (activeTheme) {
-    case "minang":
-      return (
-        <MinangTheme
-          data={data}
-          guestName={guestName}
-          showCover={showCover}
-          isEmbedded={isEmbedded}
-        />
-      );
-    case "adirara":
-      return (
-        <AdiRaraTheme
-          data={data}
-          guestName={guestName}
-          showCover={showCover}
-          isEmbedded={isEmbedded}
-        />
-      );
-    case "royal":
-      return (
-        <RoyalTheme
-          data={data}
-          guestName={guestName}
-          showCover={showCover}
-          isEmbedded={isEmbedded}
-        />
-      );
-    case "rustic":
-      return (
-        <RusticTheme
-          data={data}
-          guestName={guestName}
-          showCover={showCover}
-          isEmbedded={isEmbedded}
-        />
-      );
-    case "syari":
-      return (
-        <SyariTheme
-          data={data}
-          guestName={guestName}
-          showCover={showCover}
-          isEmbedded={isEmbedded}
-        />
-      );
-    case "minimalist":
-    default:
-      return (
-        <MinimalistTheme
-          data={data}
-          guestName={guestName}
-          showCover={showCover}
-          isEmbedded={isEmbedded}
-        />
-      );
+  const renderThemeContent = () => {
+    switch (activeTheme) {
+      case "minang":
+        return (
+          <MinangTheme
+            data={data}
+            guestName={guestName}
+            showCover={showCover}
+            isEmbedded={isEmbedded}
+          />
+        );
+      case "adirara":
+        return (
+          <AdiRaraTheme
+            data={data}
+            guestName={guestName}
+            showCover={showCover}
+            isEmbedded={isEmbedded}
+          />
+        );
+      case "royal":
+        return (
+          <RoyalTheme
+            data={data}
+            guestName={guestName}
+            showCover={showCover}
+            isEmbedded={isEmbedded}
+          />
+        );
+      case "rustic":
+        return (
+          <RusticTheme
+            data={data}
+            guestName={guestName}
+            showCover={showCover}
+            isEmbedded={isEmbedded}
+          />
+        );
+      case "syari":
+        return (
+          <SyariTheme
+            data={data}
+            guestName={guestName}
+            showCover={showCover}
+            isEmbedded={isEmbedded}
+          />
+        );
+      case "minimalist":
+      default:
+        return (
+          <MinimalistTheme
+            data={data}
+            guestName={guestName}
+            showCover={showCover}
+            isEmbedded={isEmbedded}
+          />
+        );
+    }
+  };
+
+  // If inside mobile simulation frame (device mock), render directly
+  if (isEmbedded) {
+    return renderThemeContent();
   }
+
+  // Public web view: render with Desktop Split Layout and Mobile Bottom Nav
+  return (
+    <PublicInvitationLayout data={data} guestName={guestName}>
+      {renderThemeContent()}
+    </PublicInvitationLayout>
+  );
 };
 
 export default ThemeRenderer;
