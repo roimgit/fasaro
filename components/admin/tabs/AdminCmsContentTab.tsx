@@ -478,7 +478,7 @@ export const AdminCmsContentTab: React.FC<AdminCmsContentTabProps> = ({
               type="text"
               value={formData.support_whatsapp || ""}
               onChange={(e) => handleChange("support_whatsapp", e.target.value)}
-              placeholder="6281234567890"
+              placeholder="085716697416"
               className="w-full px-3.5 py-2 rounded-lg bg-white border border-[#E2E8F0] text-xs text-slate-900 font-mono focus:outline-none focus:border-[#F97316]"
             />
           </div>

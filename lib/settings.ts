@@ -72,10 +72,10 @@ export const SYSTEM_SETTING_DEFINITIONS: SystemSettingDefinition[] = [
   },
   {
     key: "support_whatsapp",
-    defaultValue: "6281234567890",
+    defaultValue: "085716697416",
     category: "cms",
     label: "Nomor WhatsApp Bantuan",
-    description: "Nomor CS resmi diawali kode negara (misal 62812...)",
+    description: "Nomor CS resmi Fasaro (misal 085716697416 atau 6285716697416)",
     isPublic: true,
   },
   {
@@ -470,7 +470,7 @@ export const SYSTEM_SETTING_DEFINITIONS: SystemSettingDefinition[] = [
   },
   {
     key: "manual_whatsapp_confirmation",
-    defaultValue: "6281234567890",
+    defaultValue: "085716697416",
     category: "gateway",
     label: "Nomor WhatsApp Konfirmasi Manual",
     description: "Nomor WhatsApp CS/Admin untuk menerima konfirmasi bukti transfer",
@@ -545,3 +545,16 @@ export async function getPublicSettingsMap(): Promise<Record<string, string>> {
 
   return publicMap;
 }
+
+/**
+ * Menormalkan nomor WhatsApp agar siap dipakai pada link https://wa.me/
+ * Mengubah awalan 0 atau +62 menjadi format 62...
+ */
+export function normalizeWhatsAppNumber(phone: string): string {
+  const digits = phone.replace(/[^0-9]/g, "");
+  if (digits.startsWith("0")) {
+    return "62" + digits.slice(1);
+  }
+  return digits || "6285716697416";
+}
+

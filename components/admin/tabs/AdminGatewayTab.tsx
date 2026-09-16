@@ -266,9 +266,9 @@ export const AdminGatewayTab: React.FC<AdminGatewayTabProps> = ({
           </label>
           <input
             type="text"
-            value={formData.manual_whatsapp_confirmation || "6281234567890"}
+            value={formData.manual_whatsapp_confirmation || "085716697416"}
             onChange={(e) => handleChange("manual_whatsapp_confirmation", e.target.value)}
-            placeholder="6281234567890 (Gunakan format diawali 62)"
+            placeholder="085716697416 (Bisa format 08... atau 628...)"
             className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-[#E2E8F0] text-xs text-slate-900 font-mono focus:outline-none focus:border-[#F97316]"
           />
           <p className="text-[10px] text-slate-400">

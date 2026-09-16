@@ -466,14 +466,21 @@ export const FeaturesPricingFaqSection: React.FC<FeaturesPricingFaqSectionProps>
             <p className="text-xs text-slate-500">
               Customer Success siap membantu persiapan hari bahagia Anda setiap hari ({settings?.support_hours || "08:00 - 22:00 WIB"}).
             </p>
-            <a
-              href={`https://wa.me/${(settings?.support_whatsapp || "6281234567890").replace(/[^0-9]/g, "")}?text=Halo%20Admin%20Fasaro%20saya%20ingin%20tanya%20undangan%20pernikahan`}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-block mt-2 py-2 px-3.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-colors"
-            >
-              Chat WhatsApp Support
-            </a>
+            {(() => {
+              const rawWa = settings?.support_whatsapp || "085716697416";
+              const digits = rawWa.replace(/[^0-9]/g, "");
+              const cleanWa = digits.startsWith("0") ? "62" + digits.slice(1) : digits;
+              return (
+                <a
+                  href={`https://wa.me/${cleanWa}?text=Halo%20Admin%20Fasaro%20saya%20ingin%20tanya%20undangan%20pernikahan`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-block mt-2 py-2 px-3.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-colors"
+                >
+                  Chat WhatsApp Support
+                </a>
+              );
+            })()}
           </div>
         </div>
 

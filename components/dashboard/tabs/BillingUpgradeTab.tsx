@@ -86,7 +86,7 @@ export const BillingUpgradeTab: React.FC<BillingUpgradeTabProps> = ({
     manual_bank_name: "BCA",
     manual_account_number: "8291039481",
     manual_account_holder: "PT Fasaro Digital",
-    manual_whatsapp_confirmation: "6281234567890",
+    manual_whatsapp_confirmation: "085716697416",
     manual_payment_instructions:
       "Transfer sesuai nominal paket ke rekening atau QRIS di atas. Setelah transfer, upload bukti transfer di form ini atau kirimkan konfirmasi via WhatsApp agar paket Anda segera diaktifkan.",
     manual_qris_image_url:
@@ -435,8 +435,11 @@ export const BillingUpgradeTab: React.FC<BillingUpgradeTabProps> = ({
   };
 
   const getWhatsAppConfirmationUrl = (orderId?: string, tier?: string, amount?: number) => {
-    const rawWa = settings.manual_whatsapp_confirmation || "6281234567890";
-    const cleanWa = rawWa.replace(/[^0-9]/g, "");
+    const rawWa = settings.manual_whatsapp_confirmation || "085716697416";
+    let cleanWa = rawWa.replace(/[^0-9]/g, "");
+    if (cleanWa.startsWith("0")) {
+      cleanWa = "62" + cleanWa.slice(1);
+    }
     const formattedAmount = (amount || amountMap[manualTier] || 39000).toLocaleString("id-ID");
     const chosenTier = tier || manualTier;
     const refOrderId = orderId || lastOrderSubmitted?.orderId || "TERBARU";

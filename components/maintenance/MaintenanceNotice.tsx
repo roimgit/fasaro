@@ -16,7 +16,7 @@ export const MaintenanceNotice: React.FC<MaintenanceNoticeProps> = ({
   title = "Website Sedang Dalam Pemeliharaan Terjadwal",
   message = "Kami sedang melakukan peningkatan sistem dan infrastruktur server untuk menghadirkan pengalaman yang lebih cepat dan handal. Seluruh data undangan Anda aman.",
   estimatedEnd = "Segera kembali dalam beberapa saat",
-  whatsappNumber = "6281234567890",
+  whatsappNumber = "085716697416",
   isAdminBypass = false,
 }) => {
   if (isAdminBypass) {
@@ -40,7 +40,8 @@ export const MaintenanceNotice: React.FC<MaintenanceNoticeProps> = ({
     );
   }
 
-  const cleanWaNumber = whatsappNumber.replace(/[^0-9]/g, "");
+  const rawDigits = whatsappNumber.replace(/[^0-9]/g, "");
+  const cleanWaNumber = rawDigits.startsWith("0") ? "62" + rawDigits.slice(1) : rawDigits || "6285716697416";
 
   return (
     <div className="min-h-screen bg-[#F3F6FB] flex items-center justify-center p-4 selection:bg-[#F97316] selection:text-white">
