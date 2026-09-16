@@ -23,12 +23,11 @@ export async function GET() {
             themeId: true,
             activeUntil: true,
             isActive: true,
-            createdAt: true,
+            coupleInfo: true,
             paymentTransactions: {
-              where: { paymentStatus: "SETTLEMENT" },
               orderBy: { createdAt: "desc" },
-              take: 1,
-              select: { tier: true },
+              take: 5,
+              select: { tier: true, paymentStatus: true },
             },
           },
         },
@@ -37,12 +36,26 @@ export async function GET() {
 
     const clients = users.map((u) => {
       const inv = u.invitations[0] || null;
-      const latestTier = (inv?.paymentTransactions[0]?.tier as string) || "FREE";
+      const coupleInfo = (inv?.coupleInfo as Record<string, unknown>) || {};
+      const settlementTx = inv?.paymentTransactions.find((t) => t.paymentStatus === "SETTLEMENT");
+      const pendingTx = inv?.paymentTransactions[0];
+      const selectedTier = (coupleInfo.selectedTier as string) || null;
+
+      let latestTier = "BELUM_PILIH_PAKET";
+      if (settlementTx) {
+        latestTier = settlementTx.tier;
+      } else if (pendingTx) {
+        latestTier = pendingTx.tier;
+      } else if (selectedTier) {
+        latestTier = selectedTier;
+      }
 
       let status = "NO_INVITATION";
       if (inv) {
         if (!inv.isActive) {
           status = "INACTIVE";
+        } else if (!settlementTx && !inv.activeUntil) {
+          status = latestTier === "BELUM_PILIH_PAKET" ? "UNSELECTED" : "UNPAID";
         } else if (inv.activeUntil && new Date(inv.activeUntil) < new Date()) {
           status = "EXPIRED";
         } else {
@@ -135,7 +148,7 @@ export async function PATCH(request: NextRequest) {
           userId: currentInv.userId,
           invitationId: invitationId,
           tier: tier as SubscriptionTier,
-          amount: tier === "ULTIMATE" ? 279000 : tier === "ELEGANT" ? 149000 : tier === "STARTER" ? 69000 : 0,
+          amount: tier === "ULTIMATE" ? 279000 : tier === "ELEGANT" ? 149000 : tier === "STARTER" ? 39000 : 0,
           paymentType: "GATEWAY",
           paymentStatus: "SETTLEMENT",
           verifiedBy: "ADMIN_OVERRIDE",

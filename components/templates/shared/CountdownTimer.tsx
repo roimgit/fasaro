@@ -77,7 +77,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
           </span>
           <span
             className={`text-[9px] sm:text-xs uppercase tracking-wider font-semibold mt-0.5 sm:mt-1 ${
-              themeStyle?.labelClass ?? "text-stone-700 dark:text-stone-300"
+              themeStyle?.labelClass ?? "text-stone-600"
             }`}
           >
             {unit.label}

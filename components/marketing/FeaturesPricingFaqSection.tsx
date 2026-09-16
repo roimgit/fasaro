@@ -18,14 +18,79 @@ import {
   Zap,
 } from "lucide-react";
 
-export const FeaturesPricingFaqSection: React.FC = () => {
+interface FeaturesPricingFaqSectionProps {
+  settings?: Record<string, string>;
+}
+
+export const FeaturesPricingFaqSection: React.FC<FeaturesPricingFaqSectionProps> = ({
+  settings,
+}) => {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+
+  const starterPrice = (parseInt(settings?.price_starter || "39000", 10) || 39000).toLocaleString("id-ID");
+  const starterOriginal = (parseInt(settings?.price_starter_original || "89000", 10) || 89000).toLocaleString("id-ID");
+  const starterPhotos = settings?.max_photos_starter || "10";
+  const starterAccounts = settings?.max_accounts_starter || "2";
+
+  const elegantPrice = (parseInt(settings?.price_elegant || "149000", 10) || 149000).toLocaleString("id-ID");
+  const elegantOriginal = (parseInt(settings?.price_elegant_original || "249000", 10) || 249000).toLocaleString("id-ID");
+
+  const ultimatePrice = (parseInt(settings?.price_ultimate || "279000", 10) || 279000).toLocaleString("id-ID");
+  const ultimateOriginal = (parseInt(settings?.price_ultimate_original || "499000", 10) || 499000).toLocaleString("id-ID");
+
+  const starterName = settings?.plan_starter_name || "Paket Starter";
+  const starterDesc = settings?.plan_starter_desc || "Pilihan hemat untuk acara akad/syukuran intim keluarga.";
+  const starterPeriod = settings?.plan_starter_period || "Masa Aktif 3 Bulan";
+  const starterBadge = settings?.plan_starter_badge;
+  const starterFeatures = settings?.plan_starter_features
+    ? settings.plan_starter_features.split("\n").map((l) => l.trim()).filter(Boolean)
+    : [
+        "1 Pilihan Tema Minimalist",
+        "Masa Aktif 90 Hari",
+        `Galeri Foto hingga ${starterPhotos} Foto`,
+        "Buku Ucapan & Doa",
+        "Navigasi Google Maps",
+        `Amplop Digital (Hingga ${starterAccounts} Rekening Bank)`,
+      ];
+
+  const elegantName = settings?.plan_elegant_name || "Paket Elegant";
+  const elegantDesc = settings?.plan_elegant_desc || "Paling populer untuk resepsi pernikahan lengkap & modern.";
+  const elegantPeriod = settings?.plan_elegant_period || "Masa Aktif 1 Tahun Penuh";
+  const elegantBadge = settings?.plan_elegant_badge || "Paling Populer";
+  const elegantFeatures = settings?.plan_elegant_features
+    ? settings.plan_elegant_features.split("\n").map((l) => l.trim()).filter(Boolean)
+    : [
+        "Akses Bebas ke Seluruh Tema Desain",
+        "Ganti Tema 1-Klik Kapan Saja",
+        "Masa Aktif 365 Hari",
+        "Galeri Foto HD Tanpa Batas (WebP)",
+        "Fitur Amplop Digital (Bebas Rekening + Upload QRIS Donasi)",
+        "Buku Tamu & RSVP Realtime + Confetti",
+        "Sinkronisasi Google Calendar Tamu",
+        "Background Musik Autoplay",
+      ];
+
+  const ultimateName = settings?.plan_ultimate_name || "Paket Ultimate Event Day";
+  const ultimateDesc = settings?.plan_ultimate_desc || "Solusi lengkap hari-H dengan sistem check-in VIP resepsi.";
+  const ultimatePeriod = settings?.plan_ultimate_period || "Masa Aktif Selamanya (Lifetime)";
+  const ultimateBadge = settings?.plan_ultimate_badge;
+  const ultimateFeatures = settings?.plan_ultimate_features
+    ? settings.plan_ultimate_features.split("\n").map((l) => l.trim()).filter(Boolean)
+    : [
+        "Seluruh Fitur Paket Elegant",
+        "Masa Aktif Selamanya (Lifetime)",
+        "Sistem QR Code Check-in Meja Tamu",
+        "WhatsApp Blast Gateway Generator",
+        "Story / Love Story Timeline Kustom",
+        "Prioritas Verifikasi Kilat 10 Menit",
+        "Dukungan WhatsApp Support Prioritas",
+      ];
 
   const features = [
     {
       icon: Globe,
       title: "Subdomain & Custom Domain",
-      desc: "Dapatkan alamat link unik namapasangan.fasaro.my.id gratis, serta dukungan custom domain .com / .id.",
+      desc: "Dapatkan alamat link unik namapasangan.fasaro.my.id, serta dukungan custom domain .com / .id.",
     },
     {
       icon: Wallet,
@@ -56,72 +121,37 @@ export const FeaturesPricingFaqSection: React.FC = () => {
 
   const pricingPlans = [
     {
-      name: "Paket Gratis",
-      price: "0",
-      period: "Aktif s/d H+7 Acara",
-      description: "Uji coba platform Fasaro tanpa biaya awal pembuatan.",
+      name: starterName,
+      price: starterPrice,
+      originalPrice: starterOriginal,
+      period: starterPeriod,
+      description: starterDesc,
       highlight: false,
-      tier: "FREE",
-      features: [
-        "1 Pilihan Tema (Modern Editorial)",
-        "Masa Aktif s/d H+7 Tanggal Acara",
-        "Galeri Foto hingga 5 Foto",
-        "Buku Ucapan & Doa Tamu",
-        "Navigasi Google Maps Lokasi",
-        "Amplop Digital & Rekening Bank",
-      ],
-    },
-    {
-      name: "Paket Starter",
-      price: "69.000",
-      period: "Masa Aktif 3 Bulan",
-      description: "Pilihan hemat untuk acara akad/syukuran intim keluarga.",
-      highlight: false,
+      badge: starterBadge,
       tier: "STARTER",
-      features: [
-        "1 Pilihan Tema Minimalist",
-        "Masa Aktif 90 Hari",
-        "Galeri Foto hingga 5 Foto",
-        "Buku Ucapan & Doa",
-        "Navigasi Google Maps",
-        "Amplop Digital (1 Rekening Bank)",
-      ],
+      features: starterFeatures,
     },
     {
-      name: "Paket Elegant",
-      price: "149.000",
-      period: "Masa Aktif 1 Tahun Penuh",
-      description: "Paling populer untuk resepsi pernikahan lengkap & modern.",
+      name: elegantName,
+      price: elegantPrice,
+      originalPrice: elegantOriginal,
+      period: elegantPeriod,
+      description: elegantDesc,
       highlight: true,
-      badge: "Paling Populer",
+      badge: elegantBadge,
       tier: "ELEGANT",
-      features: [
-        "Akses Bebas ke Seluruh Tema Desain",
-        "Ganti Tema 1-Klik Kapan Saja",
-        "Masa Aktif 365 Hari",
-        "Galeri Foto HD Tanpa Batas (WebP)",
-        "Fitur Amplop Digital + QRIS Toko",
-        "Buku Tamu & RSVP Realtime + Confetti",
-        "Sinkronisasi Google Calendar Tamu",
-        "Background Musik Autoplay",
-      ],
+      features: elegantFeatures,
     },
     {
-      name: "Paket Ultimate Event Day",
-      price: "279.000",
-      period: "Masa Aktif Selamanya (Lifetime)",
-      description: "Solusi lengkap hari-H dengan sistem check-in VIP resepsi.",
+      name: ultimateName,
+      price: ultimatePrice,
+      originalPrice: ultimateOriginal,
+      period: ultimatePeriod,
+      description: ultimateDesc,
       highlight: false,
+      badge: ultimateBadge,
       tier: "ULTIMATE",
-      features: [
-        "Seluruh Fitur Paket Elegant",
-        "Masa Aktif Selamanya (Lifetime)",
-        "Sistem QR Code Check-in Meja Tamu",
-        "WhatsApp Blast Gateway Generator",
-        "Story / Love Story Timeline Kustom",
-        "Prioritas Verifikasi Kilat 10 Menit",
-        "Dukungan WhatsApp Support Prioritas",
-      ],
+      features: ultimateFeatures,
     },
   ];
 
@@ -167,7 +197,7 @@ export const FeaturesPricingFaqSection: React.FC = () => {
     },
     {
       q: "Metode pembayaran apa saja yang didukung untuk upgrade paket?",
-      a: "Kami mendukung pembayaran otomatis via Payment Gateway Midtrans (GoPay, QRIS, Virtual Account BCA/Mandiri/BRI) dan transfer manual langsung ke QRIS toko kami dengan verifikasi admin.",
+      a: "Kami mendukung pembayaran otomatis via Payment Gateway Midtrans (GoPay, QRIS, Virtual Account BCA/Mandiri/BRI) dan transfer manual langsung ke rekening bank & QRIS resmi Fasaro dengan verifikasi admin.",
     },
     {
       q: "Apakah ada batasan jumlah tamu yang bisa menerima undangan?",
@@ -226,7 +256,7 @@ export const FeaturesPricingFaqSection: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch max-w-5xl mx-auto">
           {pricingPlans.map((plan, idx) => (
             <div
               key={idx}
@@ -249,6 +279,14 @@ export const FeaturesPricingFaqSection: React.FC = () => {
                 </div>
 
                 <div className="py-2">
+                  {"originalPrice" in plan && plan.originalPrice && (
+                    <div className="flex items-center gap-2 text-xs text-slate-400 font-medium mb-1">
+                      <span className="line-through">Rp {plan.originalPrice}</span>
+                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                        Diskon Promo
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-baseline gap-1">
                     <span className="text-xs text-slate-500">Rp</span>
                     <span className="text-3xl font-bold text-slate-900 tracking-tight">
@@ -270,18 +308,14 @@ export const FeaturesPricingFaqSection: React.FC = () => {
 
               <div className="pt-8">
                 <Link
-                  href={
-                    plan.price === "0"
-                      ? "/login?from=/dashboard"
-                      : `/login?from=/dashboard&upgradeTier=${plan.tier}`
-                  }
+                  href={`/login?mode=register&plan=${plan.tier}&from=/dashboard`}
                   className={`w-full block text-center py-2.5 px-4 rounded-xl text-xs font-semibold transition-colors ${
                     plan.highlight
                       ? "bg-[#F97316] hover:bg-[#EA580C] text-white shadow-xs"
                       : "bg-[#F8FAFC] border border-[#E2E8F0] hover:bg-slate-100 text-slate-800"
                   }`}
                 >
-                  {plan.price === "0" ? "Mulai Gratis Sekarang" : `Pilih ${plan.name}`}
+                  Pilih {plan.name}
                 </Link>
               </div>
             </div>
@@ -430,10 +464,10 @@ export const FeaturesPricingFaqSection: React.FC = () => {
               Bantuan &amp; Kontak
             </h4>
             <p className="text-xs text-slate-500">
-              Customer Success siap membantu persiapan hari bahagia Anda setiap hari (08:00 - 22:00 WIB).
+              Customer Success siap membantu persiapan hari bahagia Anda setiap hari ({settings?.support_hours || "08:00 - 22:00 WIB"}).
             </p>
             <a
-              href="https://wa.me/6281234567890?text=Halo%20Admin%20Fasaro%20saya%20ingin%20tanya%20undangan%20pernikahan"
+              href={`https://wa.me/${(settings?.support_whatsapp || "6281234567890").replace(/[^0-9]/g, "")}?text=Halo%20Admin%20Fasaro%20saya%20ingin%20tanya%20undangan%20pernikahan`}
               target="_blank"
               rel="noreferrer"
               className="inline-block mt-2 py-2 px-3.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-colors"

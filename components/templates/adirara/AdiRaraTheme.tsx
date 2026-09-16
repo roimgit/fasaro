@@ -69,6 +69,12 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
             cardClass:
               "bg-[#fffbf7] border-2 border-[#e7d5c4] shadow-2xl text-[#332a24]",
             titleClass: "text-[#9f1239] font-serif",
+            badgeClass: "text-[#9f1239] font-medium tracking-widest",
+            guestBoxClass: "bg-[#fcf5ed] border border-[#e7d5c4] text-[#332a24] shadow-sm",
+            guestLabelClass: "text-stone-700 font-medium",
+            guestNameClass: "text-[#881337] font-bold",
+            guestSubtextClass: "text-stone-600",
+            dateClass: "text-[#5c3e2e] font-semibold tracking-widest",
             buttonClass:
               "bg-gradient-to-r from-rose-700 to-rose-600 hover:from-rose-600 hover:to-rose-500 text-white font-semibold shadow-lg shadow-rose-900/20",
           }}
@@ -162,23 +168,23 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
                     {data.coupleInfo.brideMother || "..."}
                   </p>
                 )}
+                {data.coupleInfo.brideInstagram && (
+                  <a
+                    href={`https://instagram.com/${data.coupleInfo.brideInstagram}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-rose-700 hover:text-rose-900 font-medium"
+                  >
+                    <span>@{data.coupleInfo.brideInstagram}</span>
+                  </a>
+                )}
               </div>
-              {data.coupleInfo.brideInstagram && (
-                <a
-                  href={`https://instagram.com/${data.coupleInfo.brideInstagram}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-block py-1.5 px-3 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-800 text-xs font-semibold"
-                >
-                  @{data.coupleInfo.brideInstagram}
-                </a>
-              )}
             </div>
 
             {/* Mempelai Pria (Adi style) */}
             <div className="p-6 rounded-3xl bg-white border border-[#ebd6c4] shadow-sm flex flex-col justify-between space-y-4">
               <div className="space-y-3">
-                <div className="w-28 h-28 mx-auto rounded-full overflow-hidden bg-rose-50 border-4 border-rose-100 shadow flex items-center justify-center relative">
+                <div className="w-28 h-28 mx-auto rounded-full overflow-hidden bg-stone-50 border-4 border-stone-100 shadow flex items-center justify-center relative">
                   {data.coupleInfo.groomPhoto ? (
                     <Image
                       src={data.coupleInfo.groomPhoto}
@@ -189,10 +195,10 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
                       className="object-cover"
                     />
                   ) : (
-                    <Heart className="w-10 h-10 text-rose-300" />
+                    <Heart className="w-10 h-10 text-stone-300" />
                   )}
                 </div>
-                <h3 className="font-serif text-xl font-bold text-rose-900">
+                <h3 className="font-serif text-xl font-bold text-stone-900">
                   {data.coupleInfo.groomName}
                 </h3>
                 {(data.coupleInfo.groomFather || data.coupleInfo.groomMother) && (
@@ -201,152 +207,145 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
                     {data.coupleInfo.groomMother || "..."}
                   </p>
                 )}
+                {data.coupleInfo.groomInstagram && (
+                  <a
+                    href={`https://instagram.com/${data.coupleInfo.groomInstagram}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-stone-700 hover:text-stone-900 font-medium"
+                  >
+                    <span>@{data.coupleInfo.groomInstagram}</span>
+                  </a>
+                )}
               </div>
-              {data.coupleInfo.groomInstagram && (
-                <a
-                  href={`https://instagram.com/${data.coupleInfo.groomInstagram}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-block py-1.5 px-3 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-800 text-xs font-semibold"
-                >
-                  @{data.coupleInfo.groomInstagram}
-                </a>
-              )}
             </div>
           </div>
         </section>
 
-        {/* Section: Cerita Cinta / Love Story Timeline (Khas WebNikah) */}
-        <section id="cerita" className="space-y-6">
-          <div className="space-y-1">
-            <span className="text-xs uppercase tracking-widest text-rose-700 font-semibold">
-              Kilas Balik
-            </span>
-            <h2 className="text-3xl font-serif font-semibold text-[#332a24]">Cerita Cinta</h2>
-          </div>
-
-          <div className="space-y-4 text-left max-w-lg mx-auto">
-            <div className="p-5 rounded-2xl bg-white border border-[#ebd6c4] shadow-sm relative pl-6 border-l-4 border-l-rose-700">
-              <span className="text-[11px] font-bold text-rose-700">Awal Pertemuan</span>
-              <h4 className="font-bold text-sm text-stone-900 mt-0.5">Pertama Kali Berjumpa</h4>
-              <p className="text-xs text-stone-700 font-normal mt-1 leading-relaxed">
-                Dipertemukan dalam sebuah momen yang tak direncanakan, senyum dan kepribadian santun
-                itu selalu membekas hingga takdir mempertemukan kembali.
+        {/* Section: Kisah Cinta (Story) */}
+        {data.coupleInfo.stories && data.coupleInfo.stories.length > 0 && (
+          <section id="cerita" className="space-y-8">
+            <div className="space-y-2">
+              <h2 className="text-3xl font-serif font-semibold text-rose-900">
+                Kisah Pertemuan
+              </h2>
+              <p className="text-xs text-stone-700 font-medium">
+                Bagaimana langkah kami bermula hingga bersatu dalam janji suci
               </p>
             </div>
 
-            <div className="p-5 rounded-2xl bg-white border border-[#ebd6c4] shadow-sm relative pl-6 border-l-4 border-l-rose-700">
-              <span className="text-[11px] font-bold text-rose-700">Silaturahmi Keluarga</span>
-              <h4 className="font-bold text-sm text-stone-900 mt-0.5">Mengunjungi Rumah Keluarga</h4>
-              <p className="text-xs text-stone-700 font-normal mt-1 leading-relaxed">
-                Niat tulus dipertemukan dengan restu kedua orang tua saat pertama kali bersilaturahmi
-                ke kediaman keluarga besar.
-              </p>
+            <div className="space-y-6 max-w-lg mx-auto text-left relative border-l-2 border-rose-200 ml-4 pl-6 sm:ml-auto">
+              {data.coupleInfo.stories.map((story, idx) => (
+                <div key={idx} className="relative space-y-1">
+                  <div className="absolute -left-[31px] top-1 w-3 h-3 rounded-full bg-rose-600 border-2 border-white shadow-sm" />
+                  <span className="text-xs font-semibold text-rose-700 font-sans tracking-wide">
+                    {story.date}
+                  </span>
+                  <h4 className="font-serif text-base font-bold text-stone-900">
+                    {story.title}
+                  </h4>
+                  <p className="text-xs text-stone-700 leading-relaxed font-normal">
+                    {story.story}
+                  </p>
+                </div>
+              ))}
             </div>
+          </section>
+        )}
 
-            <div className="p-5 rounded-2xl bg-white border border-[#ebd6c4] shadow-sm relative pl-6 border-l-4 border-l-rose-700">
-              <span className="text-[11px] font-bold text-rose-700">Lamaran &amp; Komitmen</span>
-              <h4 className="font-bold text-sm text-stone-900 mt-0.5">Prosesi Lamaran Resmi</h4>
-              <p className="text-xs text-stone-700 font-normal mt-1 leading-relaxed">
-                Mengikat janji awal dalam sebuah acara lamaran hangat dihadiri sanak famili terdekat
-                menuju gerbang pernikahan.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Section: Undangan dan Acara (Akad & Resepsi) */}
+        {/* Section: Rangkaian Acara (Undangan) */}
         <section id="undangan" className="space-y-8">
-          <div className="space-y-1">
-            <span className="text-xs uppercase tracking-widest text-rose-700 font-semibold">
-              Waktu &amp; Agenda
-            </span>
-            <h2 className="text-3xl font-serif font-semibold text-[#332a24]">
-              Undangan &amp; Acara
+          <div className="space-y-2">
+            <h2 className="text-3xl font-serif font-semibold text-rose-900">
+              Rangkaian Acara
             </h2>
+            <p className="text-xs text-stone-700 font-medium">
+              Kehadiran dan doa restu Anda merupakan kehormatan terbesar bagi kami
+            </p>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-6 max-w-lg mx-auto">
             {data.eventSchedules.map((schedule) => (
               <div
                 key={schedule.id ?? schedule.eventName}
-                className="p-6 sm:p-8 rounded-3xl bg-white border border-[#ebd6c4] shadow-sm space-y-5 text-center"
+                className="p-6 sm:p-8 rounded-3xl bg-white border border-[#eadacb] shadow-sm space-y-4"
               >
-                <div className="inline-flex p-2.5 rounded-full bg-rose-50 text-rose-700 mb-1">
-                  <Clock className="w-5 h-5" />
+                <div className="inline-block px-3 py-1 rounded-full bg-rose-50 text-rose-800 text-xs font-semibold">
+                  {schedule.eventName}
                 </div>
-                <h3 className="text-2xl font-serif font-bold text-rose-900">
+                <h3 className="text-2xl font-serif font-bold text-stone-900">
                   {schedule.eventName}
                 </h3>
 
-                <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-semibold text-stone-700">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-xs text-stone-700 font-medium">
                   <span className="flex items-center gap-1.5">
-                    <Calendar className="w-4 h-4 text-rose-700" />
+                    <Calendar className="w-4 h-4 text-rose-600" />
                     {new Date(schedule.date).toLocaleDateString("id-ID", {
+                      weekday: "long",
                       day: "numeric",
                       month: "long",
                       year: "numeric",
                     })}
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <Clock className="w-4 h-4 text-rose-700" />
+                    <Clock className="w-4 h-4 text-rose-600" />
                     {schedule.startTime} {schedule.endTime ? `- ${schedule.endTime}` : "WIB"}
                   </span>
                 </div>
 
-                {/* Tombol Add To Calendar (Khas WebNikah) */}
-                <div className="pt-1">
+                <div className="pt-2">
                   <a
                     href={generateGoogleCalendarUrl(
-                      `${schedule.eventName} - ${data.coupleInfo.brideName} & ${data.coupleInfo.groomName}`,
+                      schedule.eventName,
                       schedule.date,
                       schedule.startTime,
                       schedule.venueName
                     )}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 py-2 px-4 rounded-full text-xs font-semibold bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 transition-all hover:scale-105"
+                    className="inline-flex items-center gap-1.5 text-xs text-rose-700 hover:text-rose-800 font-semibold py-1.5 px-3 rounded-lg border border-rose-200 hover:bg-rose-50 transition-colors"
                   >
                     <CalendarPlus className="w-3.5 h-3.5" />
-                    <span>+ Add To Calendar</span>
+                    <span>Simpan ke Google Calendar</span>
                   </a>
                 </div>
 
-                <div id="peta" className="pt-2">
-                  <GoogleMapEmbed
-                    venueName={schedule.venueName}
-                    address={schedule.address}
-                    mapsUrl={schedule.mapsUrl}
-                    latitude={schedule.latitude}
-                    longitude={schedule.longitude}
-                    themeStyle={{
-                      buttonClass: "bg-rose-800 hover:bg-rose-900 text-white font-medium",
-                    }}
-                  />
-                </div>
+                <GoogleMapEmbed
+                  venueName={schedule.venueName}
+                  address={schedule.address}
+                  mapsUrl={schedule.mapsUrl}
+                  latitude={schedule.latitude}
+                  longitude={schedule.longitude}
+                  themeStyle={{
+                    cardClass: "bg-[#fffaf5] border border-[#ebd6c4] text-stone-900",
+                    venueNameClass: "text-stone-900 font-semibold",
+                    addressClass: "text-stone-700 text-xs",
+                    buttonClass: "bg-rose-800 hover:bg-rose-900 text-white font-medium",
+                    secondaryButtonClass: "border border-[#ebd6c4] bg-white hover:bg-[#fffaf5] text-stone-800 font-medium",
+                  }}
+                />
               </div>
             ))}
           </div>
         </section>
 
-        {/* Section: Galeri Photo */}
+        {/* Section: Galeri Momen (Photos) */}
         {data.galleries && data.galleries.length > 0 && (
           <section id="galeri" className="space-y-6">
-            <div className="space-y-1">
-              <span className="text-xs uppercase tracking-widest text-rose-700 font-semibold">
-                Dokumentasi
-              </span>
-              <h2 className="text-3xl font-serif font-semibold text-[#332a24]">Galeri Photo</h2>
+            <div className="space-y-2">
+              <h2 className="text-3xl font-serif font-semibold text-rose-900">
+                Galeri Foto
+              </h2>
               <p className="text-xs text-stone-700 font-medium">
-                Photo-photo kebahagiaan kami yang kami kenang selalu.
+                Setiap detik bersama adalah lembaran kisah bahagia kami
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3 max-w-lg mx-auto">
               {data.galleries.map((img, idx) => (
                 <div
                   key={img.id ?? idx}
-                  className="relative aspect-square rounded-2xl overflow-hidden bg-[#ecd9c6] border border-[#dfcdb9] shadow-sm"
+                  className="relative aspect-square rounded-2xl overflow-hidden bg-rose-50 border border-rose-100 shadow-sm"
                 >
                   <Image
                     src={img.imageUrl}
@@ -367,9 +366,14 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
           <DigitalGiftBox
             bankAccounts={data.bankAccounts}
             themeStyle={{
-              cardClass: "bg-white border-[#ebd6c4] shadow-sm",
-              badgeClass: "bg-rose-50 text-rose-900 font-bold",
-              buttonClass: "bg-rose-800 hover:bg-rose-900 text-white font-medium",
+              cardClass: "bg-white border border-[#ebd6c4] shadow-sm text-stone-900",
+              titleClass: "text-rose-950 font-serif",
+              subtitleClass: "text-stone-700",
+              badgeClass: "bg-rose-50 text-rose-900 font-bold border border-rose-200",
+              accountNumberClass: "text-rose-950 font-mono font-bold",
+              accountHolderClass: "text-stone-700",
+              qrisButtonClass: "text-rose-700 hover:text-rose-800 font-semibold",
+              buttonClass: "bg-rose-800 hover:bg-rose-900 text-white font-semibold",
             }}
           />
         </section>
@@ -380,9 +384,16 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
             invitationId={data.id}
             defaultGuestName={guestName}
             themeStyle={{
-              cardClass: "bg-white border-[#ebd6c4] shadow-md",
+              cardClass: "bg-white border border-[#ebd6c4] shadow-md text-stone-900",
+              titleClass: "text-rose-950 font-serif",
+              subtitleClass: "text-stone-700",
+              labelClass: "text-stone-800 font-semibold",
+              statusButtonClass: "bg-white border-stone-300 text-stone-700 hover:border-rose-400",
+              statusButtonActiveClass: "bg-rose-800 border-rose-800 text-white font-semibold shadow-sm",
               buttonClass: "bg-rose-800 hover:bg-rose-900 text-white font-semibold",
-              inputClass: "bg-[#fffaf5] border-[#ebd6c4] text-stone-900",
+              inputClass: "bg-[#fffaf5] border-[#ebd6c4] text-stone-900 placeholder:text-stone-400",
+              submittedTitleClass: "text-rose-950 font-serif",
+              submittedSubtitleClass: "text-stone-700",
             }}
           />
         </section>
@@ -392,25 +403,32 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
           <WishesWallSection
             invitationId={data.id}
             themeStyle={{
-              cardClass: "bg-white border-[#ebd6c4] shadow-md",
-              bubbleClass: "bg-[#fffaf5] border-[#ebd6c4] text-stone-800",
+              cardClass: "bg-white border border-[#ebd6c4] shadow-md text-stone-900",
+              titleClass: "text-rose-950 font-serif",
+              subtitleClass: "text-stone-700",
+              bubbleClass: "bg-[#fffaf5] border border-[#ebd6c4] text-stone-900",
+              senderClass: "text-rose-950 font-bold",
+              messageClass: "text-stone-800",
+              dateClass: "text-stone-600 font-medium",
+              emptyTextClass: "text-stone-600",
+              loadingTextClass: "text-stone-600",
               buttonClass: "bg-rose-800 hover:bg-rose-900 text-white font-semibold",
-              inputClass: "bg-[#fffaf5] border-[#ebd6c4] text-stone-900",
+              inputClass: "bg-[#fffaf5] border-[#ebd6c4] text-stone-900 placeholder:text-stone-400",
             }}
           />
         </section>
 
         {/* Footer */}
-        <footer className="pt-8 text-stone-600 text-xs space-y-1 font-medium">
+        <footer className="pt-8 text-stone-700 text-xs space-y-1 font-medium">
           <p>Digital Invitation by Fasaro &bull; WebNikah Edition</p>
-          <p className="text-[11px] text-stone-500">Terima kasih atas doa &amp; restu Anda</p>
+          <p className="text-[11px] text-stone-600">Terima kasih atas doa &amp; restu Anda</p>
         </footer>
       </main>
 
       {/* 2. Floating Bottom Navigation Bar (Khas WebNikah) */}
       {!isEmbedded && (
         <nav
-          className={`fixed bottom-3 left-1/2 -translate-x-1/2 z-40 transform-gpu will-change-transform bg-white/95 dark:bg-stone-900/95 backdrop-blur-sm px-4 py-2 rounded-full border border-stone-200 dark:border-stone-800 shadow-xl flex items-center gap-3 sm:gap-5 text-stone-800 dark:text-stone-200 transition-all duration-500 ${
+          className={`fixed bottom-3 left-1/2 -translate-x-1/2 z-40 transform-gpu will-change-transform bg-white/95 backdrop-blur-sm px-4 py-2 rounded-full border border-stone-200 shadow-xl flex items-center gap-3 sm:gap-5 text-stone-800 transition-all duration-500 ${
             isOpen
               ? "opacity-100 translate-y-0 pointer-events-auto"
               : "opacity-0 translate-y-10 pointer-events-none"

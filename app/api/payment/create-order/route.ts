@@ -47,6 +47,16 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     // 1. If Automatic Gateway (Midtrans Snap)
     if (paymentType === "GATEWAY") {
+      const midtransFlag = await prisma.systemSetting.findUnique({
+        where: { key: "feature_midtrans_payment" },
+      });
+      if (midtransFlag && midtransFlag.value === "false") {
+        return NextResponse.json(
+          { error: "Pembayaran otomatis via Midtrans sedang dalam pemeliharaan. Silakan gunakan metode Transfer Bank / QRIS Manual." },
+          { status: 403 }
+        );
+      }
+
       const snapData = await createSnapTransaction(orderId, amount, {
         first_name: session.email.split("@")[0],
         email: session.email,
@@ -79,6 +89,16 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     // 2. If Manual Transfer (QRIS / Bank)
+    const manualFlag = await prisma.systemSetting.findUnique({
+      where: { key: "feature_manual_payment" },
+    });
+    if (manualFlag && manualFlag.value === "false") {
+      return NextResponse.json(
+        { error: "Metode transfer manual sementara ditutup untuk pemeliharaan sistem." },
+        { status: 403 }
+      );
+    }
+
     if (!proofImageUrl) {
       return NextResponse.json(
         { error: "Bukti transfer (proofImageUrl) wajib diunggah untuk metode manual" },

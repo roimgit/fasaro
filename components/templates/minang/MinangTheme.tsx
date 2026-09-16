@@ -13,6 +13,7 @@ import CountdownTimer from "../shared/CountdownTimer";
 import FloatingAudioPlayer from "../shared/FloatingAudioPlayer";
 import HeroCover from "../shared/HeroCover";
 import DigitalGiftBox from "../shared/DigitalGiftBox";
+import RsvpFormSection from "../shared/RsvpFormSection";
 import WishesWallSection from "../shared/WishesWallSection";
 
 interface MinangThemeProps {
@@ -104,6 +105,12 @@ export const MinangTheme: React.FC<MinangThemeProps> = ({
               "bg-[#22120a]/95 border-2 border-amber-500/50 shadow-[0_0_50px_rgba(217,119,6,0.3)] text-amber-100 backdrop-blur-md",
             titleClass:
               "text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-200 font-serif",
+            badgeClass: "text-amber-300 font-serif tracking-widest font-semibold",
+            guestBoxClass: "bg-[#180c06] border border-amber-500/40 text-amber-100 shadow-inner",
+            guestLabelClass: "text-amber-200/90 font-medium",
+            guestNameClass: "text-amber-300 font-bold",
+            guestSubtextClass: "text-amber-200/70",
+            dateClass: "text-amber-200 font-semibold tracking-widest",
             buttonClass:
               "bg-gradient-to-r from-amber-600 via-yellow-600 to-amber-700 hover:from-amber-500 hover:to-yellow-500 text-stone-950 font-bold shadow-xl shadow-amber-900/40 tracking-wider",
           }}
@@ -179,7 +186,7 @@ export const MinangTheme: React.FC<MinangThemeProps> = ({
                     "bg-[#190b05] border-amber-500/40 shadow-inner",
                   numberClass:
                     "text-transparent bg-clip-text bg-gradient-to-b from-amber-200 via-amber-400 to-yellow-300 font-serif font-bold",
-                  labelClass: "text-amber-200/70 text-[9px] uppercase tracking-wider",
+                  labelClass: "text-amber-200 font-semibold text-[9px] uppercase tracking-wider",
                 }}
               />
             </div>
@@ -205,7 +212,7 @@ export const MinangTheme: React.FC<MinangThemeProps> = ({
             <h2 className="text-3xl font-serif font-bold text-amber-200">
               Anak Daro &amp; Marapulai
             </h2>
-            <p className="text-xs text-amber-100/70 max-w-md mx-auto">
+            <p className="text-xs text-amber-100/90 max-w-md mx-auto">
               Dengan memohon rahmat dan ridho Allah SWT, serta restu dari ninik mamak dan keluarga besar kedua belah pihak:
             </p>
           </div>
@@ -240,7 +247,7 @@ export const MinangTheme: React.FC<MinangThemeProps> = ({
                     {data.coupleInfo.brideName}
                   </h3>
                   {data.coupleInfo.brideFather && (
-                    <p className="text-xs text-amber-100/80 leading-relaxed">
+                    <p className="text-xs text-amber-100/90 leading-relaxed">
                       Putri tercinta dari Bpk. {data.coupleInfo.brideFather}
                       {data.coupleInfo.brideMother && ` & Ibu ${data.coupleInfo.brideMother}`}
                     </p>
@@ -292,7 +299,7 @@ export const MinangTheme: React.FC<MinangThemeProps> = ({
                     {data.coupleInfo.groomName}
                   </h3>
                   {data.coupleInfo.groomFather && (
-                    <p className="text-xs text-amber-100/80 leading-relaxed">
+                    <p className="text-xs text-amber-100/90 leading-relaxed">
                       Putra tercinta dari Bpk. {data.coupleInfo.groomFather}
                       {data.coupleInfo.groomMother && ` & Ibu ${data.coupleInfo.groomMother}`}
                     </p>
@@ -326,7 +333,7 @@ export const MinangTheme: React.FC<MinangThemeProps> = ({
             <h2 className="text-3xl font-serif font-bold text-amber-200">
               Waktu &amp; Tempat Acara
             </h2>
-            <p className="text-xs text-amber-100/70 max-w-md mx-auto">
+            <p className="text-xs text-amber-100/90 max-w-md mx-auto">
               Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir memberikan doa restu.
             </p>
           </div>
@@ -371,7 +378,7 @@ export const MinangTheme: React.FC<MinangThemeProps> = ({
                       <MapPin className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                       <div>
                         <p className="font-bold text-amber-200">{event.venueName}</p>
-                        <p className="text-amber-100/70 text-[11px] mt-0.5">{event.address}</p>
+                        <p className="text-amber-100/90 text-[11px] mt-0.5">{event.address}</p>
                       </div>
                     </div>
                   </div>
@@ -425,7 +432,7 @@ export const MinangTheme: React.FC<MinangThemeProps> = ({
                     {s.date}
                   </span>
                   <h3 className="font-serif font-bold text-base text-amber-200">{s.title}</h3>
-                  <p className="text-xs text-amber-100/70 leading-relaxed">{s.story}</p>
+                  <p className="text-xs text-amber-100/90 leading-relaxed">{s.story}</p>
                 </div>
               ))}
             </div>
@@ -442,7 +449,7 @@ export const MinangTheme: React.FC<MinangThemeProps> = ({
               <h2 className="text-3xl font-serif font-bold text-amber-200">
                 Galeri Prewedding Adat
               </h2>
-              <p className="text-xs text-amber-100/70">
+              <p className="text-xs text-amber-100/90">
                 Potret kenangan terindah dalam balutan busana adat Minangkabau
               </p>
             </div>
@@ -481,18 +488,22 @@ export const MinangTheme: React.FC<MinangThemeProps> = ({
               <h2 className="text-3xl font-serif font-bold text-amber-200">
                 Carano Tanda Kasih Digital
               </h2>
-              <p className="text-xs text-amber-100/70 max-w-md mx-auto">
+              <p className="text-xs text-amber-100/90 max-w-md mx-auto">
                 Doa restu Anda merupakan karunia terindah bagi kami. Bagi keluarga dan handai taulan yang berkenan memberikan tanda kasih, dapat disalurkan melalui:
               </p>
             </div>
 
             <DigitalGiftBox
               bankAccounts={data.bankAccounts}
+              hideHeader={true}
               themeStyle={{
                 cardClass:
                   "bg-gradient-to-b from-[#2a160d] to-[#1e0e07] border border-amber-500/40 text-amber-100 shadow-xl",
                 badgeClass:
                   "bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30",
+                accountNumberClass: "text-amber-200 font-mono font-bold",
+                accountHolderClass: "text-amber-100/90",
+                qrisButtonClass: "text-amber-300 hover:text-amber-200 font-semibold",
                 buttonClass:
                   "bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-stone-950 font-bold",
               }}
@@ -500,7 +511,38 @@ export const MinangTheme: React.FC<MinangThemeProps> = ({
           </section>
         )}
 
-        {/* Section 8: Pasambahan Doa & Buku Tamu */}
+        {/* Section 8: Konfirmasi Kehadiran (RSVP) */}
+        <section id="rsvp" className="space-y-6">
+          <div className="space-y-2">
+            <span className="text-[11px] uppercase tracking-[0.25em] text-amber-400 font-semibold">
+              Konfirmasi Kehadiran
+            </span>
+            <h2 className="text-3xl font-serif font-bold text-amber-200">
+              Kaba Baralek &amp; RSVP
+            </h2>
+            <p className="text-xs text-amber-100/90 max-w-md mx-auto">
+              Mohon konfirmasi kehadiran Dunsanak jo Kamanakan sarato tamu kehormatan untuak persiapan jamuan kami
+            </p>
+          </div>
+
+          <RsvpFormSection
+            invitationId={data.id}
+            defaultGuestName={guestName}
+            hideHeader={true}
+            themeStyle={{
+              cardClass: "bg-[#241208] border border-amber-500/30 text-amber-100 shadow-xl",
+              labelClass: "text-amber-200 font-medium",
+              inputClass: "bg-[#1b0d06] border-amber-500/40 text-amber-100 placeholder:text-amber-200/40 focus:border-amber-400 focus:ring-amber-500/20",
+              statusButtonClass: "bg-[#180b05] border-amber-500/30 text-amber-200 hover:border-amber-400",
+              statusButtonActiveClass: "bg-gradient-to-r from-amber-500 to-yellow-500 border-amber-500 text-stone-950 font-bold shadow-md",
+              buttonClass: "bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-stone-950 font-bold shadow-md shadow-amber-950/40",
+              submittedTitleClass: "text-amber-200 font-serif",
+              submittedSubtitleClass: "text-amber-100/90",
+            }}
+          />
+        </section>
+
+        {/* Section 9: Pasambahan Doa & Buku Tamu */}
         <section id="doa" className="space-y-6">
           <div className="space-y-2">
             <span className="text-[11px] uppercase tracking-[0.25em] text-amber-400 font-semibold">
@@ -509,13 +551,14 @@ export const MinangTheme: React.FC<MinangThemeProps> = ({
             <h2 className="text-3xl font-serif font-bold text-amber-200">
               Untaian Doa &amp; Restu
             </h2>
-            <p className="text-xs text-amber-100/70 max-w-md mx-auto">
+            <p className="text-xs text-amber-100/90 max-w-md mx-auto">
               Kirimkan doa tulus dan harapan terbaik bagi kedua mempelai
             </p>
           </div>
 
           <WishesWallSection
             invitationId={data.id}
+            hideHeader={true}
             themeStyle={{
               inputClass:
                 "bg-[#241208] border-amber-500/40 text-amber-100 placeholder:text-amber-200/40 focus:border-amber-400 focus:ring-amber-500/20",
@@ -524,7 +567,13 @@ export const MinangTheme: React.FC<MinangThemeProps> = ({
               cardClass:
                 "bg-[#241208] border-amber-500/30 text-amber-100 shadow-md",
               bubbleClass:
-                "bg-[#1e0e07] border border-amber-500/20 text-amber-100/90",
+                "bg-[#1e0e07] border border-amber-500/30 text-amber-100",
+              senderClass: "text-amber-300 font-serif font-bold",
+              messageClass: "text-amber-100 leading-relaxed",
+              dateClass: "text-amber-400/80 font-mono",
+              emptyTextClass: "text-amber-200/70",
+              loadingTextClass: "text-amber-200/70",
+              reactionButtonClass: "hover:bg-amber-900/40",
             }}
           />
         </section>

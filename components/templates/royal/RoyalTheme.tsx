@@ -43,9 +43,15 @@ export const RoyalTheme: React.FC<ThemeProps> = ({
           themeStyle={{
             containerClass: "bg-[#020617]/95 text-slate-100",
             cardClass:
-              "bg-gradient-to-b from-[#0f172a] to-[#020617] border-2 border-amber-500/50 shadow-[0_0_50px_rgba(245,158,11,0.2)]",
+              "bg-gradient-to-b from-[#0f172a] to-[#020617] border-2 border-amber-500/50 shadow-[0_0_50px_rgba(245,158,11,0.2)] text-slate-100",
             titleClass:
               "text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-100 font-serif",
+            badgeClass: "text-amber-300 font-semibold",
+            guestBoxClass: "bg-slate-950/80 border-amber-500/30 text-slate-100 shadow-inner",
+            guestLabelClass: "text-amber-200/80 font-medium",
+            guestNameClass: "text-amber-300 font-bold",
+            guestSubtextClass: "text-slate-400",
+            dateClass: "text-amber-200 font-semibold tracking-widest",
             buttonClass:
               "bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold shadow-lg shadow-amber-500/30",
           }}
@@ -74,7 +80,7 @@ export const RoyalTheme: React.FC<ThemeProps> = ({
           </h1>
 
           {primaryEvent?.date && (
-            <p className="text-xs tracking-widest text-slate-400 uppercase pt-2">
+            <p className="text-xs tracking-widest text-slate-300 font-medium uppercase pt-2">
               {new Date(primaryEvent.date).toLocaleDateString("id-ID", {
                 weekday: "long",
                 day: "numeric",
@@ -98,7 +104,7 @@ export const RoyalTheme: React.FC<ThemeProps> = ({
                 boxClass: "bg-[#0b1329] border-amber-500/40 shadow-inner",
                 numberClass:
                   "text-transparent bg-clip-text bg-gradient-to-b from-amber-200 to-amber-400 font-serif font-bold",
-                labelClass: "text-slate-400",
+                labelClass: "text-amber-300/80 font-semibold",
               }}
             />
           </section>
@@ -107,7 +113,7 @@ export const RoyalTheme: React.FC<ThemeProps> = ({
         {/* Couple Info */}
         <section className="space-y-12">
           <div className="max-w-md mx-auto">
-            <p className="text-xs text-slate-300/80 italic leading-relaxed">
+            <p className="text-xs text-slate-200/90 italic leading-relaxed">
               &quot;{data.coupleInfo.greetingMessage ||
                 "Dengan segala puji bagi Tuhan Yang Maha Pengasih, kami bermaksud mengikat janji suci dalam upacara pernikahan agung."}&quot;
             </p>
@@ -132,7 +138,7 @@ export const RoyalTheme: React.FC<ThemeProps> = ({
                 {data.coupleInfo.groomName}
               </h3>
               {(data.coupleInfo.groomFather || data.coupleInfo.groomMother) && (
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-300">
                   Putra dari Bpk. {data.coupleInfo.groomFather || "..."} &amp; Ibu{" "}
                   {data.coupleInfo.groomMother || "..."}
                 </p>
@@ -168,7 +174,7 @@ export const RoyalTheme: React.FC<ThemeProps> = ({
                 {data.coupleInfo.brideName}
               </h3>
               {(data.coupleInfo.brideFather || data.coupleInfo.brideMother) && (
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-300">
                   Putri dari Bpk. {data.coupleInfo.brideFather || "..."} &amp; Ibu{" "}
                   {data.coupleInfo.brideMother || "..."}
                 </p>
@@ -204,7 +210,7 @@ export const RoyalTheme: React.FC<ThemeProps> = ({
                 <h3 className="text-xl font-serif text-amber-200 font-medium">
                   {schedule.eventName}
                 </h3>
-                <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-300">
+                <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-200">
                   <span className="flex items-center gap-1.5">
                     <Calendar className="w-4 h-4 text-amber-400" />
                     {new Date(schedule.date).toLocaleDateString("id-ID", {
@@ -226,8 +232,13 @@ export const RoyalTheme: React.FC<ThemeProps> = ({
                   latitude={schedule.latitude}
                   longitude={schedule.longitude}
                   themeStyle={{
+                    cardClass: "bg-slate-950/80 border border-amber-500/30 text-slate-100",
+                    venueNameClass: "text-amber-200 font-serif font-bold",
+                    addressClass: "text-slate-300 text-xs",
                     buttonClass:
                       "bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold",
+                    secondaryButtonClass:
+                      "border border-amber-500/40 bg-slate-900/80 hover:bg-slate-800 text-amber-200",
                   }}
                 />
               </div>
@@ -266,8 +277,13 @@ export const RoyalTheme: React.FC<ThemeProps> = ({
         <DigitalGiftBox
           bankAccounts={data.bankAccounts}
           themeStyle={{
-            cardClass: "bg-slate-900/90 border-amber-500/30",
+            titleClass: "text-amber-100 font-serif",
+            subtitleClass: "text-slate-300",
+            cardClass: "bg-slate-900/90 border-amber-500/30 text-slate-100",
             badgeClass: "bg-amber-500/20 text-amber-300 border border-amber-400/40",
+            accountNumberClass: "text-amber-200",
+            accountHolderClass: "text-slate-300",
+            qrisButtonClass: "text-amber-300 hover:text-amber-200 font-semibold",
             buttonClass:
               "bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold",
           }}
@@ -278,10 +294,17 @@ export const RoyalTheme: React.FC<ThemeProps> = ({
           invitationId={data.id}
           defaultGuestName={guestName}
           themeStyle={{
-            cardClass: "bg-slate-900/95 border-amber-500/30 shadow-[0_0_30px_rgba(245,158,11,0.1)]",
+            cardClass: "bg-slate-900/95 border-amber-500/30 text-slate-100 shadow-[0_0_30px_rgba(245,158,11,0.1)]",
+            titleClass: "text-amber-100 font-serif",
+            subtitleClass: "text-slate-300",
+            labelClass: "text-amber-200 font-medium",
+            statusButtonClass: "bg-slate-950 border-slate-700 text-slate-200 hover:border-amber-400",
+            statusButtonActiveClass: "bg-amber-500 border-amber-500 text-slate-950 font-bold shadow-md",
             buttonClass:
               "bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold",
-            inputClass: "bg-slate-950 border-slate-800 text-slate-100 focus:ring-amber-500",
+            inputClass: "bg-slate-950 border-slate-800 text-slate-100 focus:ring-amber-500 placeholder:text-slate-500",
+            submittedTitleClass: "text-amber-200 font-serif",
+            submittedSubtitleClass: "text-slate-300",
           }}
         />
 
@@ -289,15 +312,23 @@ export const RoyalTheme: React.FC<ThemeProps> = ({
         <WishesWallSection
           invitationId={data.id}
           themeStyle={{
-            cardClass: "bg-slate-900/95 border-amber-500/30 shadow-[0_0_30px_rgba(245,158,11,0.1)]",
+            cardClass: "bg-slate-900/95 border-amber-500/30 text-slate-100 shadow-[0_0_30px_rgba(245,158,11,0.1)]",
+            titleClass: "text-amber-100 font-serif",
+            subtitleClass: "text-slate-300",
             bubbleClass: "bg-slate-950 border-slate-800 text-slate-200",
+            senderClass: "text-amber-300 font-bold",
+            messageClass: "text-slate-200",
+            dateClass: "text-slate-400",
+            emptyTextClass: "text-slate-400",
+            loadingTextClass: "text-slate-400",
+            reactionButtonClass: "hover:bg-slate-800",
             buttonClass:
               "bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold",
-            inputClass: "bg-slate-950 border-slate-800 text-slate-100 focus:ring-amber-500",
+            inputClass: "bg-slate-950 border-slate-800 text-slate-100 focus:ring-amber-500 placeholder:text-slate-500",
           }}
         />
 
-        <footer className="pt-12 pb-8 text-amber-500/60 text-xs tracking-widest uppercase">
+        <footer className="pt-12 pb-8 text-amber-400/80 text-xs tracking-widest uppercase">
           <p>FASARO &bull; Royal Luxury Wedding Edition</p>
         </footer>
       </main>

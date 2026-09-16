@@ -40,10 +40,16 @@ export const MinimalistTheme: React.FC<ThemeProps> = ({
           isEmbedded={isEmbedded}
           onOpenInvitation={() => setIsOpen(true)}
           themeStyle={{
-            containerClass: "bg-stone-900/95 text-stone-100",
-            cardClass: "bg-white text-stone-900 border-stone-200",
+            containerClass: "bg-stone-950/90 text-stone-100",
+            cardClass: "bg-white text-stone-900 border border-stone-200 shadow-2xl",
             titleClass: "text-stone-900 font-serif",
-            buttonClass: "bg-stone-900 hover:bg-stone-800 text-white",
+            badgeClass: "text-stone-600 font-medium tracking-widest",
+            guestBoxClass: "bg-stone-50 border border-stone-200 text-stone-900 shadow-sm",
+            guestLabelClass: "text-stone-600 font-medium",
+            guestNameClass: "text-stone-900 font-bold",
+            guestSubtextClass: "text-stone-500",
+            dateClass: "text-stone-700 font-semibold tracking-widest",
+            buttonClass: "bg-stone-900 hover:bg-stone-800 text-white font-medium shadow-md",
           }}
         />
       )}
@@ -55,16 +61,16 @@ export const MinimalistTheme: React.FC<ThemeProps> = ({
       <main className="max-w-xl mx-auto px-4 py-16 text-center space-y-20">
         {/* Header Hero */}
         <section className="space-y-4 pt-10">
-          <p className="text-xs uppercase tracking-[0.4em] text-stone-500 font-medium">
+          <p className="text-xs uppercase tracking-[0.4em] text-stone-600 font-semibold">
             The Wedding Of
           </p>
           <h1 className="text-4xl sm:text-5xl font-serif font-light tracking-tight text-stone-900">
             {data.coupleInfo.groomName}
-            <span className="block text-2xl font-serif text-stone-400 my-2">&amp;</span>
+            <span className="block text-2xl font-serif text-stone-500 my-2">&amp;</span>
             {data.coupleInfo.brideName}
           </h1>
           {primaryEvent?.date && (
-            <p className="text-xs tracking-widest text-stone-600 uppercase pt-2">
+            <p className="text-xs tracking-widest text-stone-700 uppercase font-semibold pt-2">
               {new Date(primaryEvent.date).toLocaleDateString("id-ID", {
                 weekday: "long",
                 day: "numeric",
@@ -78,13 +84,13 @@ export const MinimalistTheme: React.FC<ThemeProps> = ({
         {/* Countdown */}
         {primaryEvent?.date && (
           <section className="border-y border-stone-200 py-8">
-            <p className="text-xs tracking-widest uppercase text-stone-400 mb-2">Menghitung Hari</p>
+            <p className="text-xs tracking-widest uppercase text-stone-600 mb-2 font-semibold">Menghitung Hari</p>
             <CountdownTimer
               targetDate={primaryEvent.date}
               themeStyle={{
                 boxClass: "bg-white border-stone-200 shadow-sm",
                 numberClass: "text-stone-900 font-serif",
-                labelClass: "text-stone-500",
+                labelClass: "text-stone-600 font-semibold",
               }}
             />
           </section>
@@ -93,7 +99,7 @@ export const MinimalistTheme: React.FC<ThemeProps> = ({
         {/* Couple Info */}
         <section className="space-y-12">
           <div className="max-w-md mx-auto">
-            <p className="text-xs text-stone-500 italic leading-relaxed">
+            <p className="text-xs text-stone-700 italic leading-relaxed font-serif">
               &quot;{data.coupleInfo.greetingMessage ||
                 "Maha Suci Allah yang telah menciptakan makhluk-Nya berpasang-pasangan. Dengan memohon rahmat dan ridho-Nya, kami bermaksud menyelenggarakan pernikahan kami."}&quot;
             </p>
@@ -111,12 +117,12 @@ export const MinimalistTheme: React.FC<ThemeProps> = ({
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <Heart className="w-8 h-8 text-stone-300" />
+                  <Heart className="w-8 h-8 text-stone-400" />
                 )}
               </div>
-              <h3 className="font-serif text-lg font-medium">{data.coupleInfo.groomName}</h3>
+              <h3 className="font-serif text-lg font-medium text-stone-900">{data.coupleInfo.groomName}</h3>
               {(data.coupleInfo.groomFather || data.coupleInfo.groomMother) && (
-                <p className="text-xs text-stone-500">
+                <p className="text-xs text-stone-600 font-medium">
                   Putra dari Bpk. {data.coupleInfo.groomFather || "..."} &amp; Ibu{" "}
                   {data.coupleInfo.groomMother || "..."}
                 </p>
@@ -126,7 +132,7 @@ export const MinimalistTheme: React.FC<ThemeProps> = ({
                   href={`https://instagram.com/${data.coupleInfo.groomInstagram}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1 text-xs text-stone-400 hover:text-stone-700"
+                  className="inline-flex items-center gap-1 text-xs text-stone-600 hover:text-stone-900 font-medium"
                 >
                   <Camera className="w-3.5 h-3.5" />
                   <span>@{data.coupleInfo.groomInstagram}</span>
@@ -145,12 +151,12 @@ export const MinimalistTheme: React.FC<ThemeProps> = ({
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <Heart className="w-8 h-8 text-stone-300" />
+                  <Heart className="w-8 h-8 text-stone-400" />
                 )}
               </div>
-              <h3 className="font-serif text-lg font-medium">{data.coupleInfo.brideName}</h3>
+              <h3 className="font-serif text-lg font-medium text-stone-900">{data.coupleInfo.brideName}</h3>
               {(data.coupleInfo.brideFather || data.coupleInfo.brideMother) && (
-                <p className="text-xs text-stone-500">
+                <p className="text-xs text-stone-600 font-medium">
                   Putri dari Bpk. {data.coupleInfo.brideFather || "..."} &amp; Ibu{" "}
                   {data.coupleInfo.brideMother || "..."}
                 </p>
@@ -160,7 +166,7 @@ export const MinimalistTheme: React.FC<ThemeProps> = ({
                   href={`https://instagram.com/${data.coupleInfo.brideInstagram}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1 text-xs text-stone-400 hover:text-stone-700"
+                  className="inline-flex items-center gap-1 text-xs text-stone-600 hover:text-stone-900 font-medium"
                 >
                   <Camera className="w-3.5 h-3.5" />
                   <span>@{data.coupleInfo.brideInstagram}</span>
@@ -173,7 +179,7 @@ export const MinimalistTheme: React.FC<ThemeProps> = ({
         {/* Schedules */}
         <section className="space-y-8">
           <div className="space-y-1">
-            <p className="text-xs uppercase tracking-widest text-stone-400">Rangkaian Acara</p>
+            <p className="text-xs uppercase tracking-widest text-stone-600 font-semibold">Rangkaian Acara</p>
             <h2 className="text-2xl font-serif font-light text-stone-900">Agenda Bahagia</h2>
           </div>
 
@@ -183,10 +189,10 @@ export const MinimalistTheme: React.FC<ThemeProps> = ({
                 key={schedule.id ?? schedule.eventName}
                 className="p-6 rounded-3xl bg-white border border-stone-200 shadow-sm space-y-4"
               >
-                <h3 className="text-lg font-serif font-semibold">{schedule.eventName}</h3>
-                <div className="flex items-center justify-center gap-6 text-xs text-stone-600">
+                <h3 className="text-lg font-serif font-semibold text-stone-900">{schedule.eventName}</h3>
+                <div className="flex items-center justify-center gap-6 text-xs text-stone-700 font-medium">
                   <span className="flex items-center gap-1.5">
-                    <Calendar className="w-4 h-4 text-stone-400" />
+                    <Calendar className="w-4 h-4 text-stone-600" />
                     {new Date(schedule.date).toLocaleDateString("id-ID", {
                       day: "numeric",
                       month: "long",
@@ -194,7 +200,7 @@ export const MinimalistTheme: React.FC<ThemeProps> = ({
                     })}
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <Clock className="w-4 h-4 text-stone-400" />
+                    <Clock className="w-4 h-4 text-stone-600" />
                     {schedule.startTime} {schedule.endTime ? `- ${schedule.endTime}` : "WIB"}
                   </span>
                 </div>
@@ -206,7 +212,11 @@ export const MinimalistTheme: React.FC<ThemeProps> = ({
                   latitude={schedule.latitude}
                   longitude={schedule.longitude}
                   themeStyle={{
-                    buttonClass: "bg-stone-900 hover:bg-stone-800 text-white",
+                    cardClass: "bg-stone-50 border border-stone-200 text-stone-900",
+                    venueNameClass: "text-stone-900 font-semibold",
+                    addressClass: "text-stone-600 text-xs",
+                    buttonClass: "bg-stone-900 hover:bg-stone-800 text-white font-medium",
+                    secondaryButtonClass: "border border-stone-300 bg-white hover:bg-stone-50 text-stone-900 font-medium",
                   }}
                 />
               </div>
@@ -218,7 +228,7 @@ export const MinimalistTheme: React.FC<ThemeProps> = ({
         {data.galleries && data.galleries.length > 0 && (
           <section className="space-y-6">
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-widest text-stone-400">Galeri Foto</p>
+              <p className="text-xs uppercase tracking-widest text-stone-600 font-semibold">Galeri Foto</p>
               <h2 className="text-2xl font-serif font-light text-stone-900">Momen Bahagia</h2>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -245,9 +255,14 @@ export const MinimalistTheme: React.FC<ThemeProps> = ({
         <DigitalGiftBox
           bankAccounts={data.bankAccounts}
           themeStyle={{
-            cardClass: "bg-white border-stone-200",
-            badgeClass: "bg-stone-100 text-stone-800",
-            buttonClass: "bg-stone-900 hover:bg-stone-800 text-white",
+            titleClass: "text-stone-900 font-serif",
+            subtitleClass: "text-stone-600",
+            cardClass: "bg-white border border-stone-200 text-stone-900",
+            badgeClass: "bg-stone-100 text-stone-800 font-bold border border-stone-200",
+            accountNumberClass: "text-stone-900 font-mono font-bold",
+            accountHolderClass: "text-stone-600",
+            qrisButtonClass: "text-amber-700 hover:text-amber-800 font-semibold",
+            buttonClass: "bg-stone-900 hover:bg-stone-800 text-white font-medium",
           }}
         />
 
@@ -256,9 +271,16 @@ export const MinimalistTheme: React.FC<ThemeProps> = ({
           invitationId={data.id}
           defaultGuestName={guestName}
           themeStyle={{
-            cardClass: "bg-white border-stone-200",
-            buttonClass: "bg-stone-900 hover:bg-stone-800 text-white",
-            inputClass: "bg-stone-50 border-stone-200 text-stone-900",
+            cardClass: "bg-white border border-stone-200 text-stone-900 shadow-sm",
+            titleClass: "text-stone-900 font-serif",
+            subtitleClass: "text-stone-600",
+            labelClass: "text-stone-800 font-medium",
+            statusButtonClass: "bg-white border-stone-300 text-stone-700 hover:border-stone-900",
+            statusButtonActiveClass: "bg-stone-900 border-stone-900 text-white font-semibold shadow-sm",
+            buttonClass: "bg-stone-900 hover:bg-stone-800 text-white font-medium",
+            inputClass: "bg-stone-50 border-stone-300 text-stone-900 placeholder:text-stone-400",
+            submittedTitleClass: "text-stone-900 font-serif",
+            submittedSubtitleClass: "text-stone-600",
           }}
         />
 
@@ -266,14 +288,21 @@ export const MinimalistTheme: React.FC<ThemeProps> = ({
         <WishesWallSection
           invitationId={data.id}
           themeStyle={{
-            cardClass: "bg-white border-stone-200",
-            bubbleClass: "bg-stone-50 border-stone-100 text-stone-800",
-            buttonClass: "bg-stone-900 hover:bg-stone-800 text-white",
-            inputClass: "bg-stone-50 border-stone-200 text-stone-900",
+            cardClass: "bg-white border border-stone-200 text-stone-900 shadow-sm",
+            titleClass: "text-stone-900 font-serif",
+            subtitleClass: "text-stone-600",
+            bubbleClass: "bg-stone-50 border border-stone-200 text-stone-800",
+            senderClass: "text-stone-900 font-bold",
+            messageClass: "text-stone-800",
+            dateClass: "text-stone-500 font-medium",
+            emptyTextClass: "text-stone-500",
+            loadingTextClass: "text-stone-500",
+            buttonClass: "bg-stone-900 hover:bg-stone-800 text-white font-medium",
+            inputClass: "bg-stone-50 border-stone-300 text-stone-900 placeholder:text-stone-400",
           }}
         />
 
-        <footer className="pt-12 pb-8 text-stone-400 text-xs tracking-wider">
+        <footer className="pt-12 pb-8 text-stone-600 text-xs tracking-wider font-medium">
           <p>FASARO &bull; Digital Wedding Invitation</p>
         </footer>
       </main>

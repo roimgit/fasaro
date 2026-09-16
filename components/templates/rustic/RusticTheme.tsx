@@ -41,9 +41,15 @@ export const RusticTheme: React.FC<ThemeProps> = ({
           onOpenInvitation={() => setIsOpen(true)}
           themeStyle={{
             containerClass: "bg-[#2d221c]/90 text-[#faf5ee]",
-            cardClass: "bg-[#382b24]/90 text-[#faf5ee] border-[#8a6847]/40",
+            cardClass: "bg-[#382b24]/95 text-[#faf5ee] border-2 border-[#8a6847]/60 shadow-2xl",
             titleClass: "text-[#ecd9c6] font-serif",
-            buttonClass: "bg-[#966b43] hover:bg-[#835b36] text-[#faf5ee] shadow-[#2d221c]/40",
+            badgeClass: "text-[#ecd9c6] tracking-widest font-medium",
+            guestBoxClass: "bg-[#281e18] border border-[#8a6847]/40 text-[#faf5ee] shadow-inner",
+            guestLabelClass: "text-[#ecd9c6]/90 font-medium",
+            guestNameClass: "text-[#faf5ee] font-bold",
+            guestSubtextClass: "text-[#ecd9c6]/70",
+            dateClass: "text-[#ecd9c6] font-semibold tracking-widest",
+            buttonClass: "bg-[#966b43] hover:bg-[#835b36] text-[#faf5ee] shadow-[#2d221c]/40 font-semibold",
           }}
         />
       )}
@@ -67,7 +73,7 @@ export const RusticTheme: React.FC<ThemeProps> = ({
             {data.coupleInfo.brideName}
           </h1>
           {primaryEvent?.date && (
-            <p className="text-sm font-sans tracking-widest text-[#786152] uppercase pt-2">
+            <p className="text-sm font-sans tracking-widest text-[#5c4333] font-semibold uppercase pt-2">
               {new Date(primaryEvent.date).toLocaleDateString("id-ID", {
                 weekday: "long",
                 day: "numeric",
@@ -81,7 +87,7 @@ export const RusticTheme: React.FC<ThemeProps> = ({
         {/* Countdown */}
         {primaryEvent?.date && (
           <section className="py-6 px-4 rounded-3xl bg-[#f2e6d6]/80 border border-[#dfcdb9]">
-            <p className="text-xs font-sans tracking-widest uppercase text-[#966b43] mb-2">
+            <p className="text-xs font-sans tracking-widest uppercase text-[#966b43] mb-2 font-semibold">
               Menghitung Hari Bahagia
             </p>
             <CountdownTimer
@@ -89,7 +95,7 @@ export const RusticTheme: React.FC<ThemeProps> = ({
               themeStyle={{
                 boxClass: "bg-[#faf5ee] border-[#dfcdb9] shadow-sm",
                 numberClass: "text-[#382b24] font-serif",
-                labelClass: "text-[#786152] font-sans",
+                labelClass: "text-[#5c4333] font-sans font-semibold",
               }}
             />
           </section>
@@ -98,7 +104,7 @@ export const RusticTheme: React.FC<ThemeProps> = ({
         {/* Story / Greeting */}
         <section className="space-y-12">
           <div className="max-w-md mx-auto px-4">
-            <p className="text-sm text-[#786152] italic leading-relaxed">
+            <p className="text-sm text-[#5c4333] italic leading-relaxed">
               &quot;{data.coupleInfo.greetingMessage ||
                 "Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya."}&quot;
             </p>
@@ -123,7 +129,7 @@ export const RusticTheme: React.FC<ThemeProps> = ({
                 {data.coupleInfo.groomName}
               </h3>
               {(data.coupleInfo.groomFather || data.coupleInfo.groomMother) && (
-                <p className="text-xs font-sans text-[#786152]">
+                <p className="text-xs font-sans text-[#5c4333] font-medium">
                   Putra dari Bpk. {data.coupleInfo.groomFather || "..."} &amp; Ibu{" "}
                   {data.coupleInfo.groomMother || "..."}
                 </p>
@@ -159,7 +165,7 @@ export const RusticTheme: React.FC<ThemeProps> = ({
                 {data.coupleInfo.brideName}
               </h3>
               {(data.coupleInfo.brideFather || data.coupleInfo.brideMother) && (
-                <p className="text-xs font-sans text-[#786152]">
+                <p className="text-xs font-sans text-[#5c4333] font-medium">
                   Putri dari Bpk. {data.coupleInfo.brideFather || "..."} &amp; Ibu{" "}
                   {data.coupleInfo.brideMother || "..."}
                 </p>
@@ -197,7 +203,7 @@ export const RusticTheme: React.FC<ThemeProps> = ({
                 <h3 className="text-2xl font-serif font-medium text-[#382b24]">
                   {schedule.eventName}
                 </h3>
-                <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-sans text-[#786152]">
+                <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-sans text-[#5c4333] font-medium">
                   <span className="flex items-center gap-1.5">
                     <Calendar className="w-4 h-4 text-[#966b43]" />
                     {new Date(schedule.date).toLocaleDateString("id-ID", {
@@ -219,7 +225,11 @@ export const RusticTheme: React.FC<ThemeProps> = ({
                   latitude={schedule.latitude}
                   longitude={schedule.longitude}
                   themeStyle={{
-                    buttonClass: "bg-[#966b43] hover:bg-[#835b36] text-white",
+                    cardClass: "bg-[#f2e6d6] border border-[#dfcdb9] text-[#382b24]",
+                    venueNameClass: "text-[#382b24] font-serif font-bold text-base",
+                    addressClass: "text-[#5c4333] text-xs font-sans",
+                    buttonClass: "bg-[#966b43] hover:bg-[#835b36] text-white font-semibold font-sans",
+                    secondaryButtonClass: "border border-[#dfcdb9] bg-white/90 hover:bg-white text-[#382b24] font-semibold font-sans",
                   }}
                 />
               </div>
@@ -260,9 +270,14 @@ export const RusticTheme: React.FC<ThemeProps> = ({
         <DigitalGiftBox
           bankAccounts={data.bankAccounts}
           themeStyle={{
-            cardClass: "bg-[#f7eedf] border-[#dfcdb9]",
-            badgeClass: "bg-[#ecd9c6] text-[#382b24]",
-            buttonClass: "bg-[#966b43] hover:bg-[#835b36] text-white",
+            titleClass: "text-[#382b24] font-serif",
+            subtitleClass: "text-[#5c4333]",
+            cardClass: "bg-[#f7eedf] border border-[#dfcdb9] text-[#382b24]",
+            badgeClass: "bg-[#ecd9c6] text-[#382b24] font-bold border border-[#dfcdb9]",
+            accountNumberClass: "text-[#382b24] font-mono font-bold",
+            accountHolderClass: "text-[#5c4333]",
+            qrisButtonClass: "text-[#966b43] hover:text-[#835b36] font-semibold",
+            buttonClass: "bg-[#966b43] hover:bg-[#835b36] text-white font-medium",
           }}
         />
 
@@ -271,9 +286,16 @@ export const RusticTheme: React.FC<ThemeProps> = ({
           invitationId={data.id}
           defaultGuestName={guestName}
           themeStyle={{
-            cardClass: "bg-[#f7eedf] border-[#dfcdb9]",
-            buttonClass: "bg-[#966b43] hover:bg-[#835b36] text-white",
-            inputClass: "bg-[#faf5ee] border-[#dfcdb9] text-[#382b24]",
+            cardClass: "bg-[#f7eedf] border border-[#dfcdb9] text-[#382b24]",
+            titleClass: "text-[#382b24] font-serif",
+            subtitleClass: "text-[#5c4333]",
+            labelClass: "text-[#382b24] font-semibold font-sans",
+            statusButtonClass: "bg-[#faf5ee] border-[#dfcdb9] text-[#382b24] hover:border-[#966b43]",
+            statusButtonActiveClass: "bg-[#966b43] border-[#966b43] text-white font-semibold shadow-sm",
+            buttonClass: "bg-[#966b43] hover:bg-[#835b36] text-white font-semibold font-sans",
+            inputClass: "bg-[#faf5ee] border-[#dfcdb9] text-[#382b24] placeholder:text-[#8a7263]",
+            submittedTitleClass: "text-[#382b24] font-serif",
+            submittedSubtitleClass: "text-[#5c4333]",
           }}
         />
 
@@ -281,10 +303,18 @@ export const RusticTheme: React.FC<ThemeProps> = ({
         <WishesWallSection
           invitationId={data.id}
           themeStyle={{
-            cardClass: "bg-[#f7eedf] border-[#dfcdb9]",
-            bubbleClass: "bg-[#faf5ee] border-[#dfcdb9] text-[#4a3b32]",
-            buttonClass: "bg-[#966b43] hover:bg-[#835b36] text-white",
-            inputClass: "bg-[#faf5ee] border-[#dfcdb9] text-[#382b24]",
+            cardClass: "bg-[#f7eedf] border border-[#dfcdb9] text-[#382b24]",
+            titleClass: "text-[#382b24] font-serif",
+            subtitleClass: "text-[#5c4333]",
+            bubbleClass: "bg-[#faf5ee] border border-[#dfcdb9] text-[#4a3b32]",
+            senderClass: "text-[#382b24] font-serif font-bold",
+            messageClass: "text-[#4a3b32] font-sans",
+            dateClass: "text-[#786152] font-sans",
+            emptyTextClass: "text-[#786152]",
+            loadingTextClass: "text-[#786152]",
+            reactionButtonClass: "hover:bg-[#ecd9c6]",
+            buttonClass: "bg-[#966b43] hover:bg-[#835b36] text-white font-semibold font-sans",
+            inputClass: "bg-[#faf5ee] border-[#dfcdb9] text-[#382b24] placeholder:text-[#8a7263]",
           }}
         />
 

@@ -6,11 +6,21 @@ import { WishItem } from "@/types/wedding";
 
 interface WishesWallSectionProps {
   invitationId: string;
+  hideHeader?: boolean;
   themeStyle?: {
     cardClass?: string;
     bubbleClass?: string;
     buttonClass?: string;
     inputClass?: string;
+    titleClass?: string;
+    subtitleClass?: string;
+    senderClass?: string;
+    messageClass?: string;
+    dateClass?: string;
+    emptyTextClass?: string;
+    loadingTextClass?: string;
+    reactionButtonClass?: string;
+    iconClass?: string;
   };
 }
 
@@ -18,6 +28,7 @@ const REACTIONS = ["💖", "🤲", "🎉", "💐", "✨", "🤍"];
 
 export const WishesWallSection: React.FC<WishesWallSectionProps> = ({
   invitationId,
+  hideHeader = false,
   themeStyle,
 }) => {
   const [wishes, setWishes] = useState<WishItem[]>([]);
@@ -29,7 +40,6 @@ export const WishesWallSection: React.FC<WishesWallSectionProps> = ({
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; text: string } | null>(
     null
   );
-
 
   useEffect(() => {
     let ignore = false;
@@ -117,27 +127,41 @@ export const WishesWallSection: React.FC<WishesWallSectionProps> = ({
       <div
         className={`p-6 sm:p-8 rounded-3xl border shadow-lg ${
           themeStyle?.cardClass ??
-          "bg-white/95 dark:bg-stone-800/95 border-stone-200 dark:border-stone-700"
+          "bg-white/95 border-stone-200 text-stone-900"
         }`}
       >
-        <div className="text-center mb-6">
-          <div className="inline-flex p-3 rounded-full bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 mb-2">
-            <MessageSquare className="w-5 h-5" />
+        {!hideHeader && (
+          <div className="text-center mb-6">
+            <div
+              className={`inline-flex p-3 rounded-full mb-2 ${
+                themeStyle?.iconClass ?? "bg-amber-100 text-amber-700"
+              }`}
+            >
+              <MessageSquare className="w-5 h-5" />
+            </div>
+            <h3
+              className={`text-xl font-serif font-bold ${
+                themeStyle?.titleClass ?? "text-stone-900"
+              }`}
+            >
+              Untaian Doa &amp; Ucapan
+            </h3>
+            <p
+              className={`text-xs font-medium mt-1 leading-relaxed ${
+                themeStyle?.subtitleClass ?? "text-stone-600"
+              }`}
+            >
+              Kirimkan doa tulus dan harapan terbaik bagi kedua mempelai.
+            </p>
           </div>
-          <h3 className="text-xl font-serif font-bold text-stone-900 dark:text-stone-100">
-            Untaian Doa &amp; Ucapan
-          </h3>
-          <p className="text-xs text-stone-700 dark:text-stone-300 font-medium mt-1">
-            Kirimkan doa tulus dan harapan terbaik bagi kedua mempelai.
-          </p>
-        </div>
+        )}
 
         {feedback && (
           <div
             className={`p-3 rounded-xl text-xs mb-4 border ${
               feedback.type === "success"
-                ? "bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900"
-                : "bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-900"
+                ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                : "bg-rose-50 text-rose-800 border-rose-200"
             }`}
           >
             {feedback.text}
@@ -154,7 +178,7 @@ export const WishesWallSection: React.FC<WishesWallSectionProps> = ({
               placeholder="Nama Anda..."
               className={`w-full py-2.5 px-3.5 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${
                 themeStyle?.inputClass ??
-                "bg-stone-50 dark:bg-stone-900 border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100 placeholder:text-stone-500"
+                "bg-stone-50 border-stone-300 text-stone-900 placeholder:text-stone-400"
               }`}
             />
           </div>
@@ -168,7 +192,7 @@ export const WishesWallSection: React.FC<WishesWallSectionProps> = ({
               placeholder="Tuliskan doa restu untuk kedua mempelai..."
               className={`w-full py-2.5 px-3.5 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none ${
                 themeStyle?.inputClass ??
-                "bg-stone-50 dark:bg-stone-900 border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100 placeholder:text-stone-500"
+                "bg-stone-50 border-stone-300 text-stone-900 placeholder:text-stone-400"
               }`}
             />
           </div>
@@ -180,10 +204,10 @@ export const WishesWallSection: React.FC<WishesWallSectionProps> = ({
                   key={emoji}
                   type="button"
                   onClick={() => setSelectedReaction(emoji)}
-                  className={`p-1.5 rounded-lg text-base transition-all ${
+                  className={`p-1.5 rounded-lg text-base transition-all cursor-pointer ${
                     selectedReaction === emoji
-                      ? "bg-amber-100 dark:bg-amber-900 scale-125 shadow-sm"
-                      : "hover:bg-stone-100 dark:hover:bg-stone-700 opacity-60 hover:opacity-100"
+                      ? "bg-amber-500/20 scale-125 shadow-sm"
+                      : `${themeStyle?.reactionButtonClass ?? "hover:bg-stone-100"} opacity-70 hover:opacity-100`
                   }`}
                 >
                   {emoji}
@@ -194,7 +218,7 @@ export const WishesWallSection: React.FC<WishesWallSectionProps> = ({
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`inline-flex items-center gap-1.5 py-2.5 px-5 rounded-xl text-xs font-semibold transition-all shadow-sm disabled:opacity-50 ${
+              className={`inline-flex items-center gap-1.5 py-2.5 px-5 rounded-xl text-xs font-semibold transition-all shadow-sm disabled:opacity-50 cursor-pointer ${
                 themeStyle?.buttonClass ??
                 "bg-amber-600 hover:bg-amber-700 text-white shadow-amber-900/20"
               }`}
@@ -208,9 +232,19 @@ export const WishesWallSection: React.FC<WishesWallSectionProps> = ({
         {/* Wishes List Wall */}
         <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
           {isLoading ? (
-            <p className="text-center text-xs text-stone-600 dark:text-stone-300 py-4 font-medium">Memuat ucapan...</p>
+            <p
+              className={`text-center text-xs py-4 font-medium ${
+                themeStyle?.loadingTextClass ?? "text-stone-500"
+              }`}
+            >
+              Memuat ucapan...
+            </p>
           ) : wishes.length === 0 ? (
-            <p className="text-center text-xs text-stone-600 dark:text-stone-300 py-6 font-medium italic">
+            <p
+              className={`text-center text-xs py-6 font-medium italic ${
+                themeStyle?.emptyTextClass ?? "text-stone-500"
+              }`}
+            >
               Belum ada ucapan. Jadilah yang pertama memberikan doa restu!
             </p>
           ) : (
@@ -219,22 +253,34 @@ export const WishesWallSection: React.FC<WishesWallSectionProps> = ({
                 key={w.id}
                 className={`p-3.5 rounded-2xl border text-left text-xs space-y-1 transition-all ${
                   themeStyle?.bubbleClass ??
-                  "bg-stone-50/80 dark:bg-stone-900/80 border-stone-100 dark:border-stone-800"
+                  "bg-stone-50/80 border-stone-200 text-stone-900"
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
+                  <span
+                    className={`font-bold flex items-center gap-1.5 ${
+                      themeStyle?.senderClass ?? "text-stone-900"
+                    }`}
+                  >
                     {w.senderName}
                     {w.reaction && <span>{w.reaction}</span>}
                   </span>
-                  <span className="text-[11px] text-stone-600 dark:text-stone-400 font-medium">
+                  <span
+                    className={`text-[11px] font-medium ${
+                      themeStyle?.dateClass ?? "text-stone-500"
+                    }`}
+                  >
                     {new Date(w.createdAt).toLocaleDateString("id-ID", {
                       day: "numeric",
                       month: "short",
                     })}
                   </span>
                 </div>
-                <p className="text-stone-800 dark:text-stone-200 font-normal leading-relaxed break-words">
+                <p
+                  className={`font-normal leading-relaxed break-words ${
+                    themeStyle?.messageClass ?? "text-stone-800"
+                  }`}
+                >
                   {w.message}
                 </p>
               </div>

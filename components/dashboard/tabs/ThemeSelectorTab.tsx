@@ -14,7 +14,7 @@ import { THEME_LIST, ThemeId } from "@/types/wedding";
 interface ThemeSelectorTabProps {
   currentThemeId: ThemeId;
   slug?: string;
-  tier?: string;
+  tier?: string | null;
   onSelectTheme: (id: ThemeId) => void;
   onOpenPreview: () => void;
   onUpgradeClick?: () => void;
@@ -51,13 +51,13 @@ export const ThemeSelectorTab: React.FC<ThemeSelectorTabProps> = ({
         </button>
       </div>
 
-      {/* Free Tier Info Banner */}
-      {tier === "FREE" && (
+      {/* Starter Tier Info Banner */}
+      {(tier === "STARTER" || tier === "FREE") && (
         <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-[#F97316] shrink-0" />
             <span>
-              Anda saat ini menggunakan <strong>Paket Gratis</strong> dengan akses 1 pilihan tema (Modern Editorial / Minimalist). Upgrade ke Paket Berbayar untuk membuka seluruh tema adat, floral &amp; dark gold.
+              Anda saat ini menggunakan <strong>Paket Starter</strong> dengan akses tema Minimalist. Upgrade ke Paket Elegant atau Ultimate untuk membuka seluruh koleksi tema adat, floral, dan luxury.
             </span>
           </div>
           {onUpgradeClick && (
@@ -76,7 +76,7 @@ export const ThemeSelectorTab: React.FC<ThemeSelectorTabProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {THEME_LIST.map((theme) => {
           const isSelected = currentThemeId === theme.id;
-          const isLockedForTier = tier === "FREE" && theme.id !== "minimalist";
+          const isLockedForTier = (tier === "STARTER" || tier === "FREE") && theme.id !== "minimalist";
           const previewUrl = slug
             ? isSelected
               ? `/invitation/${slug}`

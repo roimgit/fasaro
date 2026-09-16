@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { Suspense, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import {
   AlertCircle,
   Check,
@@ -11,17 +12,31 @@ import {
   Edit2,
   ExternalLink,
   LogIn,
-  Palette,
   Plus,
   RefreshCw,
   Search,
-  Settings,
   Heart,
   Trash2,
   Users,
   Wallet,
   X,
 } from "lucide-react";
+import { AdminCmsContentTab, SettingItem } from "@/components/admin/tabs/AdminCmsContentTab";
+import { AdminPricingTab } from "@/components/admin/tabs/AdminPricingTab";
+import { AdminMaintenanceModeTab } from "@/components/admin/tabs/AdminMaintenanceModeTab";
+import { AdminFeatureFlagsTab } from "@/components/admin/tabs/AdminFeatureFlagsTab";
+import { AdminGatewayTab } from "@/components/admin/tabs/AdminGatewayTab";
+import { AdminSystemToolsTab, MaintenanceHealthData } from "@/components/admin/tabs/AdminSystemToolsTab";
+
+export type AdminTab =
+  | "clients"
+  | "themes"
+  | "cms"
+  | "pricing"
+  | "maintenance"
+  | "features"
+  | "gateway"
+  | "system";
 
 interface MetricsData {
   totalUsers: number;
@@ -65,19 +80,25 @@ interface ThemeItem {
   isPremium: boolean;
 }
 
-interface SettingItem {
-  id: string;
-  key: string;
-  value: string;
-  description: string | null;
-}
+function MasterAdminContent() {
+  const searchParams = useSearchParams();
+  const tabFromQuery = searchParams.get("tab") as AdminTab | null;
+  const [activeTab, setActiveTab] = useState<AdminTab>("clients");
 
-export default function MasterAdminPage() {
-  const [activeTab, setActiveTab] = useState<"clients" | "themes" | "settings">("clients");
+  useEffect(() => {
+    if (tabFromQuery) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setActiveTab(tabFromQuery);
+    }
+  }, [tabFromQuery]);
+
   const [metrics, setMetrics] = useState<MetricsData | null>(null);
   const [clients, setClients] = useState<ClientData[]>([]);
   const [themes, setThemes] = useState<ThemeItem[]>([]);
   const [settings, setSettings] = useState<SettingItem[]>([]);
+  const [diagnostics, setDiagnostics] = useState<MaintenanceHealthData | null>(null);
+  const [isLoadingDiagnostics, setIsLoadingDiagnostics] = useState(false);
+  const [isSavingSettings, setIsSavingSettings] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   // Search & Filter
@@ -251,23 +272,49 @@ export default function MasterAdminPage() {
     }
   };
 
+  // Fetch Diagnostics for Maintenance Tab
+  const fetchDiagnostics = useCallback(async () => {
+    setIsLoadingDiagnostics(true);
+    try {
+      const res = await fetch("/api/admin/maintenance");
+      if (res.ok) {
+        const json = await res.json();
+        setDiagnostics(json.data);
+      }
+    } catch {
+      // Silent error
+    } finally {
+      setIsLoadingDiagnostics(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === "system" && !diagnostics) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      void fetchDiagnostics();
+    }
+  }, [activeTab, diagnostics, fetchDiagnostics]);
+
   // Save Settings
-  const handleSaveSettings = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSaveSettings = async (updatedSettings: SettingItem[]) => {
+    setIsSavingSettings(true);
     try {
       const res = await fetch("/api/admin/settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ settings }),
+        body: JSON.stringify({ settings: updatedSettings }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Gagal menyimpan pengaturan");
       setFeedback({ type: "success", msg: "Pengaturan sistem berhasil disimpan!" });
+      setSettings(updatedSettings);
     } catch (err) {
       setFeedback({
         type: "error",
         msg: err instanceof Error ? err.message : "Gagal menyimpan pengaturan",
       });
+    } finally {
+      setIsSavingSettings(false);
     }
   };
 
@@ -394,43 +441,23 @@ export default function MasterAdminPage() {
         </div>
       </div>
 
-      {/* 2. Navigation Tabs */}
-      <div className="flex items-center border-b border-[#E2E8F0] gap-2">
-        <button
-          onClick={() => setActiveTab("clients")}
-          className={`pb-3 px-4 text-xs font-semibold border-b-2 transition-all flex items-center gap-2 ${
-            activeTab === "clients"
-              ? "border-[#F97316] text-[#F97316]"
-              : "border-transparent text-slate-500 hover:text-slate-800"
-          }`}
-        >
-          <Users className="w-4 h-4" />
-          <span>Manajemen Klien ({clients.length})</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab("themes")}
-          className={`pb-3 px-4 text-xs font-semibold border-b-2 transition-all flex items-center gap-2 ${
-            activeTab === "themes"
-              ? "border-[#F97316] text-[#F97316]"
-              : "border-transparent text-slate-500 hover:text-slate-800"
-          }`}
-        >
-          <Palette className="w-4 h-4" />
-          <span>Katalog Tema ({themes.length})</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab("settings")}
-          className={`pb-3 px-4 text-xs font-semibold border-b-2 transition-all flex items-center gap-2 ${
-            activeTab === "settings"
-              ? "border-[#F97316] text-[#F97316]"
-              : "border-transparent text-slate-500 hover:text-slate-800"
-          }`}
-        >
-          <Settings className="w-4 h-4" />
-          <span>Pengaturan Sistem</span>
-        </button>
+      {/* 2. Active Section Module Header Banner */}
+      <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0]">
+        <div className="flex items-center gap-2.5">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+            Modul Aktif
+          </span>
+          <span className="text-sm font-bold text-slate-900">
+            {activeTab === "clients" && `Manajemen Klien & Undangan (${clients.length})`}
+            {activeTab === "themes" && `Katalog Desain Template (${themes.length})`}
+            {activeTab === "cms" && "Konten Website, Hero & Live Showcase"}
+            {activeTab === "pricing" && "Pengaturan Paket Harga & Live Preview"}
+            {activeTab === "maintenance" && "Mode Pemeliharaan & Darurat"}
+            {activeTab === "features" && "Saklar Fitur Platform (Feature Flags)"}
+            {activeTab === "gateway" && "Gateway Pembayaran & QRIS Toko"}
+            {activeTab === "system" && "Kesehatan Database & Alat Pemeliharaan"}
+          </span>
+        </div>
       </div>
 
       {/* TAB 1: MANAJEMEN KLIEN */}
@@ -704,50 +731,58 @@ export default function MasterAdminPage() {
         </div>
       )}
 
-      {/* TAB 3: PENGATURAN SISTEM */}
-      {activeTab === "settings" && (
-        <form onSubmit={handleSaveSettings} className="space-y-6 max-w-3xl">
-          <div className="rounded-xl border border-[#E2E8F0] bg-white p-6 sm:p-8 space-y-6 shadow-xs">
-            <div>
-              <h2 className="text-base font-sans font-bold text-slate-900">Konfigurasi Gateway &amp; QRIS</h2>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Pengaturan kunci API Sandbox Midtrans, informasi nomor rekening QRIS manual, dan kuota upload foto.
-              </p>
-            </div>
+      {/* TAB 3: KONTEN WEBSITE & SHOWCASE */}
+      {activeTab === "cms" && (
+        <AdminCmsContentTab
+          settings={settings}
+          onSaveSettings={handleSaveSettings}
+          isSaving={isSavingSettings}
+        />
+      )}
 
-            <div className="space-y-4">
-              {settings.map((item, idx) => (
-                <div key={item.key} className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-700 flex items-center justify-between">
-                    <span>{item.key}</span>
-                    <span className="text-[10px] text-slate-400 font-normal">
-                      {item.description || ""}
-                    </span>
-                  </label>
-                  <input
-                    type="text"
-                    value={item.value}
-                    onChange={(e) => {
-                      const updated = [...settings];
-                      updated[idx].value = e.target.value;
-                      setSettings(updated);
-                    }}
-                    className="w-full px-3.5 py-2 rounded-lg bg-white border border-[#E2E8F0] text-xs text-slate-900 font-mono focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316]"
-                  />
-                </div>
-              ))}
-            </div>
+      {/* TAB 4: PAKET HARGA & LIVE PREVIEW */}
+      {activeTab === "pricing" && (
+        <AdminPricingTab
+          settings={settings}
+          onSaveSettings={handleSaveSettings}
+          isSaving={isSavingSettings}
+        />
+      )}
 
-            <div className="pt-4 border-t border-[#E2E8F0] flex justify-end">
-              <button
-                type="submit"
-                className="px-5 py-2 rounded-lg bg-[#F97316] hover:bg-[#EA580C] text-white text-xs font-semibold transition-all shadow-sm"
-              >
-                Simpan Semua Pengaturan
-              </button>
-            </div>
-          </div>
-        </form>
+      {/* TAB 5: MODE PEMELIHARAAN */}
+      {activeTab === "maintenance" && (
+        <AdminMaintenanceModeTab
+          settings={settings}
+          onSaveSettings={handleSaveSettings}
+          isSaving={isSavingSettings}
+        />
+      )}
+
+      {/* TAB 6: SAKLAR FITUR (FEATURE FLAGS) */}
+      {activeTab === "features" && (
+        <AdminFeatureFlagsTab
+          settings={settings}
+          onSaveSettings={handleSaveSettings}
+          isSaving={isSavingSettings}
+        />
+      )}
+
+      {/* TAB 7: GATEWAY & QRIS */}
+      {activeTab === "gateway" && (
+        <AdminGatewayTab
+          settings={settings}
+          onSaveSettings={handleSaveSettings}
+          isSaving={isSavingSettings}
+        />
+      )}
+
+      {/* TAB 8: KESEHATAN & ALAT SISTEM */}
+      {activeTab === "system" && (
+        <AdminSystemToolsTab
+          diagnostics={diagnostics}
+          isLoadingDiagnostics={isLoadingDiagnostics}
+          onRefreshDiagnostics={fetchDiagnostics}
+        />
       )}
 
       {/* MODAL: EDIT CLIENT / EXTEND VALIDITY */}
@@ -773,8 +808,7 @@ export default function MasterAdminPage() {
                   onChange={(e) => setEditTier(e.target.value)}
                   className="w-full py-2 px-3 rounded-lg bg-white border border-[#E2E8F0] text-slate-800 focus:outline-none focus:border-[#F97316]"
                 >
-                  <option value="FREE">Gratis (Rp 0 - H+7 Acara)</option>
-                  <option value="STARTER">Starter (Rp 69.000)</option>
+                  <option value="STARTER">Starter (Rp 39.000)</option>
                   <option value="ELEGANT">Elegant (Rp 149.000)</option>
                   <option value="ULTIMATE">Ultimate (Rp 279.000)</option>
                 </select>
@@ -966,5 +1000,19 @@ export default function MasterAdminPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function MasterAdminPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="p-8 text-center text-xs text-slate-400">
+          Memuat Pusat Kendali Admin...
+        </div>
+      }
+    >
+      <MasterAdminContent />
+    </Suspense>
   );
 }

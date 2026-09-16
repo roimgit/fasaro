@@ -17,6 +17,12 @@ interface HeroCoverProps {
     buttonClass?: string;
     titleClass?: string;
     subtitleClass?: string;
+    badgeClass?: string;
+    guestBoxClass?: string;
+    guestLabelClass?: string;
+    guestNameClass?: string;
+    guestSubtextClass?: string;
+    dateClass?: string;
   };
 }
 
@@ -73,34 +79,58 @@ export const HeroCover: React.FC<HeroCoverProps> = ({
     >
       <div
         className={`w-full max-w-md rounded-3xl p-8 text-center shadow-2xl transition-transform animate-in fade-in zoom-in duration-500 ${
-          themeStyle?.cardClass ?? "bg-stone-800/80 border border-stone-700/60 backdrop-blur-xl"
+          themeStyle?.cardClass ?? "bg-stone-800/80 border border-stone-700/60 backdrop-blur-xl text-stone-100"
         }`}
       >
-        <p className="text-xs uppercase tracking-[0.25em] font-semibold text-stone-700 dark:text-stone-200 mb-3">
+        <p
+          className={`text-xs uppercase tracking-[0.25em] font-semibold mb-3 ${
+            themeStyle?.badgeClass ?? themeStyle?.subtitleClass ?? "opacity-80 text-current"
+          }`}
+        >
           Walimatul Ursy / Undangan Pernikahan
         </p>
 
         <h1
           className={`text-3xl sm:text-4xl font-serif font-light tracking-wide my-4 ${
-            themeStyle?.titleClass ?? "text-stone-900 dark:text-stone-50"
+            themeStyle?.titleClass ?? "text-current"
           }`}
         >
           {groomName} &amp; {brideName}
         </h1>
 
-        <div className="my-6 py-4 px-3 rounded-2xl bg-stone-900/5 dark:bg-white/10 border border-stone-900/10 dark:border-white/15">
-          <p className="text-xs tracking-wider text-stone-600 dark:text-stone-300 font-medium mb-1">
+        <div
+          className={`my-6 py-4 px-3 rounded-2xl border ${
+            themeStyle?.guestBoxClass ?? "bg-black/5 border-black/10 text-current"
+          }`}
+        >
+          <p
+            className={`text-xs tracking-wider font-medium mb-1 ${
+              themeStyle?.guestLabelClass ?? "opacity-75"
+            }`}
+          >
             Kepada Yth. Bapak/Ibu/Saudara/i:
           </p>
-          <p className="text-xl font-bold tracking-normal text-stone-900 dark:text-white">
+          <p
+            className={`text-xl font-bold tracking-normal ${
+              themeStyle?.guestNameClass ?? "text-current"
+            }`}
+          >
             {guestName || "Tamu Undangan"}
           </p>
-          <p className="text-[11px] text-stone-600 dark:text-stone-300 mt-1 italic">
+          <p
+            className={`text-[11px] mt-1 italic ${
+              themeStyle?.guestSubtextClass ?? "opacity-60"
+            }`}
+          >
             *Mohon maaf jika ada kesalahan penulisan nama/gelar
           </p>
         </div>
 
-        <p className="text-xs font-semibold tracking-widest text-stone-700 dark:text-stone-200 mb-6 uppercase">
+        <p
+          className={`text-xs font-semibold tracking-widest mb-6 uppercase ${
+            themeStyle?.dateClass ?? "opacity-85 text-current"
+          }`}
+        >
           {formattedDate}
         </p>
 

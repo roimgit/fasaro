@@ -41,9 +41,15 @@ export const SyariTheme: React.FC<ThemeProps> = ({
           onOpenInvitation={() => setIsOpen(true)}
           themeStyle={{
             containerClass: "bg-[#030d0b]/95 text-[#e3ece8]",
-            cardClass: "bg-[#0b2b24]/90 text-[#e3ece8] border-[#134e4a]/60 backdrop-blur-xl",
+            cardClass: "bg-[#0b2b24]/95 text-[#e3ece8] border-2 border-[#134e4a] backdrop-blur-xl shadow-2xl",
             titleClass: "text-[#5eead4] font-serif",
-            buttonClass: "bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-950/50",
+            badgeClass: "text-emerald-300 tracking-widest font-medium",
+            guestBoxClass: "bg-[#071d18] border border-[#134e4a] text-[#e3ece8] shadow-inner",
+            guestLabelClass: "text-emerald-300/90 font-medium",
+            guestNameClass: "text-emerald-100 font-bold",
+            guestSubtextClass: "text-emerald-300/70",
+            dateClass: "text-emerald-200 font-semibold tracking-widest",
+            buttonClass: "bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-950/50 font-semibold",
           }}
         />
       )}
@@ -74,7 +80,7 @@ export const SyariTheme: React.FC<ThemeProps> = ({
           </h1>
 
           {primaryEvent?.date && (
-            <p className="text-xs tracking-widest text-emerald-300 uppercase pt-2">
+            <p className="text-xs tracking-widest text-emerald-200 uppercase font-medium pt-2">
               {new Date(primaryEvent.date).toLocaleDateString("id-ID", {
                 weekday: "long",
                 day: "numeric",
@@ -92,11 +98,11 @@ export const SyariTheme: React.FC<ThemeProps> = ({
               وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُمْ مِنْ أَنْفُسِكُمْ أَزْوَاجًا لِتَسْكُنُوا إِلَيْهَا
               وَجَعَلَ بَيْنَكُمْ مَوَدَّةً وَرَحْمَةً
             </p>
-            <p className="text-xs text-emerald-100/80 italic leading-relaxed">
+            <p className="text-xs text-emerald-100 italic leading-relaxed">
               &quot;{data.coupleInfo.greetingMessage ||
                 "Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang."}&quot;
             </p>
-            <p className="text-[11px] uppercase tracking-widest text-emerald-400">
+            <p className="text-[11px] uppercase tracking-widest text-emerald-400 font-semibold">
               (QS. Ar-Rum: 21)
             </p>
           </div>
@@ -105,7 +111,7 @@ export const SyariTheme: React.FC<ThemeProps> = ({
         {/* Countdown */}
         {primaryEvent?.date && (
           <section className="py-6 px-4 rounded-3xl bg-[#0d342c]/70 border border-[#134e4a]">
-            <p className="text-xs tracking-widest uppercase text-emerald-400 mb-2">
+            <p className="text-xs tracking-widest uppercase text-emerald-400 mb-2 font-medium">
               Menuju Hari Akad
             </p>
             <CountdownTimer
@@ -113,7 +119,7 @@ export const SyariTheme: React.FC<ThemeProps> = ({
               themeStyle={{
                 boxClass: "bg-[#071d18] border-[#134e4a] shadow-inner",
                 numberClass: "text-[#5eead4] font-serif",
-                labelClass: "text-emerald-300",
+                labelClass: "text-emerald-200 font-semibold",
               }}
             />
           </section>
@@ -139,7 +145,7 @@ export const SyariTheme: React.FC<ThemeProps> = ({
               {data.coupleInfo.groomName}
             </h3>
             {(data.coupleInfo.groomFather || data.coupleInfo.groomMother) && (
-              <p className="text-xs text-emerald-200/70">
+              <p className="text-xs text-emerald-200">
                 Putra dari Bpk. {data.coupleInfo.groomFather || "..."} &amp; Ibu{" "}
                 {data.coupleInfo.groomMother || "..."}
               </p>
@@ -175,7 +181,7 @@ export const SyariTheme: React.FC<ThemeProps> = ({
               {data.coupleInfo.brideName}
             </h3>
             {(data.coupleInfo.brideFather || data.coupleInfo.brideMother) && (
-              <p className="text-xs text-emerald-200/70">
+              <p className="text-xs text-emerald-200">
                 Putri dari Bpk. {data.coupleInfo.brideFather || "..."} &amp; Ibu{" "}
                 {data.coupleInfo.brideMother || "..."}
               </p>
@@ -210,7 +216,7 @@ export const SyariTheme: React.FC<ThemeProps> = ({
                 className="p-6 rounded-3xl bg-[#0d342c]/70 border border-[#134e4a] shadow-sm space-y-4"
               >
                 <h3 className="text-xl font-serif text-emerald-200">{schedule.eventName}</h3>
-                <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-emerald-300/80">
+                <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-emerald-200">
                   <span className="flex items-center gap-1.5">
                     <Calendar className="w-4 h-4 text-emerald-400" />
                     {new Date(schedule.date).toLocaleDateString("id-ID", {
@@ -232,7 +238,11 @@ export const SyariTheme: React.FC<ThemeProps> = ({
                   latitude={schedule.latitude}
                   longitude={schedule.longitude}
                   themeStyle={{
-                    buttonClass: "bg-emerald-600 hover:bg-emerald-500 text-white",
+                    cardClass: "bg-[#071d18] border border-[#134e4a] text-emerald-100",
+                    venueNameClass: "text-emerald-200 font-serif font-bold",
+                    addressClass: "text-emerald-200/90 text-xs",
+                    buttonClass: "bg-emerald-600 hover:bg-emerald-500 text-white font-semibold",
+                    secondaryButtonClass: "border border-[#134e4a] bg-[#0d342c] hover:bg-[#114238] text-emerald-200 font-semibold",
                   }}
                 />
               </div>
@@ -271,9 +281,14 @@ export const SyariTheme: React.FC<ThemeProps> = ({
         <DigitalGiftBox
           bankAccounts={data.bankAccounts}
           themeStyle={{
-            cardClass: "bg-[#0d342c]/80 border-[#134e4a]",
-            badgeClass: "bg-[#071d18] text-[#5eead4]",
-            buttonClass: "bg-emerald-600 hover:bg-emerald-500 text-white",
+            titleClass: "text-emerald-100 font-serif",
+            subtitleClass: "text-emerald-200",
+            cardClass: "bg-[#0d342c]/90 border border-[#134e4a] text-emerald-100",
+            badgeClass: "bg-[#071d18] text-[#5eead4] border border-[#134e4a]",
+            accountNumberClass: "text-[#5eead4] font-mono font-bold",
+            accountHolderClass: "text-emerald-200",
+            qrisButtonClass: "text-[#5eead4] hover:text-emerald-200 font-semibold",
+            buttonClass: "bg-emerald-600 hover:bg-emerald-500 text-white font-semibold",
           }}
         />
 
@@ -282,9 +297,16 @@ export const SyariTheme: React.FC<ThemeProps> = ({
           invitationId={data.id}
           defaultGuestName={guestName}
           themeStyle={{
-            cardClass: "bg-[#0d342c]/90 border-[#134e4a]",
-            buttonClass: "bg-emerald-600 hover:bg-emerald-500 text-white",
-            inputClass: "bg-[#071d18] border-[#134e4a] text-emerald-100",
+            cardClass: "bg-[#0d342c]/90 border border-[#134e4a] text-emerald-100",
+            titleClass: "text-emerald-100 font-serif",
+            subtitleClass: "text-emerald-200",
+            labelClass: "text-emerald-200 font-medium",
+            statusButtonClass: "bg-[#071d18] border-[#134e4a] text-emerald-200 hover:border-emerald-400",
+            statusButtonActiveClass: "bg-emerald-600 border-emerald-600 text-white font-semibold shadow-sm",
+            buttonClass: "bg-emerald-600 hover:bg-emerald-500 text-white font-semibold",
+            inputClass: "bg-[#071d18] border-[#134e4a] text-emerald-100 focus:ring-emerald-500 placeholder:text-emerald-400/40",
+            submittedTitleClass: "text-emerald-200 font-serif",
+            submittedSubtitleClass: "text-emerald-100",
           }}
         />
 
@@ -292,14 +314,22 @@ export const SyariTheme: React.FC<ThemeProps> = ({
         <WishesWallSection
           invitationId={data.id}
           themeStyle={{
-            cardClass: "bg-[#0d342c]/90 border-[#134e4a]",
-            bubbleClass: "bg-[#071d18] border-[#134e4a] text-emerald-100",
-            buttonClass: "bg-emerald-600 hover:bg-emerald-500 text-white",
-            inputClass: "bg-[#071d18] border-[#134e4a] text-emerald-100",
+            cardClass: "bg-[#0d342c]/90 border border-[#134e4a] text-emerald-100",
+            titleClass: "text-emerald-100 font-serif",
+            subtitleClass: "text-emerald-200",
+            bubbleClass: "bg-[#071d18] border border-[#134e4a] text-emerald-100",
+            senderClass: "text-[#5eead4] font-bold",
+            messageClass: "text-emerald-100",
+            dateClass: "text-emerald-300 font-mono",
+            emptyTextClass: "text-emerald-300/80",
+            loadingTextClass: "text-emerald-300/80",
+            reactionButtonClass: "hover:bg-[#071d18]",
+            buttonClass: "bg-emerald-600 hover:bg-emerald-500 text-white font-semibold",
+            inputClass: "bg-[#071d18] border-[#134e4a] text-emerald-100 focus:ring-emerald-500 placeholder:text-emerald-400/40",
           }}
         />
 
-        <footer className="pt-12 pb-8 text-emerald-500 text-xs tracking-wider">
+        <footer className="pt-12 pb-8 text-emerald-400 text-xs tracking-wider">
           <p>FASARO &bull; Syar&apos;i Islamic Wedding Theme</p>
         </footer>
       </main>

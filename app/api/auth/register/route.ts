@@ -18,8 +18,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         { status: 400 }
       );
     }
+    const regSetting = await prisma.systemSetting.findUnique({
+      where: { key: "feature_registration" },
+    });
+    if (regSetting && regSetting.value === "false") {
+      return NextResponse.json(
+        { error: "Pendaftaran pengguna baru sementara ditutup untuk pemeliharaan sistem." },
+        { status: 403 }
+      );
+    }
 
-    const { name, email, password } = parsed.data;
+    const { name, email, password, plan } = parsed.data;
 
     const existingUser = await prisma.user.findUnique({
       where: { email },
@@ -39,6 +48,32 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         email,
         passwordHash,
         role: "USER",
+        invitations: {
+          create: {
+            slug: `undangan-${Math.random().toString(36).substring(2, 8)}`,
+            title: `Pernikahan ${name}`,
+            themeId: "minimalist",
+            isActive: true,
+            coupleInfo: {
+              groomName: name,
+              groomNickname: name.split(" ")[0] || "Pria",
+              groomFather: "",
+              groomMother: "",
+              groomInstagram: "",
+              groomPhoto: "",
+              brideName: "Mempelai Wanita",
+              brideNickname: "Wanita",
+              brideFather: "",
+              brideMother: "",
+              brideInstagram: "",
+              bridePhoto: "",
+              greetingMessage:
+                "Dengan memohon rahmat dan ridho Allah SWT, kami mengundang Anda untuk menghadiri pernikahan kami.",
+              stories: [],
+              selectedTier: plan || null,
+            },
+          },
+        },
       },
       select: {
         id: true,

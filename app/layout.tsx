@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+import PwaInstallBanner from "@/components/pwa/PwaInstallBanner";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -16,6 +18,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
+  themeColor: "#F97316",
 };
 
 export const metadata: Metadata = {
@@ -30,6 +33,16 @@ export const metadata: Metadata = {
     "fasaro",
   ],
   authors: [{ name: "Fasaro Wedding" }],
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Fasaro",
+  },
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/icons/apple-touch-icon.png",
+  },
   verification: {
     google: "n66cH7S-Us2bCPgZ3lwvWyYRpbKtyU7HUkt45s-6FbQ",
   },
@@ -38,10 +51,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
+      lang="id"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <PwaInstallBanner />
+      </body>
     </html>
   );
 }

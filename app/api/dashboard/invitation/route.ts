@@ -20,10 +20,9 @@ export async function GET() {
         galleries: { orderBy: { sortOrder: "asc" } },
         bankAccounts: true,
         paymentTransactions: {
-          where: { paymentStatus: "SETTLEMENT" },
           orderBy: { createdAt: "desc" },
-          take: 1,
-          select: { tier: true },
+          take: 5,
+          select: { tier: true, paymentStatus: true, amount: true, orderId: true },
         },
       },
     });
@@ -35,7 +34,7 @@ export async function GET() {
           slug: `undangan-${user.userId.slice(-6)}`,
           title: "Pernikahan Mempelai",
           userId: user.userId,
-          themeId: "adirara",
+          themeId: "minimalist",
           isActive: true,
           coupleInfo: {
             groomName: "Mempelai Pria",
@@ -53,6 +52,7 @@ export async function GET() {
             greetingMessage:
               "Dengan memohon rahmat dan ridho Allah SWT, kami mengundang Anda untuk menghadiri pernikahan kami.",
             stories: [],
+            selectedTier: null,
           },
         },
         include: {
@@ -64,30 +64,46 @@ export async function GET() {
       });
     }
 
-    let currentTier = invitation.paymentTransactions?.[0]?.tier as string | undefined;
-    if (!currentTier) {
-      currentTier = "FREE";
+    const settlementTx = invitation.paymentTransactions.find(
+      (t) => t.paymentStatus === "SETTLEMENT"
+    );
+    const waitingTx = invitation.paymentTransactions.find(
+      (t) => t.paymentStatus === "WAITING_VERIFICATION"
+    );
+    const pendingTx = invitation.paymentTransactions.find(
+      (t) => t.paymentStatus === "PENDING"
+    );
+
+    const coupleInfo = (invitation.coupleInfo as Record<string, unknown>) || {};
+    const selectedTier = (coupleInfo.selectedTier as string) || null;
+
+    let currentTier: string | null = null;
+    let isPaid = false;
+    let paymentStatus: "SETTLEMENT" | "WAITING_VERIFICATION" | "PENDING" | "UNPAID" | "UNSELECTED" = "UNSELECTED";
+
+    if (settlementTx) {
+      currentTier = settlementTx.tier;
+      isPaid = true;
+      paymentStatus = "SETTLEMENT";
+    } else if (waitingTx) {
+      currentTier = waitingTx.tier;
+      isPaid = false;
+      paymentStatus = "WAITING_VERIFICATION";
+    } else if (pendingTx) {
+      currentTier = pendingTx.tier;
+      isPaid = false;
+      paymentStatus = "PENDING";
+    } else if (selectedTier) {
+      currentTier = selectedTier;
+      isPaid = false;
+      paymentStatus = "UNPAID";
+    } else {
+      currentTier = null;
+      isPaid = false;
+      paymentStatus = "UNSELECTED";
     }
 
-    // Auto calculate activeUntil for FREE tier: H+7 of event date
-    let effectiveActiveUntil = invitation.activeUntil;
-    if (currentTier === "FREE") {
-      const schedules = invitation.eventSchedules || [];
-      const latestDate =
-        schedules.length > 0
-          ? new Date(Math.max(...schedules.map((s) => new Date(s.date).getTime())))
-          : invitation.createdAt;
-      const hPlus7 = new Date(latestDate.getTime() + 7 * 24 * 60 * 60 * 1000);
-      hPlus7.setHours(23, 59, 59, 999);
-
-      if (!invitation.activeUntil || Math.abs(new Date(invitation.activeUntil).getTime() - hPlus7.getTime()) > 86400000) {
-        await prisma.invitation.update({
-          where: { id: invitation.id },
-          data: { activeUntil: hPlus7 },
-        });
-        effectiveActiveUntil = hPlus7;
-      }
-    }
+    const effectiveActiveUntil = isPaid ? invitation.activeUntil : null;
 
     return NextResponse.json({
       success: true,
@@ -95,6 +111,8 @@ export async function GET() {
         ...invitation,
         activeUntil: effectiveActiveUntil,
         tier: currentTier,
+        isPaid,
+        paymentStatus,
         userEmail: user.email,
         isAdmin: user.email === "admin@admin.com",
       },
@@ -166,15 +184,26 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const currentTier = (userInv.paymentTransactions?.[0]?.tier as string) || "FREE";
+    const rawTier = (userInv.paymentTransactions?.[0]?.tier as string) || "STARTER";
+    const currentTier = rawTier === "FREE" ? "STARTER" : rawTier;
 
-    // Enforce tier validation for FREE
-    if (currentTier === "FREE") {
-      if (validData.galleries && validData.galleries.length > 5) {
+    // Enforce tier validation for STARTER
+    if (currentTier === "STARTER") {
+      if (validData.galleries && validData.galleries.length > 10) {
         return NextResponse.json(
           {
             success: false,
-            error: "Paket Gratis hanya mengizinkan maksimal 5 foto galeri. Silakan upgrade paket untuk foto tanpa batas.",
+            error: "Paket Starter mengizinkan maksimal 10 foto galeri. Silakan upgrade ke Paket Elegant untuk foto tanpa batas.",
+          },
+          { status: 400 }
+        );
+      }
+
+      if (validData.bankAccounts && validData.bankAccounts.length > 2) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Paket Starter mengizinkan maksimal 2 rekening bank. Silakan upgrade ke Paket Elegant untuk rekening tanpa batas.",
           },
           { status: 400 }
         );
@@ -184,24 +213,11 @@ export async function PUT(request: NextRequest) {
         return NextResponse.json(
           {
             success: false,
-            error: "Paket Gratis hanya dapat menggunakan 1 pilihan tema (Clean Minimalist). Silakan upgrade paket untuk membuka seluruh tema.",
+            error: "Paket Starter hanya dapat menggunakan 1 pilihan tema (Clean Minimalist). Silakan upgrade paket untuk membuka seluruh tema.",
           },
           { status: 400 }
         );
       }
-    }
-
-    // Calculate activeUntil for FREE tier: H+7 of latest event date
-    let computedActiveUntil: Date | undefined = undefined;
-    if (currentTier === "FREE") {
-      const scheduleDates = (validData.schedules || [])
-        .map((s: EventScheduleInput) => new Date(s.date).getTime())
-        .filter((t: number) => !isNaN(t));
-
-      const latestTime = scheduleDates.length > 0 ? Math.max(...scheduleDates) : Date.now();
-      const hPlus7 = new Date(latestTime + 7 * 24 * 60 * 60 * 1000);
-      hPlus7.setHours(23, 59, 59, 999);
-      computedActiveUntil = hPlus7;
     }
 
     // Update in transaction to safely sync relations
@@ -215,7 +231,7 @@ export async function PUT(request: NextRequest) {
           themeId: validData.themeId,
           coupleInfo: validData.coupleInfo as object,
           isActive: validData.isActive,
-          ...(computedActiveUntil ? { activeUntil: computedActiveUntil } : {}),
+          ...(validData.activeUntil ? { activeUntil: new Date(validData.activeUntil) } : {}),
         },
       });
 
@@ -309,6 +325,14 @@ export async function PATCH(request: NextRequest) {
 
     const currentTier = (userInv.paymentTransactions?.[0]?.tier as string) || "FREE";
     const updateData: Record<string, unknown> = {};
+
+    if (body.selectedTier && ["STARTER", "ELEGANT", "ULTIMATE"].includes(body.selectedTier)) {
+      const currentCouple = (userInv.coupleInfo as Record<string, unknown>) || {};
+      updateData.coupleInfo = {
+        ...currentCouple,
+        selectedTier: body.selectedTier,
+      };
+    }
 
     if (body.themeId && typeof body.themeId === "string") {
       if (currentTier === "FREE" && body.themeId !== "minimalist") {

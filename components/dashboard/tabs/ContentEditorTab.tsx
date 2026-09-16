@@ -105,7 +105,7 @@ interface ContentEditorTabProps {
   setStories: React.Dispatch<React.SetStateAction<StoryItem[]>>;
 
   // Tier & Upgrade
-  tier?: string;
+  tier?: string | null;
   onUpgradeClick?: () => void;
 
   onSave: () => void;
@@ -638,17 +638,17 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
                   <h4 className="font-semibold text-slate-800 text-xs">
                     Daftar Foto Prewedding ({galleries.length} Foto)
                   </h4>
-                  {tier === "FREE" && (
+                  {(tier === "STARTER" || tier === "FREE") && (
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-semibold">
-                      Paket Gratis: Maks. 5 Foto ({galleries.length}/5)
+                      Paket Starter: Maks. 10 Foto ({galleries.length}/10)
                     </span>
                   )}
                 </div>
                 <button
                   type="button"
-                  disabled={tier === "FREE" && galleries.length >= 5}
+                  disabled={(tier === "STARTER" || tier === "FREE") && galleries.length >= 10}
                   onClick={() => {
-                    if (tier === "FREE" && galleries.length >= 5) return;
+                    if ((tier === "STARTER" || tier === "FREE") && galleries.length >= 10) return;
                     setGalleries([
                       ...galleries,
                       {
@@ -659,7 +659,7 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
                     ]);
                   }}
                   className={`inline-flex items-center gap-1.5 py-1 px-3 rounded-lg font-semibold text-xs border transition-colors ${
-                    tier === "FREE" && galleries.length >= 5
+                    (tier === "STARTER" || tier === "FREE") && galleries.length >= 10
                       ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
                       : "bg-orange-50 text-[#F97316] hover:bg-orange-100 border-orange-100"
                   }`}
@@ -669,12 +669,12 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
                 </button>
               </div>
 
-              {tier === "FREE" && galleries.length >= 5 && (
+              {(tier === "STARTER" || tier === "FREE") && galleries.length >= 10 && (
                 <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
                     <span>
-                      Batas maksimal <strong>5 foto</strong> untuk Paket Gratis telah tercapai. Upgrade paket untuk upload foto galeri tanpa batas.
+                      Batas maksimal <strong>10 foto</strong> untuk Paket Starter telah tercapai. Upgrade paket untuk upload foto galeri tanpa batas.
                     </span>
                   </div>
                   {onUpgradeClick && (
@@ -759,13 +759,22 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
 
         {openSection === 3 && (
           <div className="p-4 sm:p-5 pt-0 border-t border-[#E2E8F0] space-y-4 text-xs animate-in fade-in">
-            <div className="flex items-center justify-between pt-4">
-              <p className="text-slate-500 text-xs">
-                Tamu dapat mengirimkan hadiah tanda kasih langsung via rekening bank atau scan QRIS.
-              </p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-4">
+              <div>
+                <p className="text-slate-500 text-xs">
+                  Tamu dapat mengirimkan hadiah tanda kasih langsung via rekening bank atau scan QRIS.
+                </p>
+                {(tier === "STARTER" || tier === "FREE") && (
+                  <span className="inline-block mt-1 text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-semibold">
+                    Paket Starter: Maks. 2 Rekening ({bankAccounts.length}/2)
+                  </span>
+                )}
+              </div>
               <button
                 type="button"
+                disabled={(tier === "STARTER" || tier === "FREE") && bankAccounts.length >= 2}
                 onClick={() => {
+                  if ((tier === "STARTER" || tier === "FREE") && bankAccounts.length >= 2) return;
                   setBankAccounts([
                     ...bankAccounts,
                     {
@@ -775,12 +784,36 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
                     },
                   ]);
                 }}
-                className="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-lg bg-orange-50 text-[#F97316] hover:bg-blue-100 font-semibold text-xs border border-orange-100 transition-colors"
+                className={`inline-flex items-center gap-1.5 py-1.5 px-3 rounded-lg font-semibold text-xs border transition-colors ${
+                  (tier === "STARTER" || tier === "FREE") && bankAccounts.length >= 2
+                    ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
+                    : "bg-orange-50 text-[#F97316] hover:bg-orange-100 border-orange-100 cursor-pointer"
+                }`}
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Tambah Rekening</span>
               </button>
             </div>
+
+            {(tier === "STARTER" || tier === "FREE") && bankAccounts.length >= 2 && (
+              <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>
+                    Batas maksimal <strong>2 rekening bank</strong> untuk Paket Starter telah tercapai. Upgrade paket untuk menambah rekening &amp; scan QRIS tanpa batas.
+                  </span>
+                </div>
+                {onUpgradeClick && (
+                  <button
+                    type="button"
+                    onClick={onUpgradeClick}
+                    className="px-3 py-1.5 rounded-lg bg-[#F97316] hover:bg-[#EA580C] text-white font-semibold text-xs shrink-0 transition-colors shadow-2xs cursor-pointer"
+                  >
+                    Upgrade Paket
+                  </button>
+                )}
+              </div>
+            )}
 
             {bankAccounts.map((b, idx) => (
               <div

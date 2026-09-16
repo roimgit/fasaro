@@ -55,11 +55,18 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTarget = searchParams.get("from") || "/dashboard";
+  const modeParam = searchParams.get("mode");
+  const planParam = (searchParams.get("plan") || searchParams.get("upgradeTier")) as
+    | "STARTER"
+    | "ELEGANT"
+    | "ULTIMATE"
+    | null;
 
-  const [email, setEmail] = useState("admin@admin.com");
-  const [password, setPassword] = useState("An1357@$");
-  const [name, setName] = useState("Super Administrator");
-  const [isRegisterMode, setIsRegisterMode] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [isRegisterMode, setIsRegisterMode] = useState(modeParam === "register" || Boolean(planParam));
+  const [selectedPlan, setSelectedPlan] = useState<"STARTER" | "ELEGANT" | "ULTIMATE" | null>(planParam);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -82,7 +89,9 @@ function LoginForm() {
     setFormError(null);
 
     const endpoint = isRegisterMode ? "/api/auth/register" : "/api/auth/login";
-    const payload = isRegisterMode ? { name, email, password } : { email, password };
+    const payload = isRegisterMode
+      ? { name, email, password, plan: selectedPlan || undefined }
+      : { email, password };
 
     try {
       const res = await fetch(endpoint, {
@@ -170,24 +179,104 @@ function LoginForm() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+      <form onSubmit={handleSubmit} autoComplete="off" className="space-y-4 mt-4">
         {isRegisterMode && (
-          <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1">
-              Nama Lengkap
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Nama Anda..."
-                className="w-full py-2.5 px-3.5 pl-10 rounded-lg text-sm border border-[#E2E8F0] bg-white text-slate-900 placeholder:text-slate-400 focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] focus:outline-none transition-colors"
-              />
-              <User className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+          <>
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">
+                Nama Lengkap
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  required
+                  autoComplete="off"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Nama Anda..."
+                  className="w-full py-2.5 px-3.5 pl-10 rounded-lg text-sm border border-[#E2E8F0] bg-white text-slate-900 placeholder:text-slate-400 focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316] focus:outline-none transition-colors"
+                />
+                <User className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              </div>
             </div>
-          </div>
+
+            <div className="space-y-1.5 pt-1">
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-semibold text-slate-800">
+                  Pilih Paket Undangan
+                </label>
+                <span className="text-[10px] text-slate-400">
+                  (Bisa diubah di dashboard)
+                </span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedPlan("STARTER")}
+                  className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                    selectedPlan === "STARTER"
+                      ? "border-[#F97316] bg-orange-50/70 ring-1 ring-orange-300"
+                      : "border-[#E2E8F0] hover:border-slate-300 bg-white"
+                  }`}
+                >
+                  <div className="text-[11px] font-bold text-slate-900">Starter</div>
+                  <div className="text-xs font-extrabold text-[#F97316] mt-0.5">Rp 39rb</div>
+                  <div className="text-[9px] text-slate-400 line-through">Rp 89rb</div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedPlan("ELEGANT")}
+                  className={`p-2.5 rounded-xl border text-left transition-all relative cursor-pointer ${
+                    selectedPlan === "ELEGANT"
+                      ? "border-[#F97316] bg-orange-50/70 ring-1 ring-orange-300"
+                      : "border-[#E2E8F0] hover:border-slate-300 bg-white"
+                  }`}
+                >
+                  <div className="text-[11px] font-bold text-slate-900">Elegant</div>
+                  <div className="text-xs font-extrabold text-[#F97316] mt-0.5">Rp 149rb</div>
+                  <div className="text-[9px] text-slate-400 line-through">Rp 249rb</div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedPlan("ULTIMATE")}
+                  className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                    selectedPlan === "ULTIMATE"
+                      ? "border-[#F97316] bg-orange-50/70 ring-1 ring-orange-300"
+                      : "border-[#E2E8F0] hover:border-slate-300 bg-white"
+                  }`}
+                >
+                  <div className="text-[11px] font-bold text-slate-900">Ultimate</div>
+                  <div className="text-xs font-extrabold text-[#F97316] mt-0.5">Rp 279rb</div>
+                  <div className="text-[9px] text-slate-400 line-through">Rp 499rb</div>
+                </button>
+              </div>
+
+              {selectedPlan ? (
+                <div className="p-2 rounded-lg bg-orange-50 border border-orange-200 text-slate-700 text-[11px] flex items-center justify-between">
+                  <span>
+                    Paket dipilih:{" "}
+                    <strong className="text-[#F97316]">
+                      Paket {selectedPlan}
+                    </strong>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPlan(null)}
+                    className="text-[10px] text-slate-400 hover:text-slate-600 underline cursor-pointer"
+                  >
+                    Pilih nanti
+                  </button>
+                </div>
+              ) : (
+                <p className="text-[10px] text-slate-400">
+                  Pilih salah satu paket atau pilih nanti setelah masuk ke dashboard.
+                </p>
+              )}
+            </div>
+          </>
         )}
 
         <div>
@@ -198,6 +287,7 @@ function LoginForm() {
             <input
               type="email"
               required
+              autoComplete="off"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="nama@email.com"
@@ -215,6 +305,7 @@ function LoginForm() {
             <input
               type={showPassword ? "text" : "password"}
               required
+              autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Minimal 6 karakter..."
@@ -252,7 +343,7 @@ function LoginForm() {
         </button>
       </form>
 
-      <div className="mt-5 text-center space-y-3">
+      <div className="mt-5 text-center">
         <button
           type="button"
           onClick={() => {
@@ -265,36 +356,6 @@ function LoginForm() {
             ? "Sudah punya akun? Masuk di sini"
             : "Belum punya akun? Buat akun baru"}
         </button>
-
-        {/* Demo Quick Fill for development */}
-        <div className="pt-3 border-t border-[#F1F5F9] flex items-center justify-center gap-2 text-[11px] text-slate-500">
-          <span>Akun demo:</span>
-          <button
-            type="button"
-            onClick={() => {
-              setEmail("admin@admin.com");
-              setPassword("An1357@$");
-              setIsRegisterMode(false);
-              setFormError(null);
-            }}
-            className="text-slate-600 hover:text-[#F97316] underline font-medium cursor-pointer"
-          >
-            Admin
-          </button>
-          <span>•</span>
-          <button
-            type="button"
-            onClick={() => {
-              setEmail("pengantin@fasaro.id");
-              setPassword("Pengantin123!");
-              setIsRegisterMode(false);
-              setFormError(null);
-            }}
-            className="text-slate-600 hover:text-[#F97316] underline font-medium cursor-pointer"
-          >
-            Pengantin
-          </button>
-        </div>
       </div>
     </div>
 

@@ -82,8 +82,19 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     if (action === "APPROVE") {
-      const oneYearFromNow = new Date();
-      oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+      const activeUntil = new Date();
+      let durationDesc = "365 hari (1 Tahun)";
+
+      if (transaction.tier === "STARTER") {
+        activeUntil.setDate(activeUntil.getDate() + 90);
+        durationDesc = "90 hari";
+      } else if (transaction.tier === "ULTIMATE") {
+        activeUntil.setFullYear(activeUntil.getFullYear() + 100);
+        durationDesc = "Lifetime (Selamanya)";
+      } else {
+        activeUntil.setFullYear(activeUntil.getFullYear() + 1);
+        durationDesc = "365 hari (1 Tahun)";
+      }
 
       const updated = await prisma.$transaction(async (tx) => {
         const txUpdated = await tx.paymentTransaction.update({
@@ -96,11 +107,20 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         });
 
         if (transaction.invitationId) {
+          const inv = await tx.invitation.findUnique({
+            where: { id: transaction.invitationId },
+          });
+          const coupleInfo = (inv?.coupleInfo as Record<string, unknown>) || {};
+
           await tx.invitation.update({
             where: { id: transaction.invitationId },
             data: {
               isActive: true,
-              activeUntil: oneYearFromNow,
+              activeUntil,
+              coupleInfo: {
+                ...coupleInfo,
+                selectedTier: transaction.tier,
+              },
             },
           });
         }
@@ -109,7 +129,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       });
 
       return NextResponse.json({
-        message: "Transaksi berhasil disetujui & masa aktif undangan diaktifkan selama 365 hari",
+        message: `Transaksi berhasil disetujui & paket ${transaction.tier} aktif (${durationDesc})`,
         data: updated,
       });
     }

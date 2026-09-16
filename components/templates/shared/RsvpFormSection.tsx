@@ -7,16 +7,26 @@ import { CheckCircle2, Loader2, Send, Users } from "lucide-react";
 interface RsvpFormSectionProps {
   invitationId: string;
   defaultGuestName?: string;
+  hideHeader?: boolean;
   themeStyle?: {
     cardClass?: string;
     buttonClass?: string;
     inputClass?: string;
+    titleClass?: string;
+    subtitleClass?: string;
+    labelClass?: string;
+    statusButtonClass?: string;
+    statusButtonActiveClass?: string;
+    iconClass?: string;
+    submittedTitleClass?: string;
+    submittedSubtitleClass?: string;
   };
 }
 
 export const RsvpFormSection: React.FC<RsvpFormSectionProps> = ({
   invitationId,
   defaultGuestName = "",
+  hideHeader = false,
   themeStyle,
 }) => {
   const [guestName, setGuestName] = useState(defaultGuestName);
@@ -77,41 +87,67 @@ export const RsvpFormSection: React.FC<RsvpFormSectionProps> = ({
       <div
         className={`p-6 sm:p-8 rounded-3xl border shadow-lg ${
           themeStyle?.cardClass ??
-          "bg-white/95 dark:bg-stone-800/95 border-stone-200 dark:border-stone-700"
+          "bg-white/95 border-stone-200 text-stone-900"
         }`}
       >
-        <div className="text-center mb-6">
-          <div className="inline-flex p-3 rounded-full bg-rose-100 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 mb-2">
-            <Users className="w-5 h-5" />
+        {!hideHeader && (
+          <div className="text-center mb-6">
+            <div
+              className={`inline-flex p-3 rounded-full mb-2 ${
+                themeStyle?.iconClass ?? "bg-rose-100 text-rose-600"
+              }`}
+            >
+              <Users className="w-5 h-5" />
+            </div>
+            <h3
+              className={`text-xl font-serif font-bold ${
+                themeStyle?.titleClass ?? "text-stone-900"
+              }`}
+            >
+              Konfirmasi Kehadiran (RSVP)
+            </h3>
+            <p
+              className={`text-xs font-medium mt-1 leading-relaxed ${
+                themeStyle?.subtitleClass ?? "text-stone-600"
+              }`}
+            >
+              Bantu kami mempersiapkan jamuan terbaik dengan mengonfirmasi kehadiran Anda.
+            </p>
           </div>
-          <h3 className="text-xl font-serif font-bold text-stone-900 dark:text-stone-100">
-            Konfirmasi Kehadiran (RSVP)
-          </h3>
-          <p className="text-xs text-stone-700 dark:text-stone-300 font-medium mt-1">
-            Bantu kami mempersiapkan jamuan terbaik dengan mengonfirmasi kehadiran Anda.
-          </p>
-        </div>
+        )}
 
         {isSubmitted ? (
           <div className="text-center py-6 animate-in fade-in zoom-in">
             <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-3" />
-            <h4 className="text-base font-bold text-stone-900 dark:text-stone-100">
+            <h4
+              className={`text-base font-bold ${
+                themeStyle?.submittedTitleClass ?? themeStyle?.titleClass ?? "text-stone-900"
+              }`}
+            >
               Terima Kasih atas Konfirmasi Anda!
             </h4>
-            <p className="text-xs text-stone-700 dark:text-stone-300 font-medium mt-1">
+            <p
+              className={`text-xs font-medium mt-1 ${
+                themeStyle?.submittedSubtitleClass ?? themeStyle?.subtitleClass ?? "text-stone-600"
+              }`}
+            >
               Jawaban Anda telah kami simpan. Sampai jumpa di hari bahagia!
             </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4 text-left">
             {errorMessage && (
-              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 text-xs border border-rose-200 dark:border-rose-900">
+              <div className="p-3 rounded-xl bg-rose-50 text-rose-700 text-xs border border-rose-200">
                 {errorMessage}
               </div>
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1">
+              <label
+                className={`block text-xs font-semibold mb-1 ${
+                  themeStyle?.labelClass ?? "text-stone-700"
+                }`}
+              >
                 Nama Lengkap
               </label>
               <input
@@ -122,13 +158,17 @@ export const RsvpFormSection: React.FC<RsvpFormSectionProps> = ({
                 placeholder="Masukkan nama Anda..."
                 className={`w-full py-2.5 px-3.5 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${
                   themeStyle?.inputClass ??
-                  "bg-stone-50 dark:bg-stone-900 border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100"
+                  "bg-stone-50 border-stone-300 text-stone-900 placeholder:text-stone-400"
                 }`}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1">
+              <label
+                className={`block text-xs font-semibold mb-1 ${
+                  themeStyle?.labelClass ?? "text-stone-700"
+                }`}
+              >
                 Konfirmasi
               </label>
               <div className="grid grid-cols-3 gap-2">
@@ -143,10 +183,12 @@ export const RsvpFormSection: React.FC<RsvpFormSectionProps> = ({
                     onClick={() =>
                       setStatus(item.key as "ATTENDING" | "NOT_ATTENDING" | "UNCERTAIN")
                     }
-                    className={`py-2 px-2 rounded-xl text-xs font-medium border transition-all text-center ${
+                    className={`py-2 px-2 rounded-xl text-xs font-semibold border transition-all text-center cursor-pointer ${
                       status === item.key
-                        ? "bg-amber-600 border-amber-600 text-white shadow-sm"
-                        : "bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:border-amber-400"
+                        ? themeStyle?.statusButtonActiveClass ??
+                          "bg-amber-600 border-amber-600 text-white shadow-sm"
+                        : themeStyle?.statusButtonClass ??
+                          "bg-white border-stone-200 text-stone-700 hover:border-amber-400"
                     }`}
                   >
                     {item.label}
@@ -158,7 +200,11 @@ export const RsvpFormSection: React.FC<RsvpFormSectionProps> = ({
             {status === "ATTENDING" && (
               <>
                 <div>
-                  <label className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1">
+                  <label
+                    className={`block text-xs font-semibold mb-1 ${
+                      themeStyle?.labelClass ?? "text-stone-700"
+                    }`}
+                  >
                     Jumlah Tamu
                   </label>
                   <select
@@ -166,11 +212,11 @@ export const RsvpFormSection: React.FC<RsvpFormSectionProps> = ({
                     onChange={(e) => setAttendeeCount(parseInt(e.target.value, 10))}
                     className={`w-full py-2.5 px-3.5 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${
                       themeStyle?.inputClass ??
-                      "bg-stone-50 dark:bg-stone-900 border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100"
+                      "bg-stone-50 border-stone-300 text-stone-900"
                     }`}
                   >
                     {[1, 2, 3, 4, 5].map((num) => (
-                      <option key={num} value={num}>
+                      <option key={num} value={num} className="text-stone-900 bg-white">
                         {num} Orang
                       </option>
                     ))}
@@ -178,7 +224,11 @@ export const RsvpFormSection: React.FC<RsvpFormSectionProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1">
+                  <label
+                    className={`block text-xs font-semibold mb-1 ${
+                      themeStyle?.labelClass ?? "text-stone-700"
+                    }`}
+                  >
                     Sesi Acara
                   </label>
                   <select
@@ -186,12 +236,18 @@ export const RsvpFormSection: React.FC<RsvpFormSectionProps> = ({
                     onChange={(e) => setSessionChosen(e.target.value)}
                     className={`w-full py-2.5 px-3.5 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-amber-500 ${
                       themeStyle?.inputClass ??
-                      "bg-stone-50 dark:bg-stone-900 border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100"
+                      "bg-stone-50 border-stone-300 text-stone-900"
                     }`}
                   >
-                    <option value="Akad & Resepsi">Akad &amp; Resepsi</option>
-                    <option value="Resepsi Saja">Resepsi Saja</option>
-                    <option value="Akad Nikah Saja">Akad Nikah Saja</option>
+                    <option value="Akad & Resepsi" className="text-stone-900 bg-white">
+                      Akad &amp; Resepsi
+                    </option>
+                    <option value="Resepsi Saja" className="text-stone-900 bg-white">
+                      Resepsi Saja
+                    </option>
+                    <option value="Akad Nikah Saja" className="text-stone-900 bg-white">
+                      Akad Nikah Saja
+                    </option>
                   </select>
                 </div>
               </>

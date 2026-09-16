@@ -83,6 +83,7 @@ export const updateInvitationSchema = invitationSchema.partial().extend({
     .optional(),
   themeId: z.string().min(1).max(50).optional(),
   coupleInfo: coupleInfoSchema.partial().optional(),
+  selectedTier: z.enum(["STARTER", "ELEGANT", "ULTIMATE"]).optional().nullable(),
 });
 
 export const rsvpSchema = z.object({
@@ -106,6 +107,7 @@ export const registerSchema = z.object({
   name: z.string().min(2, "Nama minimal 2 karakter").max(100),
   email: z.string().email("Format email tidak valid").toLowerCase(),
   password: z.string().min(6, "Password minimal 6 karakter").max(100),
+  plan: z.enum(["STARTER", "ELEGANT", "ULTIMATE"]).optional().nullable(),
 });
 
 export const loginSchema = z.object({
