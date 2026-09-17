@@ -37,54 +37,54 @@ interface MusicPreset {
 
 const MUSIC_PRESETS: MusicPreset[] = [
   {
-    title: "Romantic Grand Piano",
-    category: "Piano Romantis",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+    title: "Janji Suci (Instrumental Romantis)",
+    category: "Melow Romantis",
+    url: "https://cdn.jsdelivr.net/gh/alfalaah404/undangan-nikah@main/index_files/janji-suci.mp3",
   },
   {
-    title: "Warm Acoustic Melody",
+    title: "Lagu Pernikahan Impian (Syahdu & Lembut)",
+    category: "Syahdu Puitis",
+    url: "https://cdn.jsdelivr.net/gh/idindrakusuma/thekusuma@master/src/assets/music/lagu-pernikahan-impian.mp3",
+  },
+  {
+    title: "Beautiful In White (Akustik Hangat)",
     category: "Akustik Hangat",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+    url: "https://cdn.jsdelivr.net/gh/petershaan12/Weddingly-Free@main/public/music/wedding_song.mp3",
   },
   {
-    title: "Cinematic Wedding Strings",
-    category: "Orkestra Mewah",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+    title: "Kisah Kasih Abadi (Piano & Strings)",
+    category: "Piano & Strings",
+    url: "https://cdn.jsdelivr.net/gh/andikaputradev/wedding-invitation@main/public/audio/wedding-music.mp3",
   },
   {
-    title: "Gentle Symphony & Harp",
-    category: "Lembut & Elegan",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+    title: "Acoustic Sunset Romance (Petikan Lembut)",
+    category: "Akustik Santai",
+    url: "https://cdn.jsdelivr.net/gh/zachriek/nikah-yuk@master/public/assets/audio/music1.mp3",
   },
   {
-    title: "Sweet Love Serenade",
+    title: "Harmoni Janji Bahagia (Piano Melow)",
+    category: "Piano Syahdu",
+    url: "https://cdn.jsdelivr.net/gh/In-HyeokJang/new-mobile-wedding@master/public/music/bgm.mp3",
+  },
+  {
+    title: "Fulfilling Romance (Alunan Tenang)",
+    category: "Khidmat & Syar'i",
+    url: "https://cdn.jsdelivr.net/gh/sakeenah-wedding/template@main/public/audio/fulfilling-humming.mp3",
+  },
+  {
+    title: "Cinta Sejati (Romantic Acoustic)",
     category: "Romansa Manis",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+    url: "https://cdn.jsdelivr.net/gh/zachriek/nikah-yuk@master/public/assets/audio/music2.mp3",
   },
   {
-    title: "Everlasting Harmony",
-    category: "Bahagia Bersamamu",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3",
+    title: "Classic Nocturne Romance (Piano Chopin)",
+    category: "Klasik Elegan",
+    url: "https://cdn.jsdelivr.net/npm/audio-lab@1.3.0/test/assets/chopin.mp3",
   },
   {
-    title: "Pastoral Calm Nuance",
-    category: "Syahdu & Khidmat",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3",
-  },
-  {
-    title: "Traditional Soft Serenade",
-    category: "Tradisional Syahdu",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
-  },
-  {
-    title: "Modern Acoustic Ballad",
-    category: "Modern Pop Akustik",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3",
-  },
-  {
-    title: "Sacred Vow Orchestra",
-    category: "Harmoni Janji Suci",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3",
+    title: "Sweet Wedding Harmony (Sentuhan Kasih)",
+    category: "Pop Romantis",
+    url: "https://cdn.jsdelivr.net/gh/salmanagustian/wedding-digital-invitation@master/public/assets/music/music.mp3",
   },
 ];
 
