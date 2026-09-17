@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 import { WeddingInvitationData } from "@/types/wedding";
 import HeroCover from "../shared/HeroCover";
 import FloatingAudioPlayer from "../shared/FloatingAudioPlayer";
@@ -185,6 +184,45 @@ export const RusticTheme: React.FC<ThemeProps> = ({
             </div>
           </div>
         </section>
+
+        {/* Love Story */}
+        {data.coupleInfo.stories && data.coupleInfo.stories.length > 0 && (
+          <section id="cerita" className="space-y-8">
+            <div className="space-y-1">
+              <p className="text-xs uppercase tracking-widest text-[#966b43] font-sans">
+                Kisah Kasih
+              </p>
+              <h2 className="text-3xl font-serif text-[#382b24]">Awal Mula Perjumpaan</h2>
+            </div>
+
+            <div className="space-y-6 max-w-lg mx-auto text-left relative border-l-2 border-[#dfcdb9] ml-4 pl-6 sm:ml-auto">
+              {data.coupleInfo.stories.map((story, idx) => (
+                <div key={idx} className="relative space-y-1.5">
+                  <div className="absolute -left-[31px] top-1 w-3 h-3 rounded-full bg-[#966b43] border-2 border-white shadow-xs" />
+                  <span className="text-xs font-semibold text-[#966b43] font-sans tracking-wide">
+                    {story.date}
+                  </span>
+                  <h4 className="font-serif text-base font-bold text-[#382b24]">
+                    {story.title}
+                  </h4>
+                  {story.imageUrl && (
+                    <div className="my-2 rounded-xl overflow-hidden border border-[#dfcdb9] shadow-xs max-w-sm">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={story.imageUrl}
+                        alt={story.title || "Foto Momen Cerita"}
+                        className="w-full h-44 object-cover hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                  )}
+                  <p className="text-xs text-[#5c4333] leading-relaxed font-normal">
+                    {story.story}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Schedules */}
         <section id="event" className="space-y-8">

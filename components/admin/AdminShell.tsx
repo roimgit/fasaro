@@ -25,6 +25,7 @@ interface AdminShellProps {
 }
 
 const TAB_LABELS: Record<string, string> = {
+  overview: "Dashboard & Analisa Penjualan",
   clients: "Klien & Undangan",
   themes: "Katalog Desain",
   cms: "Konten Web & Showcase",
@@ -33,6 +34,7 @@ const TAB_LABELS: Record<string, string> = {
   features: "Saklar Fitur",
   gateway: "Gateway & QRIS Toko",
   system: "Alat & Kesehatan Sistem",
+  roles: "Pengaturan Hak Akses Pengguna",
 };
 
 export default function AdminShell({ children, sessionUser }: AdminShellProps) {
@@ -41,10 +43,10 @@ export default function AdminShell({ children, sessionUser }: AdminShellProps) {
   const searchParams = useSearchParams();
 
   const isVerificationPage = pathname.startsWith("/admin/verifikasi-manual");
-  const currentTab = searchParams.get("tab") || "clients";
+  const currentTab = searchParams.get("tab") || "overview";
   const activeLabel = isVerificationPage
     ? "Verifikasi Pembayaran Manual"
-    : TAB_LABELS[currentTab] || "Pusat Kendali";
+    : TAB_LABELS[currentTab] || "Dashboard";
 
   return (
     <div className="min-h-screen bg-[#F3F6FB] text-slate-800 flex flex-col font-sans selection:bg-orange-500 selection:text-white">

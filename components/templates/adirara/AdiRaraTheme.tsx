@@ -235,7 +235,7 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
 
             <div className="space-y-6 max-w-lg mx-auto text-left relative border-l-2 border-rose-200 ml-4 pl-6 sm:ml-auto">
               {data.coupleInfo.stories.map((story, idx) => (
-                <div key={idx} className="relative space-y-1">
+                <div key={idx} className="relative space-y-1.5">
                   <div className="absolute -left-[31px] top-1 w-3 h-3 rounded-full bg-rose-600 border-2 border-white shadow-sm" />
                   <span className="text-xs font-semibold text-rose-700 font-sans tracking-wide">
                     {story.date}
@@ -243,6 +243,16 @@ export const AdiRaraTheme: React.FC<ThemeProps> = ({
                   <h4 className="font-serif text-base font-bold text-stone-900">
                     {story.title}
                   </h4>
+                  {story.imageUrl && (
+                    <div className="my-2 rounded-xl overflow-hidden border border-rose-100 shadow-xs max-w-sm">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={story.imageUrl}
+                        alt={story.title || "Foto Momen Cerita"}
+                        className="w-full h-44 object-cover hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                  )}
                   <p className="text-xs text-stone-700 leading-relaxed font-normal">
                     {story.story}
                   </p>

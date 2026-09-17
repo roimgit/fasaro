@@ -9,11 +9,13 @@ import {
   CreditCard,
   FileText,
   Globe,
+  LayoutDashboard,
   LogOut,
   Palette,
   Power,
   Radio,
   Shield,
+  ShieldCheck,
   Sparkles,
   Tag,
   Users,
@@ -50,7 +52,7 @@ export default function AdminSidebar({
 }: AdminSidebarProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const currentTab = searchParams.get("tab") || "clients";
+  const currentTab = searchParams.get("tab") || "overview";
 
   const isTabActive = (tabId: string, href: string) => {
     if (href === "/admin/verifikasi-manual") {
@@ -63,6 +65,17 @@ export default function AdminSidebar({
   };
 
   const SECTIONS: NavSection[] = [
+    {
+      title: "DASHBOARD",
+      items: [
+        {
+          id: "overview",
+          label: "Dashboard & Penjualan",
+          href: "/admin?tab=overview",
+          icon: LayoutDashboard,
+        },
+      ],
+    },
     {
       title: "DATA & KLIEN",
       items: [
@@ -133,6 +146,12 @@ export default function AdminSidebar({
           label: "Alat & Kesehatan Sistem",
           href: "/admin?tab=system",
           icon: Activity,
+        },
+        {
+          id: "roles",
+          label: "Pengaturan Hak Akses",
+          href: "/admin?tab=roles",
+          icon: ShieldCheck,
         },
       ],
     },

@@ -88,10 +88,13 @@ function LoginForm() {
     setIsLoading(true);
     setFormError(null);
 
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanName = name.trim();
+
     const endpoint = isRegisterMode ? "/api/auth/register" : "/api/auth/login";
     const payload = isRegisterMode
-      ? { name, email, password, plan: selectedPlan || undefined }
-      : { email, password };
+      ? { name: cleanName, email: cleanEmail, password, plan: selectedPlan || undefined }
+      : { email: cleanEmail, password };
 
     try {
       const res = await fetch(endpoint, {

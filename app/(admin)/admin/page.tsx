@@ -1,24 +1,19 @@
 "use client";
 
 import React, { Suspense, useCallback, useEffect, useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import {
   AlertCircle,
   Check,
   CheckCircle2,
-  Clock,
   Edit2,
   ExternalLink,
   LogIn,
   Plus,
   RefreshCw,
   Search,
-  Heart,
   Trash2,
-  Users,
-  Wallet,
   X,
 } from "lucide-react";
 import { AdminCmsContentTab, SettingItem } from "@/components/admin/tabs/AdminCmsContentTab";
@@ -27,8 +22,15 @@ import { AdminMaintenanceModeTab } from "@/components/admin/tabs/AdminMaintenanc
 import { AdminFeatureFlagsTab } from "@/components/admin/tabs/AdminFeatureFlagsTab";
 import { AdminGatewayTab } from "@/components/admin/tabs/AdminGatewayTab";
 import { AdminSystemToolsTab, MaintenanceHealthData } from "@/components/admin/tabs/AdminSystemToolsTab";
+import {
+  AdminOverviewTab,
+  SalesAnalytics,
+  TransactionItem,
+} from "@/components/admin/tabs/AdminOverviewTab";
+import { AdminUserRolesTab } from "@/components/admin/tabs/AdminUserRolesTab";
 
 export type AdminTab =
+  | "overview"
   | "clients"
   | "themes"
   | "cms"
@@ -36,7 +38,8 @@ export type AdminTab =
   | "maintenance"
   | "features"
   | "gateway"
-  | "system";
+  | "system"
+  | "roles";
 
 interface MetricsData {
   totalUsers: number;
@@ -83,7 +86,7 @@ interface ThemeItem {
 function MasterAdminContent() {
   const searchParams = useSearchParams();
   const tabFromQuery = searchParams.get("tab") as AdminTab | null;
-  const [activeTab, setActiveTab] = useState<AdminTab>("clients");
+  const [activeTab, setActiveTab] = useState<AdminTab>("overview");
 
   useEffect(() => {
     if (tabFromQuery) {
@@ -96,6 +99,8 @@ function MasterAdminContent() {
   const [clients, setClients] = useState<ClientData[]>([]);
   const [themes, setThemes] = useState<ThemeItem[]>([]);
   const [settings, setSettings] = useState<SettingItem[]>([]);
+  const [transactions, setTransactions] = useState<TransactionItem[]>([]);
+  const [salesAnalytics, setSalesAnalytics] = useState<SalesAnalytics | null>(null);
   const [diagnostics, setDiagnostics] = useState<MaintenanceHealthData | null>(null);
   const [isLoadingDiagnostics, setIsLoadingDiagnostics] = useState(false);
   const [isSavingSettings, setIsSavingSettings] = useState(false);
@@ -132,11 +137,12 @@ function MasterAdminContent() {
       setFeedback(null);
     }
     try {
-      const [resMetrics, resClients, resThemes, resSettings] = await Promise.all([
+      const [resMetrics, resClients, resThemes, resSettings, resPayments] = await Promise.all([
         fetch("/api/admin/metrics"),
         fetch("/api/admin/clients"),
         fetch("/api/admin/themes"),
         fetch("/api/admin/settings"),
+        fetch("/api/admin/payments"),
       ]);
 
       if (resMetrics.ok) {
@@ -154,6 +160,11 @@ function MasterAdminContent() {
       if (resSettings.ok) {
         const json = await resSettings.json();
         setSettings(json.data || []);
+      }
+      if (resPayments.ok) {
+        const json = await resPayments.json();
+        setTransactions(json.data?.transactions || []);
+        setSalesAnalytics(json.data?.analytics || null);
       }
     } catch {
       setFeedback({ type: "error", msg: "Gagal memuat data dashboard admin." });
@@ -332,27 +343,6 @@ function MasterAdminContent() {
 
   return (
     <div className="space-y-6">
-      {/* Top Header Title & Refresh */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-sans font-bold text-slate-900 tracking-tight">
-            Pusat Kendali Super Admin
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Pantau pertumbuhan pengguna, manajemen status langganan klien, dan konfigurasi platform.
-          </p>
-        </div>
-
-        <button
-          onClick={() => void fetchAllData(true)}
-          disabled={isLoading}
-          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-[#E2E8F0] bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-all shadow-xs disabled:opacity-50"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin text-[#F97316]" : "text-slate-500"}`} />
-          <span>Refresh Data</span>
-        </button>
-      </div>
-
       {/* Feedback Banner */}
       {feedback && (
         <div
@@ -370,95 +360,53 @@ function MasterAdminContent() {
             )}
             <span>{feedback.msg}</span>
           </div>
-          <button onClick={() => setFeedback(null)} className="p-1 text-slate-500 hover:text-slate-800">
+          <button onClick={() => setFeedback(null)} className="p-1 text-slate-500 hover:text-slate-800 cursor-pointer">
             <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
-      {/* 1. Executive Metrics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Card 1: Users */}
-        <div className="p-5 rounded-xl bg-white border border-[#E2E8F0] shadow-xs space-y-2">
-          <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
-            <span>Total Pengguna</span>
-            <div className="p-2 rounded-lg bg-orange-50 text-[#F97316]">
-              <Users className="w-4 h-4" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold font-sans text-slate-900 tracking-tight">
-            {metrics?.totalUsers ?? 0}
-          </p>
-          <p className="text-[11px] text-slate-500">Akun terdaftar dalam database</p>
-        </div>
+      {/* TAB 0: DASHBOARD & ANALISA PENJUALAN (Requirement 4 & 5) */}
+      {activeTab === "overview" && (
+        <AdminOverviewTab
+          metrics={metrics}
+          analytics={salesAnalytics}
+          transactions={transactions}
+          isLoading={isLoading}
+          onRefresh={() => void fetchAllData(true)}
+        />
+      )}
 
-        {/* Card 2: Active Invitations */}
-        <div className="p-5 rounded-xl bg-white border border-[#E2E8F0] shadow-xs space-y-2">
-          <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
-            <span>Undangan Aktif</span>
-            <div className="p-2 rounded-lg bg-orange-50 text-[#F97316]">
-              <Heart className="w-4 h-4" />
-            </div>
+      {/* Active Section Module Header (Only visible on subpages, NOT on overview) */}
+      {activeTab !== "overview" && (
+        <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0]">
+          <div className="flex items-center gap-2.5">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+              Modul Aktif
+            </span>
+            <span className="text-sm font-bold text-slate-900">
+              {activeTab === "clients" && `Manajemen Klien & Undangan (${clients.length})`}
+              {activeTab === "themes" && `Katalog Desain Template (${themes.length})`}
+              {activeTab === "cms" && "Konten Website, Hero & Live Showcase"}
+              {activeTab === "pricing" && "Pengaturan Paket Harga & Live Preview"}
+              {activeTab === "maintenance" && "Mode Pemeliharaan & Darurat"}
+              {activeTab === "features" && "Saklar Fitur Platform (Feature Flags)"}
+              {activeTab === "gateway" && "Gateway Pembayaran & QRIS Toko"}
+              {activeTab === "system" && "Kesehatan Database & Alat Pemeliharaan"}
+              {activeTab === "roles" && "Pengaturan Hak Akses & Peran Pengguna"}
+            </span>
           </div>
-          <p className="text-2xl font-bold font-sans text-slate-900 tracking-tight">
-            {metrics?.totalActiveInvitations ?? 0}
-          </p>
-          <p className="text-[11px] text-emerald-600 font-medium">Status tayang &amp; siap diakses tamu</p>
-        </div>
 
-        {/* Card 3: Monthly Revenue */}
-        <div className="p-5 rounded-xl bg-white border border-[#E2E8F0] shadow-xs space-y-2">
-          <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
-            <span>Pendapatan Bulan Ini</span>
-            <div className="p-2 rounded-lg bg-orange-50 text-[#F97316]">
-              <Wallet className="w-4 h-4" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold font-sans text-slate-900 tracking-tight">
-            Rp {(metrics?.monthlyRevenue ?? 0).toLocaleString("id-ID")}
-          </p>
-          <p className="text-[11px] text-slate-500">Total settlement Midtrans &amp; QRIS</p>
-        </div>
-
-        {/* Card 4: Verification Queue */}
-        <div className="p-5 rounded-xl bg-white border border-[#E2E8F0] shadow-xs space-y-2">
-          <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
-            <span>Antrean Verifikasi</span>
-            <div className="p-2 rounded-lg bg-orange-50 text-[#F97316]">
-              <Clock className="w-4 h-4" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold font-sans text-slate-900 tracking-tight">
-            {metrics?.pendingPaymentsCount ?? 0}
-          </p>
-          <Link
-            href="/admin/verifikasi-manual"
-            className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#F97316] hover:underline"
+          <button
+            onClick={() => void fetchAllData(true)}
+            disabled={isLoading}
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-all shadow-xs disabled:opacity-50 cursor-pointer"
           >
-            <span>Buka Halaman Verifikasi</span>
-            <ExternalLink className="w-3 h-3" />
-          </Link>
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin text-[#F97316]" : "text-slate-500"}`} />
+            <span className="hidden sm:inline">Refresh Data</span>
+          </button>
         </div>
-      </div>
-
-      {/* 2. Active Section Module Header Banner */}
-      <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0]">
-        <div className="flex items-center gap-2.5">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-            Modul Aktif
-          </span>
-          <span className="text-sm font-bold text-slate-900">
-            {activeTab === "clients" && `Manajemen Klien & Undangan (${clients.length})`}
-            {activeTab === "themes" && `Katalog Desain Template (${themes.length})`}
-            {activeTab === "cms" && "Konten Website, Hero & Live Showcase"}
-            {activeTab === "pricing" && "Pengaturan Paket Harga & Live Preview"}
-            {activeTab === "maintenance" && "Mode Pemeliharaan & Darurat"}
-            {activeTab === "features" && "Saklar Fitur Platform (Feature Flags)"}
-            {activeTab === "gateway" && "Gateway Pembayaran & QRIS Toko"}
-            {activeTab === "system" && "Kesehatan Database & Alat Pemeliharaan"}
-          </span>
-        </div>
-      </div>
+      )}
 
       {/* TAB 1: MANAJEMEN KLIEN */}
       {activeTab === "clients" && (
@@ -782,6 +730,13 @@ function MasterAdminContent() {
           diagnostics={diagnostics}
           isLoadingDiagnostics={isLoadingDiagnostics}
           onRefreshDiagnostics={fetchDiagnostics}
+        />
+      )}
+
+      {/* TAB 9: PENGATURAN HAK AKSES PENGGUNA */}
+      {activeTab === "roles" && (
+        <AdminUserRolesTab
+          onNotify={(type, msg) => setFeedback({ type, msg })}
         />
       )}
 

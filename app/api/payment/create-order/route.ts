@@ -43,6 +43,19 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       }
     }
 
+    // Validate & enforce amount against official configured tier price to prevent client tampering
+    const priceKey = `price_${tier.toLowerCase()}`;
+    const priceSetting = await prisma.systemSetting.findUnique({
+      where: { key: priceKey },
+    });
+    const defaultPrices: Record<string, number> = {
+      STARTER: 39000,
+      ELEGANT: 149000,
+      ULTIMATE: 279000,
+    };
+    const officialPrice = priceSetting ? parseInt(priceSetting.value, 10) || defaultPrices[tier] : defaultPrices[tier];
+    const verifiedAmount = officialPrice > 0 ? officialPrice : amount;
+
     const orderId = `FSR-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
     // 1. If Automatic Gateway (Midtrans Snap)
@@ -57,7 +70,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         );
       }
 
-      const snapData = await createSnapTransaction(orderId, amount, {
+      const snapData = await createSnapTransaction(orderId, verifiedAmount, {
         first_name: session.email.split("@")[0],
         email: session.email,
       });
@@ -68,7 +81,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           userId: session.userId,
           invitationId: invitationId ?? null,
           tier,
-          amount,
+          amount: verifiedAmount,
           paymentType: "GATEWAY",
           paymentStatus: "PENDING",
         },
@@ -112,7 +125,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         userId: session.userId,
         invitationId: invitationId ?? null,
         tier,
-        amount,
+        amount: verifiedAmount,
         paymentType: paymentType === "MANUAL_QRIS" ? "MANUAL_QRIS" : "MANUAL_BANK",
         paymentStatus: "WAITING_VERIFICATION",
         proofImageUrl,

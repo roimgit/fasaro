@@ -432,6 +432,16 @@ export const MinangTheme: React.FC<MinangThemeProps> = ({
                     {s.date}
                   </span>
                   <h3 className="font-serif font-bold text-base text-amber-200">{s.title}</h3>
+                  {s.imageUrl && (
+                    <div className="my-2 rounded-xl overflow-hidden border border-amber-500/30 shadow-md max-w-sm">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={s.imageUrl}
+                        alt={s.title || "Foto Janjang Kasih"}
+                        className="w-full h-44 object-cover hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                  )}
                   <p className="text-xs text-amber-100/90 leading-relaxed">{s.story}</p>
                 </div>
               ))}

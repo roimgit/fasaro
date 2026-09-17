@@ -118,7 +118,7 @@ export async function GET() {
         isPaid,
         paymentStatus,
         userEmail: user.email,
-        isAdmin: user.email === "admin@admin.com",
+        isAdmin: user.role === "ADMIN" || user.email === "admin@admin.com",
       },
     });
   } catch (error) {
@@ -169,21 +169,6 @@ export async function PUT(request: NextRequest) {
 
     const validData = parseResult.data;
 
-    // Check slug uniqueness if slug changed
-    const existingSlug = await prisma.invitation.findFirst({
-      where: {
-        slug: validData.slug,
-        userId: { not: user.userId },
-      },
-    });
-
-    if (existingSlug) {
-      return NextResponse.json(
-        { success: false, error: "Subdomain / slug tautan ini sudah dipakai pasangan lain." },
-        { status: 409 }
-      );
-    }
-
     // Find user's invitation and current tier
     const userInv = await prisma.invitation.findFirst({
       where: { userId: user.userId },
@@ -205,7 +190,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const hasActiveSettlement = userInv.paymentTransactions && userInv.paymentTransactions.length > 0;
-    const isAdmin = user.email === "admin@admin.com";
+    const isAdmin = user.role === "ADMIN" || user.email === "admin@admin.com";
 
     if (!hasActiveSettlement && !isAdmin) {
       return NextResponse.json(
@@ -219,6 +204,30 @@ export async function PUT(request: NextRequest) {
     }
 
     const currentTier = (userInv.paymentTransactions?.[0]?.tier as string) || "STARTER";
+
+    // Enforce slug auto-sync from nicknames for Starter tier (custom slug only for tiers above Starter or admin)
+    if (currentTier === "STARTER" && !isAdmin) {
+      const gNick = (validData.coupleInfo?.groomNickname || "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+      const bNick = (validData.coupleInfo?.brideNickname || "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+      if (gNick && bNick) {
+        validData.slug = `${gNick}-${bNick}`;
+      }
+    }
+
+    // Check slug uniqueness if slug changed
+    const existingSlug = await prisma.invitation.findFirst({
+      where: {
+        slug: validData.slug,
+        userId: { not: user.userId },
+      },
+    });
+
+    if (existingSlug) {
+      return NextResponse.json(
+        { success: false, error: "Subdomain / slug tautan ini sudah dipakai pasangan lain." },
+        { status: 409 }
+      );
+    }
 
     // Enforce tier validation for STARTER
     if (currentTier === "STARTER" && !isAdmin) {
@@ -253,6 +262,22 @@ export async function PUT(request: NextRequest) {
             success: false,
             error:
               "Paket Starter tidak mendukung foto QRIS. Silakan upgrade ke Paket Elegant atau Ultimate untuk menggunakan scan QRIS.",
+          },
+          { status: 400 }
+        );
+      }
+
+      if (
+        validData.coupleInfo?.stories &&
+        validData.coupleInfo.stories.some(
+          (s) => s.imageUrl && s.imageUrl.trim() !== ""
+        )
+      ) {
+        return NextResponse.json(
+          {
+            success: false,
+            error:
+              "Paket Starter tidak mendukung upload foto pada Kisah Cinta. Silakan upgrade ke Paket Elegant atau Ultimate untuk menambahkan foto momen cinta.",
           },
           { status: 400 }
         );

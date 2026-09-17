@@ -94,12 +94,22 @@ export const coupleInfoSchema = z.object({
     .optional()
     .nullable()
     .or(z.literal("")),
+  useVideoAsDesktopCover: z.boolean().optional().nullable(),
   stories: z
     .array(
       z.object({
         date: z.string(),
         title: z.string(),
         story: z.string(),
+        imageUrl: z
+          .string()
+          .refine(
+            (val) => !val || val.startsWith("/") || /^https?:\/\//.test(val),
+            "Format URL atau file foto kisah cinta tidak valid"
+          )
+          .optional()
+          .nullable()
+          .or(z.literal("")),
       })
     )
     .optional()
@@ -155,14 +165,14 @@ export const wishSchema = z.object({
 });
 
 export const registerSchema = z.object({
-  name: z.string().min(2, "Nama minimal 2 karakter").max(100),
-  email: z.string().email("Format email tidak valid").toLowerCase(),
+  name: z.string().trim().min(2, "Nama minimal 2 karakter").max(100),
+  email: z.string().trim().min(1, "Email wajib diisi").email("Format email tidak valid").toLowerCase(),
   password: z.string().min(6, "Password minimal 6 karakter").max(100),
   plan: z.enum(["STARTER", "ELEGANT", "ULTIMATE"]).optional().nullable(),
 });
 
 export const loginSchema = z.object({
-  email: z.string().email("Format email tidak valid").toLowerCase(),
+  email: z.string().trim().min(1, "Email wajib diisi").email("Format email tidak valid").toLowerCase(),
   password: z.string().min(1, "Password wajib diisi"),
 });
 

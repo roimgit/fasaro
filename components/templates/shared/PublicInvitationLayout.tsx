@@ -99,6 +99,16 @@ export const PublicInvitationLayout: React.FC<PublicInvitationLayoutProps> = ({
     window.dispatchEvent(new CustomEvent("fasaro:music-toggle"));
   };
 
+  const getYouTubeVideoId = (url?: string | null): string | null => {
+    if (!url) return null;
+    const regExp = /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/;
+    const match = url.match(regExp);
+    return match ? match[1] : null;
+  };
+
+  const rawYoutubeUrl = data.youtubeVideoUrl || data.coupleInfo.youtubeVideoUrl;
+  const youtubeCoverId = data.coupleInfo.useVideoAsDesktopCover ? getYouTubeVideoId(rawYoutubeUrl) : null;
+
   // Prewedding Hero Image: Prefer custom desktop cover, then couple photos, then gallery
   const heroImage =
     data.coupleInfo.desktopCoverImage ||
@@ -135,20 +145,34 @@ export const PublicInvitationLayout: React.FC<PublicInvitationLayoutProps> = ({
       {/* 1. DESKTOP LEFT PANE (STICKY SHOWCASE / SISI KIRI)       */}
       {/* ========================================================= */}
       <aside className="hidden lg:flex lg:w-1/2 xl:w-[55%] sticky top-0 h-screen overflow-hidden flex-col justify-between p-8 xl:p-10 select-none z-10">
-        {/* Background Photo */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src={heroImage}
-            alt={`${groomDisplay} & ${brideDisplay}`}
-            fill
-            priority
-            sizes="(min-width: 1024px) 55vw, 100vw"
-            className="object-cover object-center scale-105 transition-transform duration-1000"
-          />
-          {/* Subtle Dark Vignette / Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/45" />
-          <div className="absolute inset-0 bg-black/20" />
-        </div>
+        {/* Background Media: YouTube Video Teaser or Hero Image */}
+        {youtubeCoverId ? (
+          <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+            <iframe
+              src={`https://www.youtube-nocookie.com/embed/${youtubeCoverId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${youtubeCoverId}&playsinline=1&modestbranding=1&rel=0`}
+              title="Background Video Teaser"
+              className="absolute top-1/2 left-1/2 w-[300%] h-[300%] min-w-full min-h-full -translate-x-1/2 -translate-y-1/2 object-cover pointer-events-none"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            />
+            {/* Subtle Dark Vignette / Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/50" />
+            <div className="absolute inset-0 bg-black/25" />
+          </div>
+        ) : (
+          <div className="absolute inset-0 z-0">
+            <Image
+              src={heroImage}
+              alt={`${groomDisplay} & ${brideDisplay}`}
+              fill
+              priority
+              sizes="(min-width: 1024px) 55vw, 100vw"
+              className="object-cover object-center scale-105 transition-transform duration-1000"
+            />
+            {/* Subtle Dark Vignette / Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/45" />
+            <div className="absolute inset-0 bg-black/20" />
+          </div>
+        )}
 
         {/* Falling Sakura Petals Animation */}
         <div className="absolute inset-0 pointer-events-none z-1 overflow-hidden">

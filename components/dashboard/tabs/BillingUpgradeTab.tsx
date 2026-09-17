@@ -169,6 +169,7 @@ export const BillingUpgradeTab: React.FC<BillingUpgradeTabProps> = ({
   // Fetch payment history
   useEffect(() => {
     let ignore = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLoadingHistory(true);
     fetch("/api/dashboard/payments")
       .then((res) => (res.ok ? res.json() : null))

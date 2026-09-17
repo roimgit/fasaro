@@ -18,7 +18,7 @@ const ALLOWED_IMAGE_MIME_TYPES = new Set([
 
 const ALLOWED_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif"]);
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
-const ALLOWED_FOLDERS = new Set(["couples", "qris", "galleries", "proofs"]);
+const ALLOWED_FOLDERS = new Set(["couples", "qris", "galleries", "proofs", "stories"]);
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
@@ -63,6 +63,20 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         {
           success: false,
           error: "Ukuran gambar terlalu besar. Maksimal 10MB.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Batas maksimal 1MB khusus untuk foto galeri & foto mempelai
+    if (
+      (folder === "couples" || folder === "galleries") &&
+      file.size > 1.15 * 1024 * 1024
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Ukuran foto galeri dan foto mempelai maksimal 1MB.",
         },
         { status: 400 }
       );

@@ -76,6 +76,7 @@ export default function UserAdminPanel() {
   const [bridePhoto, setBridePhoto] = useState("");
   const [greetingMessage, setGreetingMessage] = useState("");
   const [desktopCoverImage, setDesktopCoverImage] = useState("");
+  const [useVideoAsDesktopCover, setUseVideoAsDesktopCover] = useState(false);
 
   // Schedules
   const [schedules, setSchedules] = useState<
@@ -111,7 +112,7 @@ export default function UserAdminPanel() {
 
   // Stories
   const [stories, setStories] = useState<
-    Array<{ date: string; title: string; story: string }>
+    Array<{ date: string; title: string; story: string; imageUrl?: string }>
   >([]);
 
   // Guests & RSVPs
@@ -169,6 +170,7 @@ export default function UserAdminPanel() {
           setBridePhoto(c.bridePhoto || "");
           setGreetingMessage(c.greetingMessage || "");
           setDesktopCoverImage(c.desktopCoverImage || "");
+          setUseVideoAsDesktopCover(Boolean(c.useVideoAsDesktopCover));
           setStories(Array.isArray(c.stories) ? c.stories : []);
 
           setMusicUrl(data.musicUrl || c.musicUrl || "");
@@ -336,7 +338,19 @@ export default function UserAdminPanel() {
         bridePhoto: bridePhoto || undefined,
         greetingMessage: greetingMessage || undefined,
         desktopCoverImage: desktopCoverImage || undefined,
-        stories: stories.length > 0 ? stories : undefined,
+        useVideoAsDesktopCover: Boolean(useVideoAsDesktopCover),
+        stories:
+          stories.length > 0
+            ? stories.map((s) => ({
+                date: s.date,
+                title: s.title,
+                story: s.story,
+                imageUrl:
+                  tier === "STARTER" && !isAdmin
+                    ? undefined
+                    : s.imageUrl?.trim() || undefined,
+              }))
+            : undefined,
         musicUrl: musicUrl || undefined,
         youtubeVideoUrl: youtubeVideoUrl || undefined,
       },
@@ -569,6 +583,7 @@ export default function UserAdminPanel() {
       bridePhoto: bridePhoto || undefined,
       greetingMessage,
       desktopCoverImage: desktopCoverImage || undefined,
+      useVideoAsDesktopCover: Boolean(useVideoAsDesktopCover),
       stories,
     },
     isActive,
@@ -812,6 +827,8 @@ export default function UserAdminPanel() {
             setGreetingMessage={setGreetingMessage}
             desktopCoverImage={desktopCoverImage}
             setDesktopCoverImage={setDesktopCoverImage}
+            useVideoAsDesktopCover={useVideoAsDesktopCover}
+            setUseVideoAsDesktopCover={setUseVideoAsDesktopCover}
             schedules={schedules}
             setSchedules={setSchedules}
             galleries={galleries}
@@ -844,10 +861,10 @@ export default function UserAdminPanel() {
                 setActiveTab("billing");
                 return;
               }
-              if (tier === "FREE" && newThemeId !== "minimalist") {
+              if ((tier === "STARTER" || tier === "FREE") && newThemeId !== "minimalist" && !isAdmin) {
                 setNotification({
                   type: "error",
-                  message: "Tema ini khusus untuk paket berbayar. Silakan upgrade paket untuk memilih tema ini.",
+                  message: "Paket Starter hanya dapat menggunakan 1 pilihan tema (Clean Minimalist). Silakan upgrade ke Paket Elegant atau Ultimate untuk membuka seluruh koleksi tema.",
                 });
                 setActiveTab("billing");
                 return;

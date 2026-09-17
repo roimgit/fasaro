@@ -1,3 +1,10 @@
+export interface StoryItem {
+  date: string;
+  title: string;
+  story: string;
+  imageUrl?: string | null;
+}
+
 export interface CoupleInfo {
   groomName: string;
   groomNickname?: string | null;
@@ -12,10 +19,11 @@ export interface CoupleInfo {
   brideInstagram?: string | null;
   bridePhoto?: string | null;
   greetingMessage?: string | null;
-  stories?: Array<{ date: string; title: string; story: string }> | null;
+  stories?: StoryItem[] | null;
   musicUrl?: string | null;
   youtubeVideoUrl?: string | null;
   desktopCoverImage?: string | null;
+  useVideoAsDesktopCover?: boolean | null;
 }
 
 
@@ -67,6 +75,7 @@ export interface WeddingInvitationData {
   galleries: GalleryItem[];
   bankAccounts: BankAccountItem[];
   musicUrl?: string | null;
+  youtubeVideoUrl?: string | null;
   wishes?: WishItem[];
 }
 
