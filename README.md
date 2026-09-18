@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Fasaro Wedding Platform — Monorepo
 
-## Getting Started
+Arsitektur aplikasi terpisah sejajar menjadi **Backend (Express.js)** dan **Frontend (Next.js 16)** di bawah root folder `fasaro`.
 
-First, run the development server:
+## 📁 Struktur Monorepo
+
+```
+fasaro/
+├── backend/                  # Dedicated Express.js REST API
+│   ├── prisma/               # Prisma schema, migrations & seed
+│   ├── src/
+│   │   ├── config/           # Prisma client, constants
+│   │   ├── controllers/      # REST API Controllers (Auth, Public, Dashboard, Admin, Payment, Upload)
+│   │   ├── middleware/       # Auth JWT, rate limit, error handler
+│   │   ├── routes/           # Express Route definitions
+│   │   ├── services/         # Supabase, Midtrans, Google Auth, Settings
+│   │   ├── utils/            # Validations, Quotes
+│   │   └── server.ts         # Express server (Port 5000)
+│   ├── .env                  # Backend Environment variables
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── frontend/                 # Next.js 16 UI (App Router)
+│   ├── app/                  # Next.js pages & layouts (Port 3000)
+│   ├── components/           # UI Components (Admin, Dashboard, Templates, Marketing)
+│   ├── lib/                  # Client/SSR helpers (Auth JWT reader, sanitizers)
+│   ├── public/               # Static assets & PWA manifest
+│   ├── next.config.ts        # Reverse proxy rewrites (/api & /uploads -> Port 5001)
+│   ├── .env.local            # Frontend Environment variables
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── package.json              # Monorepo workspace orchestrator
+└── README.md
+```
+
+## 🚀 Menjalankan Server Pengembangan (Dev)
+
+Jalankan kedua service (Backend & Frontend) secara bersamaan dari root folder:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Atau jalankan masing-masing service secara terpisah:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Terminal 1: Backend Express (Port 5001)
+npm run dev:backend
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Terminal 2: Frontend Next.js (Port 3000)
+npm run dev:frontend
+```
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+## 🛠️ Perintah Berguna Lainnya
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+# Typecheck seluruh monorepo (Frontend + Backend)
+npm run typecheck
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Build seluruh monorepo
+npm run build
 
-## Deploy on Vercel
+# Database commands (di folder backend)
+cd backend
+npm run db:push      # Push schema ke database
+npm run db:seed      # Seed initial demo data
+npm run db:studio    # Buka Prisma Studio GUI
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
